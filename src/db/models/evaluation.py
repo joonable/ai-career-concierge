@@ -1,0 +1,51 @@
+from __future__ import annotations
+
+import uuid
+from datetime import datetime, timezone
+from typing import Optional
+
+from sqlalchemy import Column, DateTime, Enum as SQLEnum, ForeignKey, Integer, String, Text, UniqueConstraint
+from sqlmodel import Field, SQLModel
+
+from db.enums import EvaluationStatus, FeedbackState
+
+
+def utc_now() -> datetime:
+    return datetime.now(timezone.utc)
+
+
+class Evaluation(SQLModel, table=True):
+    __tablename__ = "evaluations"
+    __table_args__ = (UniqueConstraint("user_id", "job_id", name="uq_evaluations_user_job"),)
+
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    user_id: uuid.UUID = Field(
+        sa_column=Column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    )
+    job_id: uuid.UUID = Field(
+        sa_column=Column(ForeignKey("jobs.id", ondelete="CASCADE"), nullable=False, index=True)
+    )
+    status: EvaluationStatus = Field(
+        default=EvaluationStatus.PENDING,
+        sa_column=Column(
+            SQLEnum(EvaluationStatus, native_enum=False, length=32),
+            nullable=False,
+            default=EvaluationStatus.PENDING,
+        ),
+    )
+    fit_score: Optional[int] = Field(default=None, sa_column=Column(Integer, nullable=True))
+    reasoning: Optional[str] = Field(default=None, sa_column=Column(Text, nullable=True))
+    rule_rejection_reason: Optional[str] = Field(default=None, sa_column=Column(String(255), nullable=True))
+    user_feedback: Optional[FeedbackState] = Field(
+        default=None,
+        sa_column=Column(SQLEnum(FeedbackState, native_enum=False, length=16), nullable=True),
+    )
+    feedback_reason: Optional[str] = Field(default=None, sa_column=Column(Text, nullable=True))
+    created_at: datetime = Field(
+        default_factory=utc_now,
+        sa_column=Column(DateTime(timezone=True), nullable=False),
+    )
+    updated_at: datetime = Field(
+        default_factory=utc_now,
+        sa_column=Column(DateTime(timezone=True), nullable=False),
+    )

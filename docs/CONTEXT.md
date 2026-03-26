@@ -36,6 +36,25 @@ The PoC should support the core loop end to end:
 - Scheduler: GitHub Actions cron trigger
 - Tracing: LangSmith
 
+## Current Implementation Layout
+
+The repository keeps the backend in a Python `src/*` layout and isolates the frontend in `apps/web`.
+
+- `apps/web`
+  - Next.js App Router, auth entry routes, onboarding form, and dashboard shell
+- `src/api`
+  - FastAPI routes, schemas, dependencies, thin application services
+- `src/agent`
+  - LangGraph workflow, node implementations, prompts, typed pipeline state
+- `src/scraper`
+  - base scraper interface, normalizer, source registry, source-specific scrapers
+- `src/db`
+  - SQLModel models, repositories, session setup, Alembic migrations
+- `src/common`
+  - typed config, logging, telemetry, ids, and shared errors
+- `tests`
+  - unit, integration, contract, and resilience tests
+
 ## Core Business Logic
 
 ### Stage 1: Rule-Based Filter
@@ -121,6 +140,15 @@ Expected node flow:
 - `GET /api/v1/users/me/dashboard`
   - Returns personalized recommendation data for the dashboard
 
+### Scaffold Endpoints Added For The PoC Loop
+
+- `GET /api/v1/users/me/profile`
+  - Returns the current user profile and notification settings
+- `PUT /api/v1/users/me/profile`
+  - Updates profile data, guidelines, and notification settings
+- `POST /api/v1/evaluations/{evaluation_id}/feedback`
+  - Stores like or dislike feedback from the dashboard flow
+
 ## Definition Of Done
 
 - A feature is not complete until code, automated tests, and affected docs or config references are updated together.
@@ -176,6 +204,12 @@ Expected node flow:
 - Keep environment variables explicitly split so local development cannot accidentally point to prod resources.
 - Treat scheduled pipeline execution as prod-only by default unless a dedicated dev schedule is intentionally configured.
 - Standardize on `APP_ENV` plus separate `.env.development`, `.env.test`, and `.env.production` files.
+
+Current scaffold defaults:
+
+- `DATABASE_URL` defaults to local SQLite for safe development bootstrapping.
+- `ALLOW_DEV_SCHEDULE=false` keeps non-prod scheduling disabled unless explicitly enabled.
+- The web app reads `NEXT_PUBLIC_API_BASE_URL`, `NEXT_PUBLIC_SUPABASE_URL`, and `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
 
 ## Guardrails For Future Work
 
