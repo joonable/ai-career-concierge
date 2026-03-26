@@ -6,10 +6,10 @@ AI Career Concierge is a PoC job-matching system that ingests job postings, filt
 
 Read project guidance in this order:
 
-1. [`docs/CONTEXT.md`](/Users/joon/PycharmProjects/ai-career-concierge/docs/CONTEXT.md)
-2. [`docs/TRD.md`](/Users/joon/PycharmProjects/ai-career-concierge/docs/TRD.md)
-3. [`docs/PRD.md`](/Users/joon/PycharmProjects/ai-career-concierge/docs/PRD.md)
-4. [`AGENTS.md`](/Users/joon/PycharmProjects/ai-career-concierge/AGENTS.md)
+1. [`docs/CONTEXT.md`](docs/CONTEXT.md)
+2. [`docs/TRD.md`](docs/TRD.md)
+3. [`docs/PRD.md`](docs/PRD.md)
+4. [`AGENTS.md`](AGENTS.md)
 
 ## Environment Setup
 

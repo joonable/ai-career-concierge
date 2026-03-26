@@ -121,6 +121,24 @@ Expected node flow:
 - `GET /api/v1/users/me/dashboard`
   - Returns personalized recommendation data for the dashboard
 
+## Definition Of Done
+
+- A feature is not complete until code, automated tests, and affected docs or config references are updated together.
+- If behavior changes, logging and error handling should be reviewed as part of the same delivery.
+- Implementation-only work is not considered complete.
+
+## Migration Guardrails
+
+- Treat schema changes as contract changes.
+- Keep database schema, application models, lifecycle enums, and affected docs or tests in sync.
+- Any meaningful schema change should include a migration path and a rollback or compatibility consideration.
+
+## API Change Guardrails
+
+- Treat request and response schemas, auth behavior, webhook payloads, and status enums as stable contracts.
+- If an API contract changes, update docs and automated tests in the same change.
+- Check downstream impact on the dashboard, Slack flows, and scheduled pipeline triggers before finalizing the change.
+
 ## Delivery Requirements
 
 - Primary notification channel is Slack.
@@ -138,6 +156,17 @@ Expected node flow:
 - Operational failures should be stored in `System_Log`.
 - Important failures should be reportable to an admin Slack channel such as `#system-alerts`.
 
+## Observability Guardrails
+
+- Each pipeline run should be traceable with a `run_id` or `trace_id`.
+- Important logs should capture the relevant subset of `user_id`, `job_id`, `platform`, `status`, and `error_type`.
+- Scraper failures, evaluation state transitions, LLM calls, Slack delivery, and webhook actions should be observable without exposing secrets or unnecessary PII.
+
+## Prompt Management Guardrails
+
+- Keep prompts modular and traceable instead of scattering them inline across the codebase.
+- If a structured output schema changes, update the prompt instructions, parser or validator logic, and tests together.
+
 ## Environment Strategy
 
 - Separate dev and prod environments from the start.
@@ -146,7 +175,7 @@ Expected node flow:
 - Never share database, Slack workspace, OAuth credentials, or API keys between dev and prod.
 - Keep environment variables explicitly split so local development cannot accidentally point to prod resources.
 - Treat scheduled pipeline execution as prod-only by default unless a dedicated dev schedule is intentionally configured.
-- Prefer naming that makes environment targets obvious, for example `SUPABASE_URL_DEV` at setup time or separate `.env.development` and `.env.production` files at app level.
+- Standardize on `APP_ENV` plus separate `.env.development`, `.env.test`, and `.env.production` files.
 
 ## Guardrails For Future Work
 
@@ -155,6 +184,9 @@ Expected node flow:
 - Do not depend on fragile scraper success for overall pipeline completion.
 - Keep schemas and APIs aligned with the feedback-driven recommendation loop.
 - Prefer structured outputs and typed models over free-form parsing.
+- Treat test coverage as part of feature delivery, not as follow-up work.
+- Any meaningful feature implementation or behavior change should ship with automated tests that cover the expected behavior.
+- Bug fixes should add or update regression tests whenever practical.
 
 ## Deferred Or Later-Phase Ideas
 
@@ -170,3 +202,4 @@ When making implementation decisions, prefer the simplest design that preserves:
 - low LLM cost
 - feedback-aware recommendation quality
 - future extensibility into a SaaS architecture
+- a default Python `src/*` repository layout until a multi-app split is clearly necessary

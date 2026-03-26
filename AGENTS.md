@@ -10,9 +10,9 @@ The current phase is a **single-user PoC**. All implementation decisions should 
 
 When working in this repository, use documents in this order:
 
-1. [`docs/CONTEXT.md`](/Users/joon/PycharmProjects/ai-career-concierge/docs/CONTEXT.md)
-2. [`docs/TRD.md`](/Users/joon/PycharmProjects/ai-career-concierge/docs/TRD.md)
-3. [`docs/PRD.md`](/Users/joon/PycharmProjects/ai-career-concierge/docs/PRD.md)
+1. [`docs/CONTEXT.md`](docs/CONTEXT.md)
+2. [`docs/TRD.md`](docs/TRD.md)
+3. [`docs/PRD.md`](docs/PRD.md)
 
 If there is a conflict:
 
@@ -75,33 +75,31 @@ Operational rule:
 
 Prefer a repository layout that matches the system layers from the TRD and keeps boundaries obvious.
 
-Recommended top-level structure as the codebase grows:
+Default implementation layout for the current repository:
 
-- `apps/web`
-  - Next.js frontend for dashboard and onboarding
-- `apps/api`
-  - FastAPI backend for API routes, orchestration entrypoints, and integration handlers
-- `packages/agent`
+- `src/api`
+  - FastAPI routes, orchestration entrypoints, auth, and integration handlers
+- `src/agent`
   - LangGraph workflow, prompt builders, evaluation schemas, and node implementations
-- `packages/scraper`
+- `src/scraper`
   - Playwright-based ingestion logic and source-specific scrapers
-- `packages/db`
+- `src/db`
   - SQLModel models, migrations, repository helpers, and DB setup
-- `packages/common`
+- `src/common`
   - shared config, logging, constants, and typed utility modules
 - `tests`
-  - cross-package integration and end-to-end tests
+  - unit, integration, contract, and end-to-end tests
 - `docs`
   - product and technical documentation
 
-If the project stays single-runtime Python for a while, an acceptable interim layout is:
+If the project later grows into a multi-app repository, it may evolve into a structure such as:
 
-- `src/api`
-- `src/agent`
-- `src/scraper`
-- `src/db`
-- `src/common`
-- `tests`
+- `apps/web`
+- `apps/api`
+- `packages/agent`
+- `packages/scraper`
+- `packages/db`
+- `packages/common`
 
 Folder rules:
 
@@ -171,6 +169,14 @@ Important invariants:
 - Rule-based rejections must still be persisted as evaluation state.
 - Dislike feedback should be storable with a reason when available.
 
+## Migration Rules
+
+- Treat database schema changes as contract changes, not local refactors.
+- Any schema change should include a forward migration and a documented rollback or compatibility plan.
+- Keep SQLModel models, database schema, status enums, and API-facing assumptions in sync.
+- If a schema change affects API responses, evaluation lifecycle, or feedback behavior, update tests and docs in the same change.
+- Prefer additive or staged migrations when compatibility matters more than cleanup speed.
+
 ## Required External Interfaces
 
 Maintain compatibility with these endpoints:
@@ -180,6 +186,13 @@ Maintain compatibility with these endpoints:
 - `GET /api/v1/users/me/dashboard`
 
 `POST /api/v1/pipeline/trigger` must validate internal `X-API-Key`.
+
+## API Change Rules
+
+- Treat request and response schemas, auth behavior, webhook payloads, and public status enums as public contracts.
+- Any API contract change must update typed schemas, handlers, docs, and automated tests in the same change.
+- Breaking changes must be called out explicitly in the final summary or change notes.
+- Check downstream impact on the dashboard, Slack integration, scheduler triggers, and stored evaluation data before finalizing a contract change.
 
 ## Configuration And Environment Variable Rules
 
@@ -202,7 +215,7 @@ Naming rules:
   - `SUPABASE_ANON_KEY`
   - `SLACK_BOT_TOKEN`
 - Use `APP_ENV` to indicate active runtime environment, with values such as `development`, `test`, or `production`.
-- Prefer separate env files like `.env.development` and `.env.production` over suffixing every variable with `_DEV` and `_PROD` inside application code.
+- Prefer separate env files like `.env.development`, `.env.test`, and `.env.production` over suffixing every variable with environment names inside application code.
 - Reserve explicit suffixes like `_TEST` only for isolated test configuration when needed.
 
 Secret handling rules:
@@ -211,6 +224,20 @@ Secret handling rules:
 - Never commit real `.env` files.
 - Never reuse prod secrets in development or tests.
 - Treat service role keys and webhook signing secrets as high sensitivity.
+
+## Prompt Management Rules
+
+- Keep prompts in dedicated modules or templates, not scattered inline across routes, services, or tests.
+- Name prompts by purpose so prompt usage stays traceable as behaviors evolve.
+- Keep prompt instructions, structured output schema, parsing logic, and validation tests aligned in the same change.
+- Any structured output schema change must update prompt text, parser or validator logic, and automated tests together.
+
+## Observability Rules
+
+- Emit a traceable `run_id` or `trace_id` for each pipeline run and reuse it across child operations when possible.
+- Structured logs for pipeline activity should include the relevant subset of `run_id`, `user_id`, `job_id`, `platform`, `status`, and `error_type`.
+- Log scraper failures, evaluation state transitions, LLM calls, Slack delivery attempts, and webhook actions in a structured form.
+- Do not log secrets, access tokens, raw webhook signatures, or unnecessary personally identifiable information.
 
 ## Reliability Requirements
 
@@ -274,9 +301,22 @@ Test shape guidance:
 
 Minimum expectation for new feature work:
 
+- Any meaningful feature development must include automated tests that cover the delivered behavior.
 - New business logic should ship with at least one automated test unless the code is temporary scaffolding.
 - Bug fixes should include a regression test when practical.
 - If a test is intentionally skipped, document why in the final update.
+
+## Definition Of Done
+
+A feature or bug fix is not done until the relevant change includes:
+
+- implementation code
+- automated tests for the delivered behavior
+- documentation or contract updates when behavior or interfaces changed
+- environment variable or config template updates when setup changed
+- logging and error-handling review for the new or changed execution path
+
+Implementation-only changes are not considered complete delivery.
 
 ## Working Norms For Agents
 
