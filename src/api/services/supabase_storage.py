@@ -8,6 +8,7 @@ from uuid import UUID, uuid4
 import httpx
 from fastapi import HTTPException, status
 
+from agent.schemas.pipeline_job import PipelineJob
 from api.dependencies.auth import UserIdentity
 from api.schemas.users import (
     Guidelines,
@@ -17,7 +18,8 @@ from api.schemas.users import (
     UserProfileResponse,
 )
 from common.config import Settings
-from db.enums import FeedbackState
+from db.enums import EvaluationStatus, FeedbackState, LogLevel
+from scraper.base import ScrapedJob
 
 
 def utc_now_iso() -> str:
@@ -44,6 +46,32 @@ class FeedbackRecord:
     evaluation_id: UUID
     feedback: FeedbackState
     feedback_reason: Optional[str]
+
+
+@dataclass
+class EvaluationRecord:
+    id: UUID
+    user_id: UUID
+    job_id: UUID
+    status: EvaluationStatus
+    fit_score: Optional[int]
+    reasoning: Optional[str]
+    rule_rejection_reason: Optional[str]
+    user_feedback: Optional[FeedbackState]
+    feedback_reason: Optional[str]
+
+
+@dataclass
+class SystemLogRecord:
+    id: UUID
+    run_id: str
+    event_type: str
+    level: LogLevel
+    message: str
+    user_id: Optional[UUID]
+    job_id: Optional[UUID]
+    platform: Optional[str]
+    event_metadata: Dict[str, Any]
 
 
 class SupabaseRestClient:
@@ -165,9 +193,18 @@ class SupabaseUserStore:
         )[0]
         return self._to_profile_response(updated)
 
-    def list_all_ids(self) -> List[UUID]:
-        rows = self.client.select("users", params={"select": "id"})
-        return [UUID(str(row["id"])) for row in rows]
+    def get_user_by_id(self, user_id: UUID) -> Optional[UserProfileResponse]:
+        rows = self.client.select(
+            "users",
+            params={"id": f"eq.{user_id}", "select": "*", "limit": "1"},
+        )
+        if not rows:
+            return None
+        return self._to_profile_response(rows[0])
+
+    def list_all_users(self) -> List[UserProfileResponse]:
+        rows = self.client.select("users", params={"select": "*"})
+        return [self._to_profile_response(row) for row in rows]
 
     def _find_by_oauth_or_email(self, oauth_id: str, email: str) -> Optional[Dict[str, Any]]:
         by_oauth = self.client.select(
@@ -273,4 +310,258 @@ class SupabaseEvaluationStore:
             evaluation_id=UUID(str(row["id"])),
             feedback=FeedbackState(str(row["user_feedback"])),
             feedback_reason=row.get("feedback_reason"),
+        )
+
+    def get_by_user_and_job(self, user_id: UUID, job_id: UUID) -> Optional[EvaluationRecord]:
+        rows = self.client.select(
+            "evaluations",
+            params={
+                "user_id": f"eq.{user_id}",
+                "job_id": f"eq.{job_id}",
+                "select": "*",
+                "limit": "1",
+            },
+        )
+        if not rows:
+            return None
+        return self._to_evaluation_record(rows[0])
+
+    def ensure_pending(self, user_id: UUID, job_id: UUID) -> EvaluationRecord:
+        existing = self.get_by_user_and_job(user_id, job_id)
+        payload = {
+            "status": EvaluationStatus.PENDING.value,
+            "rule_rejection_reason": None,
+            "updated_at": utc_now_iso(),
+        }
+        if existing is None:
+            created = self.client.insert(
+                "evaluations",
+                [
+                    {
+                        "id": str(uuid4()),
+                        "user_id": str(user_id),
+                        "job_id": str(job_id),
+                        "status": EvaluationStatus.PENDING.value,
+                        "created_at": utc_now_iso(),
+                        "updated_at": utc_now_iso(),
+                    }
+                ],
+            )[0]
+            return self._to_evaluation_record(created)
+
+        updated = self.client.update(
+            "evaluations",
+            payload,
+            params={"id": f"eq.{existing.id}"},
+        )[0]
+        return self._to_evaluation_record(updated)
+
+    def mark_rule_rejected(self, user_id: UUID, job_id: UUID, reason: str) -> EvaluationRecord:
+        existing = self.get_by_user_and_job(user_id, job_id)
+        payload = {
+            "status": EvaluationStatus.RULE_REJECTED.value,
+            "rule_rejection_reason": reason,
+            "fit_score": None,
+            "reasoning": None,
+            "updated_at": utc_now_iso(),
+        }
+        if existing is None:
+            created = self.client.insert(
+                "evaluations",
+                [
+                    {
+                        "id": str(uuid4()),
+                        "user_id": str(user_id),
+                        "job_id": str(job_id),
+                        "status": EvaluationStatus.RULE_REJECTED.value,
+                        "rule_rejection_reason": reason,
+                        "created_at": utc_now_iso(),
+                        "updated_at": utc_now_iso(),
+                    }
+                ],
+            )[0]
+            return self._to_evaluation_record(created)
+
+        updated = self.client.update(
+            "evaluations",
+            payload,
+            params={"id": f"eq.{existing.id}"},
+        )[0]
+        return self._to_evaluation_record(updated)
+
+    def mark_llm_evaluated(
+        self,
+        user_id: UUID,
+        job_id: UUID,
+        fit_score: int,
+        reasoning: str,
+    ) -> EvaluationRecord:
+        existing = self.get_by_user_and_job(user_id, job_id)
+        payload = {
+            "status": EvaluationStatus.LLM_EVALUATED.value,
+            "fit_score": fit_score,
+            "reasoning": reasoning,
+            "rule_rejection_reason": None,
+            "updated_at": utc_now_iso(),
+        }
+        if existing is None:
+            created = self.client.insert(
+                "evaluations",
+                [
+                    {
+                        "id": str(uuid4()),
+                        "user_id": str(user_id),
+                        "job_id": str(job_id),
+                        "status": EvaluationStatus.LLM_EVALUATED.value,
+                        "fit_score": fit_score,
+                        "reasoning": reasoning,
+                        "created_at": utc_now_iso(),
+                        "updated_at": utc_now_iso(),
+                    }
+                ],
+            )[0]
+            return self._to_evaluation_record(created)
+
+        updated = self.client.update(
+            "evaluations",
+            payload,
+            params={"id": f"eq.{existing.id}"},
+        )[0]
+        return self._to_evaluation_record(updated)
+
+    def list_recent_dislikes(self, user_id: UUID, limit: int = 10) -> List[str]:
+        rows = self.client.select(
+            "evaluations",
+            params={
+                "user_id": f"eq.{user_id}",
+                "user_feedback": f"eq.{FeedbackState.DISLIKE.value}",
+                "feedback_reason": "not.is.null",
+                "select": "feedback_reason",
+                "order": "updated_at.desc",
+                "limit": str(limit),
+            },
+        )
+        return [str(row["feedback_reason"]) for row in rows if row.get("feedback_reason")]
+
+    @staticmethod
+    def _to_evaluation_record(row: Dict[str, Any]) -> EvaluationRecord:
+        user_feedback = row.get("user_feedback")
+        return EvaluationRecord(
+            id=UUID(str(row["id"])),
+            user_id=UUID(str(row["user_id"])),
+            job_id=UUID(str(row["job_id"])),
+            status=EvaluationStatus(str(row["status"])),
+            fit_score=row.get("fit_score"),
+            reasoning=row.get("reasoning"),
+            rule_rejection_reason=row.get("rule_rejection_reason"),
+            user_feedback=FeedbackState(str(user_feedback)) if user_feedback else None,
+            feedback_reason=row.get("feedback_reason"),
+        )
+
+
+class SupabaseJobStore:
+    def __init__(self, client: SupabaseRestClient):
+        self.client = client
+
+    def upsert_job(self, scraped_job: ScrapedJob) -> PipelineJob:
+        existing = self.client.select(
+            "jobs",
+            params={
+                "platform": f"eq.{scraped_job.platform}",
+                "external_job_id": f"eq.{scraped_job.external_job_id}",
+                "select": "*",
+                "limit": "1",
+            },
+        )
+        payload = {
+            "platform": scraped_job.platform,
+            "external_job_id": scraped_job.external_job_id,
+            "title": scraped_job.title,
+            "company": scraped_job.company,
+            "jd_raw_text": scraped_job.jd_raw_text,
+            "url": scraped_job.url,
+            "min_years_experience": scraped_job.min_years_experience,
+            "max_years_experience": scraped_job.max_years_experience,
+            "source_metadata": scraped_job.source_metadata,
+            "updated_at": utc_now_iso(),
+        }
+        if not existing:
+            row = self.client.insert(
+                "jobs",
+                [
+                    {
+                        "id": str(uuid4()),
+                        "created_at": utc_now_iso(),
+                        **payload,
+                    }
+                ],
+            )[0]
+            return self._to_pipeline_job(row)
+
+        row = self.client.update(
+            "jobs",
+            payload,
+            params={"id": f"eq.{existing[0]['id']}"},
+        )[0]
+        return self._to_pipeline_job(row)
+
+    @staticmethod
+    def _to_pipeline_job(row: Dict[str, Any]) -> PipelineJob:
+        return PipelineJob(
+            job_id=UUID(str(row["id"])),
+            platform=row["platform"],
+            external_job_id=row["external_job_id"],
+            title=row["title"],
+            company=row["company"],
+            jd_raw_text=row["jd_raw_text"],
+            url=row["url"],
+            min_years_experience=row.get("min_years_experience"),
+            max_years_experience=row.get("max_years_experience"),
+            source_metadata=row.get("source_metadata") or {},
+        )
+
+
+class SupabaseSystemLogStore:
+    def __init__(self, client: SupabaseRestClient):
+        self.client = client
+
+    def create(
+        self,
+        *,
+        run_id: str,
+        event_type: str,
+        message: str,
+        level: LogLevel = LogLevel.INFO,
+        user_id: Optional[UUID] = None,
+        job_id: Optional[UUID] = None,
+        platform: Optional[str] = None,
+        metadata: Optional[Dict[str, Any]] = None,
+    ) -> SystemLogRecord:
+        row = self.client.insert(
+            "system_logs",
+            [
+                {
+                    "id": str(uuid4()),
+                    "run_id": run_id,
+                    "event_type": event_type,
+                    "level": level.value,
+                    "message": message,
+                    "user_id": str(user_id) if user_id else None,
+                    "job_id": str(job_id) if job_id else None,
+                    "platform": platform,
+                    "metadata": metadata or {},
+                    "created_at": utc_now_iso(),
+                }
+            ],
+        )[0]
+        return SystemLogRecord(
+            id=UUID(str(row["id"])),
+            run_id=row["run_id"],
+            event_type=row["event_type"],
+            level=LogLevel(str(row["level"])),
+            message=row["message"],
+            user_id=UUID(str(row["user_id"])) if row.get("user_id") else None,
+            job_id=UUID(str(row["job_id"])) if row.get("job_id") else None,
+            platform=row.get("platform"),
+            event_metadata=row.get("metadata") or {},
         )

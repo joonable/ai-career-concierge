@@ -47,14 +47,13 @@ The repository keeps the backend in a Python `src/*` layout and isolates the fro
   - `src/lib` holds Supabase auth helpers, API client code, and frontend runtime adapters
 - `src/api`
   - FastAPI routes, schemas, dependencies, thin application services
-  - User-facing auth/profile/dashboard/feedback flows use Supabase Auth plus the Supabase Data API
+  - Auth, profile, dashboard, feedback, and pipeline runtime use Supabase Auth plus the Supabase Data API
 - `src/agent`
   - LangGraph workflow, node implementations, prompts, typed pipeline state
 - `src/scraper`
   - base scraper interface, normalizer, source registry, source-specific scrapers
 - `src/db`
-  - SQLModel models, repositories, session setup, Alembic migrations
-  - Still used for pipeline-oriented persistence and schema ownership
+  - Legacy SQLModel models, repository history, and schema references retained during the PoC transition
 - `src/common`
   - typed config, logging, telemetry, ids, and shared errors
 - `tests`
@@ -162,7 +161,7 @@ Expected node flow:
 - Protected web routes such as `/onboarding` and `/dashboard` require a valid Supabase session.
 - Backend user endpoints require `Authorization: Bearer <Supabase access token>`.
 - Backend authentication verifies Supabase JWTs against the project JWKS and extracts `sub` plus `email`.
-- Backend user/profile/dashboard/feedback routes currently persist through the Supabase Data API using `SUPABASE_SERVICE_ROLE_KEY`.
+- Backend auth-adjacent routes and pipeline persistence currently use the Supabase Data API with `SUPABASE_SERVICE_ROLE_KEY`.
 
 ## Definition Of Done
 
@@ -223,8 +222,8 @@ Expected node flow:
 
 Current scaffold defaults:
 
-- `SUPABASE_URL`, `SUPABASE_ANON_KEY`, and `SUPABASE_SERVICE_ROLE_KEY` are the required backend runtime credentials for login-adjacent flows.
-- `DATABASE_URL` is optional for local login/profile/dashboard development, but still required for direct SQLModel paths such as Alembic migrations and the current pipeline implementation.
+- `SUPABASE_URL`, `SUPABASE_ANON_KEY`, and `SUPABASE_SERVICE_ROLE_KEY` are the required backend runtime credentials for the PoC runtime path.
+- `DATABASE_URL` is now a legacy optional setting for direct Postgres tooling only, not a required runtime dependency.
 - `ALLOW_DEV_SCHEDULE=false` keeps non-prod scheduling disabled unless explicitly enabled.
 - The web app reads `NEXT_PUBLIC_API_BASE_URL`, `NEXT_PUBLIC_SUPABASE_URL`, and `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
 

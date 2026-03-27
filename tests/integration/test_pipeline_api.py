@@ -38,3 +38,20 @@ async def test_pipeline_trigger_runs_end_to_end(client, db_session, runtime):
     jobs = db_session.exec(select(Job)).all()
     assert len(jobs) == 2
     assert len(evaluations) == 2
+
+
+async def test_pipeline_trigger_dry_run_skips_delivery(client, db_session, runtime):
+    from tests.conftest import seed_user
+
+    runtime.slack_notifier.deliveries.clear()
+    seed_user(db_session)
+
+    response = await client.post(
+        "/api/v1/pipeline/trigger",
+        headers={"X-API-Key": "test-internal-key"},
+        json={"dry_run": True},
+    )
+
+    assert response.status_code == 200
+    assert response.json()["runs"][0]["jobs_sent"] == 0
+    assert runtime.slack_notifier.deliveries == []

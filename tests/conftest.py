@@ -10,15 +10,16 @@ import pytest
 from httpx import ASGITransport, AsyncClient
 from sqlmodel import Session, SQLModel, create_engine
 
+from agent.schemas.pipeline_job import PipelineJob
 from api.services.mock_llm_evaluator import MockGeminiEvaluator
 from api.services.runtime import RuntimeServices
 from api.services.slack_notifier import LoggingSlackNotifier
 from api.services.slack_signature_service import SlackSignatureService
-from api.services.supabase_storage import DashboardRow, FeedbackRecord
+from api.services.supabase_storage import DashboardRow, EvaluationRecord, FeedbackRecord
 from common.config import get_settings
-from db.enums import FeedbackState
+from db.enums import EvaluationStatus, FeedbackState, LogLevel
 from db.models import Evaluation, Job, User
-from db.repositories import EvaluationRepository, UserRepository
+from db.repositories import EvaluationRepository, JobRepository, SystemLogRepository, UserRepository
 from db.session import get_engine
 from scraper.base import ScrapedJob
 from scraper.registry import ScraperRegistry
@@ -91,7 +92,7 @@ class FakeTokenVerifier:
         )
 
 
-class TestUserStore:
+class FakeUserStore:
     def __init__(self, session: Session):
         self.repo = UserRepository(session)
 
@@ -139,8 +140,36 @@ class TestUserStore:
         identity.user_id = updated.id
         return self.upsert_from_identity(identity)
 
+    def get_user_by_id(self, user_id):
+        user = self.repo.get_by_id(user_id)
+        if user is None:
+            return None
+        from api.dependencies.auth import UserIdentity
 
-class TestEvaluationStore:
+        return self.upsert_from_identity(
+            UserIdentity(
+                user_id=user.id,
+                email=user.email,
+                oauth_id=user.oauth_id,
+            )
+        )
+
+    def list_all_users(self):
+        from api.dependencies.auth import UserIdentity
+
+        return [
+            self.upsert_from_identity(
+                UserIdentity(
+                    user_id=user.id,
+                    email=user.email,
+                    oauth_id=user.oauth_id,
+                )
+            )
+            for user in self.repo.list_all()
+        ]
+
+
+class FakeEvaluationStore:
     def __init__(self, session: Session):
         self.repo = EvaluationRepository(session)
 
@@ -167,6 +196,28 @@ class TestEvaluationStore:
             for evaluation, job in rows
         ]
 
+    def get_by_user_and_job(self, user_id, job_id):
+        evaluation = self.repo.get_by_user_and_job(user_id, job_id)
+        if evaluation is None:
+            return None
+        return self._to_record(evaluation)
+
+    def ensure_pending(self, user_id, job_id):
+        return self._to_record(self.repo.ensure_pending(user_id=user_id, job_id=job_id))
+
+    def mark_rule_rejected(self, user_id, job_id, reason):
+        return self._to_record(self.repo.mark_rule_rejected(user_id=user_id, job_id=job_id, reason=reason))
+
+    def mark_llm_evaluated(self, user_id, job_id, fit_score, reasoning):
+        return self._to_record(
+            self.repo.mark_llm_evaluated(
+                user_id=user_id,
+                job_id=job_id,
+                fit_score=fit_score,
+                reasoning=reasoning,
+            )
+        )
+
     def update_feedback(self, *, evaluation_id, feedback, feedback_reason, user_id=None):
         evaluation = self.repo.update_feedback(
             evaluation_id=evaluation_id,
@@ -183,6 +234,68 @@ class TestEvaluationStore:
                 else evaluation.user_feedback
             ),
             feedback_reason=evaluation.feedback_reason,
+        )
+
+    def list_recent_dislikes(self, user_id, limit=10):
+        return self.repo.list_recent_dislikes(user_id, limit=limit)
+
+    @staticmethod
+    def _to_record(evaluation):
+        return EvaluationRecord(
+            id=evaluation.id,
+            user_id=evaluation.user_id,
+            job_id=evaluation.job_id,
+            status=(
+                EvaluationStatus(evaluation.status.value)
+                if getattr(evaluation.status, "value", None)
+                else EvaluationStatus(evaluation.status)
+            ),
+            fit_score=evaluation.fit_score,
+            reasoning=evaluation.reasoning,
+            rule_rejection_reason=evaluation.rule_rejection_reason,
+            user_feedback=(
+                FeedbackState(evaluation.user_feedback.value)
+                if getattr(evaluation.user_feedback, "value", None)
+                else (FeedbackState(evaluation.user_feedback) if evaluation.user_feedback else None)
+            ),
+            feedback_reason=evaluation.feedback_reason,
+        )
+
+
+class FakeJobStore:
+    def __init__(self, session: Session):
+        self.repo = JobRepository(session)
+
+    def upsert_job(self, scraped_job):
+        job = self.repo.upsert_job(scraped_job)
+        return PipelineJob(
+            job_id=job.id,
+            platform=job.platform,
+            external_job_id=job.external_job_id,
+            title=job.title,
+            company=job.company,
+            jd_raw_text=job.jd_raw_text,
+            url=job.url,
+            min_years_experience=job.min_years_experience,
+            max_years_experience=job.max_years_experience,
+            source_metadata=job.source_metadata,
+        )
+
+
+class FakeSystemLogStore:
+    def __init__(self, session: Session):
+        self.repo = SystemLogRepository(session)
+
+    def create(self, *, run_id, event_type, message, level=LogLevel.INFO, user_id=None, job_id=None, platform=None, metadata=None):
+        return self.repo.create(
+            run_id=run_id,
+            event_type=event_type,
+            message=message,
+            level=level,
+            user_id=user_id,
+            job_id=job_id,
+            platform=platform,
+            metadata=metadata,
         )
 
 
@@ -225,7 +338,12 @@ def runtime():
 @pytest.fixture
 def app(test_env, runtime):
     import api.dependencies.auth as auth_module
-    from api.dependencies.supabase_store import get_evaluation_store, get_user_store
+    from api.dependencies.supabase_store import (
+        get_evaluation_store,
+        get_job_store,
+        get_system_log_store,
+        get_user_store,
+    )
     from api.dependencies.database import get_session
     from api.dependencies.runtime import get_runtime
     from api.main import create_app
@@ -243,15 +361,25 @@ def app(test_env, runtime):
 
     def override_user_store():
         with Session(engine) as session:
-            yield TestUserStore(session)
+            yield FakeUserStore(session)
 
     def override_evaluation_store():
         with Session(engine) as session:
-            yield TestEvaluationStore(session)
+            yield FakeEvaluationStore(session)
+
+    def override_job_store():
+        with Session(engine) as session:
+            yield FakeJobStore(session)
+
+    def override_system_log_store():
+        with Session(engine) as session:
+            yield FakeSystemLogStore(session)
 
     application.dependency_overrides[get_session] = override_session
     application.dependency_overrides[get_user_store] = override_user_store
     application.dependency_overrides[get_evaluation_store] = override_evaluation_store
+    application.dependency_overrides[get_job_store] = override_job_store
+    application.dependency_overrides[get_system_log_store] = override_system_log_store
     application.dependency_overrides[get_runtime] = lambda: runtime
     application.state.test_engine = engine
     original_get_token_verifier = auth_module.get_token_verifier

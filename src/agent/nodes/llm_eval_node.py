@@ -9,7 +9,6 @@ from pydantic import ValidationError
 from agent.prompts.evaluation_prompt import build_evaluation_prompt
 from agent.schemas.evaluation_result import LLMEvaluationResult
 from db.enums import LogLevel
-from db.repositories import EvaluationRepository, SystemLogRepository
 
 
 class LLMEvaluator(Protocol):
@@ -27,8 +26,8 @@ class LLMEvaluator(Protocol):
 @dataclass
 class LLMEvalNode:
     evaluator: LLMEvaluator
-    evaluation_repository: EvaluationRepository
-    system_log_repository: SystemLogRepository
+    evaluation_store: object
+    system_log_store: object
 
     async def run(self, state: Dict[str, Any]) -> Dict[str, Any]:
         user_id = UUID(str(state["user_context"]["user_id"]))
@@ -41,7 +40,7 @@ class LLMEvalNode:
                 job=job,
             )
             try:
-                evaluation = self.evaluation_repository.ensure_pending(user_id=user_id, job_id=job.job_id)
+                evaluation = self.evaluation_store.ensure_pending(user_id=user_id, job_id=job.job_id)
                 payload = await self.evaluator.evaluate(
                     job=job,
                     prompt=prompt,
@@ -59,7 +58,7 @@ class LLMEvalNode:
                         **payload,
                     }
                 )
-                self.evaluation_repository.mark_llm_evaluated(
+                self.evaluation_store.mark_llm_evaluated(
                     user_id=user_id,
                     job_id=job.job_id,
                     fit_score=result.fit_score,
@@ -67,7 +66,7 @@ class LLMEvalNode:
                 )
                 results.append(result)
             except (ValidationError, ValueError) as exc:
-                self.system_log_repository.create(
+                self.system_log_store.create(
                     run_id=state["run_id"],
                     event_type="llm_eval_invalid_output",
                     level=LogLevel.ERROR,
@@ -78,7 +77,7 @@ class LLMEvalNode:
                     metadata={"error_type": exc.__class__.__name__},
                 )
             except Exception as exc:  # pragma: no cover - exercised by resilience tests
-                self.system_log_repository.create(
+                self.system_log_store.create(
                     run_id=state["run_id"],
                     event_type="llm_eval_failure",
                     level=LogLevel.ERROR,

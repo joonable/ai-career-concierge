@@ -6,7 +6,6 @@ from uuid import UUID
 
 from agent.schemas.pipeline_job import PipelineJob
 from db.enums import EvaluationStatus
-from db.repositories import EvaluationRepository
 
 
 def _title_matches(job: PipelineJob, user_context: Dict[str, Any]) -> bool:
@@ -36,19 +35,19 @@ def _experience_matches(job: PipelineJob, user_context: Dict[str, Any]) -> bool:
 
 @dataclass
 class RuleFilterNode:
-    evaluation_repository: EvaluationRepository
+    evaluation_store: object
 
     async def run(self, state: Dict[str, Any]) -> Dict[str, Any]:
         user_id = UUID(str(state["user_context"]["user_id"]))
         filtered_jobs: List[PipelineJob] = []
 
         for job in state.get("current_jobs", []):
-            existing_evaluation = self.evaluation_repository.get_by_user_and_job(user_id, job.job_id)
+            existing_evaluation = self.evaluation_store.get_by_user_and_job(user_id, job.job_id)
             if existing_evaluation is not None and existing_evaluation.status != EvaluationStatus.PENDING:
                 continue
 
             if not _title_matches(job, state["user_context"]):
-                self.evaluation_repository.mark_rule_rejected(
+                self.evaluation_store.mark_rule_rejected(
                     user_id=user_id,
                     job_id=job.job_id,
                     reason="TITLE_MISMATCH",
@@ -56,14 +55,14 @@ class RuleFilterNode:
                 continue
 
             if not _experience_matches(job, state["user_context"]):
-                self.evaluation_repository.mark_rule_rejected(
+                self.evaluation_store.mark_rule_rejected(
                     user_id=user_id,
                     job_id=job.job_id,
                     reason="EXPERIENCE_MISMATCH",
                 )
                 continue
 
-            self.evaluation_repository.ensure_pending(user_id=user_id, job_id=job.job_id)
+            self.evaluation_store.ensure_pending(user_id=user_id, job_id=job.job_id)
             filtered_jobs.append(job)
 
         return {"current_jobs": filtered_jobs}

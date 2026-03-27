@@ -33,7 +33,7 @@ Environment ownership:
 - `NEXT_PUBLIC_*` values must live in `apps/web/.env.*`.
 - Secrets must not use `NEXT_PUBLIC_*`.
 - `SUPABASE_SERVICE_ROLE_KEY` is required for backend profile, dashboard, and feedback persistence.
-- `DATABASE_URL` is optional for local auth/profile/dashboard work, but still required for Alembic and current pipeline code paths.
+- `DATABASE_URL` is a legacy optional value for direct Postgres tooling only, not the default PoC runtime path.
 
 ## Repository Layout
 
@@ -44,7 +44,7 @@ apps/web          Next.js App Router frontend
 src/api           FastAPI routes, schemas, dependencies, services
 src/agent         LangGraph workflow, prompts, typed pipeline state
 src/scraper       Source-specific scraper interfaces and normalizers
-src/db            SQLModel models, repositories, sessions, Alembic migrations
+src/db            Legacy SQLModel models, repository history, and schema references
 src/common        Shared config, logging, telemetry, ids, errors
 tests             Unit, integration, contract, resilience coverage
 ```
@@ -93,8 +93,8 @@ The current goal is a single-user PoC that supports:
 - FastAPI verifies Supabase JWTs against the project JWKS before resolving `UserIdentity`.
 - Production-facing secrets are validated through typed settings in `src/common/config.py`.
 - Supabase OAuth redirect URLs must allow the web callback path `/auth/callback`.
-- User-facing backend flows now persist through the Supabase Data API with `SUPABASE_SERVICE_ROLE_KEY`.
-- `DATABASE_URL` remains the direct Postgres connection used by Alembic and the current pipeline-oriented ORM path.
+- Backend persistence now uses the Supabase Data API with `SUPABASE_SERVICE_ROLE_KEY` for both user-facing flows and the pipeline runtime.
+- Schema changes are managed through Supabase SQL/MCP rather than Alembic as the default PoC workflow.
 - Local API entry points:
   - `/` returns a lightweight welcome payload
   - `/healthz` returns runtime health info

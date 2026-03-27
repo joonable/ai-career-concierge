@@ -8,13 +8,11 @@ from api.routes.slack import router as slack_router
 from api.routes.users import router as users_router
 from common.config import get_settings
 from common.logging import configure_logging
-from db.session import prepare_database
 
 
 def create_app() -> FastAPI:
     settings = get_settings()
     configure_logging(settings.app_debug)
-    prepare_database()
 
     application = FastAPI(title="AI Career Concierge API", version="0.1.0")
     application.include_router(pipeline_router)
