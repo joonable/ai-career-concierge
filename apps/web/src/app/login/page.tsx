@@ -1,10 +1,8 @@
 import { Inter, Playfair_Display } from "next/font/google";
-import { redirect } from "next/navigation";
 
 import { LoginCard } from "@/components/auth/login-card";
 import { mapLoginErrorMessage } from "@/lib/login_messages";
-import { resolvePostLoginPath, resolveSafeNextPath } from "@/lib/login_redirect";
-import { createSupabaseServerClient } from "@/lib/supabase_auth_server";
+import { resolveSafeNextPath } from "@/lib/login_redirect";
 
 type LoginPageProps = {
   searchParams?: Promise<{
@@ -27,15 +25,6 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
   const resolvedSearchParams = (await searchParams) ?? {};
   const nextPath = resolveSafeNextPath(resolvedSearchParams.next);
   const errorMessage = mapLoginErrorMessage(resolvedSearchParams.error);
-  const supabase = await createSupabaseServerClient();
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
-
-  if (session?.access_token) {
-    const destination = await resolvePostLoginPath(session.access_token, nextPath);
-    redirect(destination);
-  }
 
   return (
     <main className="woven-hero login-hero">

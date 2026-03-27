@@ -5,7 +5,10 @@ import { describe, expect, it, vi, beforeEach } from "vitest";
 
 import { LoginCard } from "@/components/auth/login-card";
 
-const signInWithOAuth = vi.fn();
+const { signInWithOAuth, redirectToExternalUrl } = vi.hoisted(() => ({
+  signInWithOAuth: vi.fn(),
+  redirectToExternalUrl: vi.fn(),
+}));
 
 vi.mock("@/lib/supabase_auth_browser", () => ({
   createSupabaseBrowserClient: () => ({
@@ -15,14 +18,24 @@ vi.mock("@/lib/supabase_auth_browser", () => ({
   }),
 }));
 
+vi.mock("@/lib/browser_redirect", () => ({
+  redirectToExternalUrl,
+}));
+
 describe("LoginCard", () => {
   beforeEach(() => {
     signInWithOAuth.mockReset();
+    redirectToExternalUrl.mockReset();
     window.history.replaceState({}, "", "http://localhost:3000/login");
   });
 
   it("calls Google OAuth with the provided next path", async () => {
-    signInWithOAuth.mockResolvedValue({ error: null });
+    signInWithOAuth.mockResolvedValue({
+      data: {
+        url: "https://accounts.google.com/o/oauth2/v2/auth?client_id=test",
+      },
+      error: null,
+    });
     const user = userEvent.setup();
 
     render(<LoginCard bodyClassName="body" nextPath="/dashboard" />);
@@ -34,18 +47,27 @@ describe("LoginCard", () => {
         provider: "google",
         options: {
           redirectTo: "http://localhost:3000/auth/callback?next=%2Fdashboard",
+          queryParams: {
+            prompt: "select_account",
+          },
+          skipBrowserRedirect: true,
         },
       });
     });
 
     expect(screen.getByText("Google 로그인 페이지로 이동합니다.")).toBeInTheDocument();
+    expect(redirectToExternalUrl).toHaveBeenCalledWith(
+      "https://accounts.google.com/o/oauth2/v2/auth?client_id=test",
+    );
   });
 
   it("disables the button while OAuth starts", async () => {
-    let resolveSignIn: ((value: { error: null }) => void) | undefined;
+    let resolveSignIn:
+      | ((value: { data: { url: string | null }; error: Error | null }) => void)
+      | undefined;
     signInWithOAuth.mockImplementation(
       () =>
-        new Promise((resolve) => {
+        new Promise<{ data: { url: string | null }; error: Error | null }>((resolve) => {
           resolveSignIn = resolve;
         }),
     );
@@ -58,15 +80,22 @@ describe("LoginCard", () => {
 
     expect(screen.getByRole("button", { name: "Google 연결 중..." })).toBeDisabled();
 
-    resolveSignIn?.({ error: null });
+    resolveSignIn?.({
+      data: {
+        url: "https://accounts.google.com/o/oauth2/v2/auth?client_id=test",
+      },
+      error: null,
+    });
 
     await waitFor(() => {
-      expect(screen.getByRole("button", { name: "Continue with Google" })).not.toBeDisabled();
+      expect(redirectToExternalUrl).toHaveBeenCalledWith(
+        "https://accounts.google.com/o/oauth2/v2/auth?client_id=test",
+      );
     });
   });
 
   it("shows a failure message when OAuth start fails", async () => {
-    signInWithOAuth.mockResolvedValue({ error: new Error("boom") });
+    signInWithOAuth.mockResolvedValue({ data: { url: null }, error: new Error("boom") });
     const user = userEvent.setup();
 
     render(<LoginCard bodyClassName="body" />);
@@ -76,6 +105,7 @@ describe("LoginCard", () => {
     expect(
       await screen.findByText("Google 로그인을 시작하지 못했습니다. 다시 시도하세요."),
     ).toBeInTheDocument();
+    expect(redirectToExternalUrl).not.toHaveBeenCalled();
   });
 
   it("renders callback failure messages from the page", () => {

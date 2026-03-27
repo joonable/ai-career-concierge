@@ -1,8 +1,9 @@
 "use client";
 
-import React, { startTransition, useState } from "react";
+import React, { useState } from "react";
 
 import { FeyButton } from "@/components/ui/fey-button";
+import { redirectToExternalUrl } from "@/lib/browser_redirect";
 import { resolveSafeNextPath } from "@/lib/login_redirect";
 import { createSupabaseBrowserClient } from "@/lib/supabase_auth_browser";
 
@@ -16,37 +17,42 @@ export function LoginCard({ bodyClassName, errorMessage, nextPath }: LoginCardPr
   const [message, setMessage] = useState<string | null>(null);
   const [isPending, setIsPending] = useState(false);
 
-  const handleSignIn = () => {
+  const handleSignIn = async () => {
     setIsPending(true);
     setMessage(null);
 
-    startTransition(async () => {
-      try {
-        const supabase = createSupabaseBrowserClient();
-        const origin = window.location.origin;
-        const redirectPath = resolveSafeNextPath(nextPath);
-        const redirectUrl = new URL("/auth/callback", origin);
-        if (redirectPath) {
-          redirectUrl.searchParams.set("next", redirectPath);
-        }
-        const { error } = await supabase.auth.signInWithOAuth({
-          provider: "google",
-          options: {
-            redirectTo: redirectUrl.toString(),
-          },
-        });
-
-        if (error) {
-          throw error;
-        }
-
-        setMessage("Google 로그인 페이지로 이동합니다.");
-      } catch {
-        setMessage("Google 로그인을 시작하지 못했습니다. 다시 시도하세요.");
-      } finally {
-        setIsPending(false);
+    try {
+      const supabase = createSupabaseBrowserClient();
+      const origin = window.location.origin;
+      const redirectPath = resolveSafeNextPath(nextPath);
+      const redirectUrl = new URL("/auth/callback", origin);
+      if (redirectPath) {
+        redirectUrl.searchParams.set("next", redirectPath);
       }
-    });
+      const {
+        data: { url },
+        error,
+      } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: redirectUrl.toString(),
+          queryParams: {
+            prompt: "select_account",
+          },
+          skipBrowserRedirect: true,
+        },
+      });
+
+      if (error || !url) {
+        throw error ?? new Error("Missing OAuth redirect URL.");
+      }
+
+      setMessage("Google 로그인 페이지로 이동합니다.");
+      redirectToExternalUrl(url);
+    } catch {
+      setMessage("Google 로그인을 시작하지 못했습니다. 다시 시도하세요.");
+      setIsPending(false);
+    }
   };
 
   return (
