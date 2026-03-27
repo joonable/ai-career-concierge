@@ -1,36 +1,56 @@
+import React from "react";
+
 import { OnboardingStatusCard } from "@/components/dashboard/onboarding-status-card";
 import { RecommendationBoard } from "@/components/dashboard/recommendation-board";
 import { getDashboardSnapshot, getProfileSnapshot } from "@/lib/api_client_server";
 import { mapDashboardRecommendations } from "@/lib/dashboard_mapper";
+import { deriveDashboardOnboardingState } from "@/lib/dashboard_onboarding";
 
 export default async function DashboardPage() {
   const [dashboard, profile] = await Promise.all([getDashboardSnapshot(), getProfileSnapshot()]);
   const recommendations = mapDashboardRecommendations(dashboard);
-  const isOnboardingComplete = profile.profile_data.role.trim().length > 0;
+  const onboardingState = deriveDashboardOnboardingState(profile);
 
   return (
-    <main>
-      <div className="shell stack">
-        <section className="hero">
-          <div className="stack">
-            <span className="eyebrow">오늘의 추천 목록</span>
-            <h1 className="display">전체 파이프라인을 통과한 공고만 남깁니다.</h1>
-            <p className="lead">
-              이 보드는 의도적으로 좁게 설계했습니다. PoC 루프가 먼저 안정적으로 동작하도록,
-              추천 검토와 피드백에 필요한 백엔드 계약만 그대로 반영합니다.
-            </p>
-          </div>
+    <main className="dashboard-page">
+      <div className="dashboard-shell">
+        <section className="dashboard-grid">
+          <article className="dashboard-card dashboard-card--active dashboard-card--span-2">
+            <div className="dashboard-hero">
+              <div className="dashboard-hero__top">
+                <div className="dashboard-hero__copy">
+                  <span className="dashboard-kicker">Dashboard</span>
+                  <h1 className="dashboard-title">추천 공고</h1>
+                  <p className="dashboard-subcopy">
+                    {onboardingState.isComplete
+                      ? `${onboardingState.role} 기준으로 정리한 결과만 보여줍니다.`
+                      : `추천 기준 ${onboardingState.completionLabel}. 남은 항목을 채우면 더 정확한 추천을 받을 수 있습니다.`}
+                  </p>
+                </div>
+                <span className="dashboard-pill">
+                  {profile.notification_settings.delivery_channel.toUpperCase()}
+                </span>
+              </div>
+              <div className="dashboard-stat-grid">
+                <div className="dashboard-stat">
+                  <span className="dashboard-stat__label">추천 수</span>
+                  <strong>{recommendations.length}</strong>
+                </div>
+                <div className="dashboard-stat">
+                  <span className="dashboard-stat__label">최소 점수</span>
+                  <strong>{dashboard.minimum_fit_score}+</strong>
+                </div>
+                <div className="dashboard-stat">
+                  <span className="dashboard-stat__label">온보딩</span>
+                  <strong>
+                    {onboardingState.isComplete ? "완료" : onboardingState.completionLabel}
+                  </strong>
+                </div>
+              </div>
+            </div>
+          </article>
+          <OnboardingStatusCard state={onboardingState} />
         </section>
-        <OnboardingStatusCard
-          summary={{
-            isComplete: isOnboardingComplete,
-            role: profile.profile_data.role,
-            yearsOfExperience: profile.profile_data.years_of_experience,
-            mustHaves: profile.guidelines.must_haves,
-            dealBreakers: profile.guidelines.deal_breakers,
-            minimumFitScore: profile.notification_settings.minimum_fit_score,
-          }}
-        />
         <RecommendationBoard
           minimumFitScore={dashboard.minimum_fit_score}
           recommendations={recommendations}

@@ -1,89 +1,133 @@
+import React from "react";
 import Link from "next/link";
 
-type OnboardingSummary = {
-  isComplete: boolean;
-  role: string;
-  yearsOfExperience: number;
-  mustHaves: string[];
-  dealBreakers: string[];
-  minimumFitScore: number;
-};
+import type { DashboardOnboardingField, DashboardOnboardingState } from "@/lib/dashboard_onboarding";
 
 type OnboardingStatusCardProps = {
-  summary: OnboardingSummary;
+  state: DashboardOnboardingState;
 };
 
-export function OnboardingStatusCard({ summary }: OnboardingStatusCardProps) {
-  if (!summary.isComplete) {
+function renderCompactTags(items: string[]) {
+  const visibleItems = items.slice(0, 3);
+  const remainingCount = items.length - visibleItems.length;
+
+  return (
+    <>
+      {visibleItems.map((item, index) => (
+        <span className="dashboard-chip" key={`${item}-${index}`}>
+          {item}
+        </span>
+      ))}
+      {remainingCount > 0 ? (
+        <span className="dashboard-chip dashboard-chip--muted">+{remainingCount}</span>
+      ) : null}
+    </>
+  );
+}
+
+function ChecklistRow({ field }: { field: DashboardOnboardingField }) {
+  return (
+    <div
+      className={[
+        "dashboard-checklist__item",
+        field.isComplete
+          ? "dashboard-checklist__item--complete"
+          : "dashboard-checklist__item--missing",
+      ].join(" ")}
+      role="listitem"
+    >
+      <span className="dashboard-checklist__status" aria-hidden="true">
+        <span
+          className={[
+            "dashboard-checklist__dot",
+            field.isComplete
+              ? "dashboard-checklist__dot--complete"
+              : "dashboard-checklist__dot--missing",
+          ].join(" ")}
+        />
+      </span>
+      <div className="dashboard-checklist__copy">
+        <span className="dashboard-detail__label">{field.label}</span>
+        <p className="dashboard-checklist__meta">{field.detail}</p>
+      </div>
+      <span
+        className={[
+          "dashboard-checklist__badge",
+          field.isComplete
+            ? "dashboard-checklist__badge--complete"
+            : "dashboard-checklist__badge--missing",
+        ].join(" ")}
+      >
+        {field.statusLabel}
+      </span>
+    </div>
+  );
+}
+
+export function OnboardingStatusCard({ state }: OnboardingStatusCardProps) {
+  const cardClassName = [
+    "dashboard-card",
+    "dashboard-card--interactive",
+    "dashboard-summary-card",
+    state.isComplete ? "dashboard-summary-card--complete" : "dashboard-summary-card--incomplete",
+  ].join(" ");
+
+  if (!state.isComplete) {
     return (
-      <section className="panel board-card">
-        <div className="stack">
-          <div className="meta-row">
-            <span className="eyebrow">온보딩 필요</span>
-            <span className="muted">프로필 미작성</span>
+      <Link aria-label="온보딩 설정 열기" className={cardClassName} href="/onboarding">
+        <div className="dashboard-summary__header">
+          <div className="dashboard-summary-card__copy">
+            <span className="dashboard-kicker">Profile</span>
+            <h2 className="dashboard-section__title">추천 기준이 아직 부족합니다</h2>
           </div>
-          <div>
-            <h2 style={{ marginTop: 0, marginBottom: 8 }}>먼저 기준을 작성해야 합니다</h2>
-            <p className="muted" style={{ margin: 0 }}>
-              목표 직무와 필수 조건이 비어 있어서 추천 정밀도가 떨어집니다. 온보딩을 완료하면
-              이후 평가와 전달 기준에 바로 반영됩니다.
-            </p>
-          </div>
-          <div>
-            <Link className="button secondary" href="/onboarding">
-              온보딩 작성하기
-            </Link>
-          </div>
+          <span className="dashboard-pill dashboard-pill--muted">{state.completionLabel}</span>
         </div>
-      </section>
+        <p className="dashboard-meta">
+          무엇이 비어 있는지 확인하고 바로 설정을 이어갈 수 있습니다.
+        </p>
+        <div className="dashboard-checklist" role="list">
+          {state.fields.map((field) => (
+            <ChecklistRow field={field} key={field.key} />
+          ))}
+        </div>
+        <div className="dashboard-summary-card__footer">
+          <span className="dashboard-summary-card__cta">온보딩 열기</span>
+          <span aria-hidden="true" className="dashboard-summary-card__arrow">
+            &gt;
+          </span>
+        </div>
+      </Link>
     );
   }
 
   return (
-    <section className="panel board-card">
-      <div className="stack">
-        <div className="meta-row">
-          <span className="eyebrow">온보딩 완료</span>
-          <Link className="button secondary" href="/onboarding">
-            수정하기
-          </Link>
+    <Link aria-label="온보딩 설정 수정" className={cardClassName} href="/onboarding">
+      <div className="dashboard-summary__header">
+        <div className="dashboard-summary-card__copy">
+          <span className="dashboard-kicker">Profile</span>
+          <h2 className="dashboard-section__title">{state.role}</h2>
         </div>
-        <div>
-          <h2 style={{ marginTop: 0, marginBottom: 8 }}>현재 설정 요약</h2>
-          <p className="muted" style={{ margin: 0 }}>
-            {summary.role} · {summary.yearsOfExperience}년 경력 · 최소 적합도{" "}
-            {summary.minimumFitScore}점
-          </p>
-        </div>
-        <div className="card-grid">
-          <article
-            style={{
-              padding: 18,
-              borderRadius: 20,
-              border: "1px solid rgba(32, 28, 23, 0.08)",
-              background: "rgba(255, 255, 255, 0.58)",
-            }}
-          >
-            <strong>Must-haves</strong>
-            <p className="muted" style={{ marginBottom: 0 }}>
-              {summary.mustHaves.length > 0 ? summary.mustHaves.join(", ") : "아직 없음"}
-            </p>
-          </article>
-          <article
-            style={{
-              padding: 18,
-              borderRadius: 20,
-              border: "1px solid rgba(32, 28, 23, 0.08)",
-              background: "rgba(255, 255, 255, 0.58)",
-            }}
-          >
-            <strong>Deal-breakers</strong>
-            <p className="muted" style={{ marginBottom: 0 }}>
-              {summary.dealBreakers.length > 0 ? summary.dealBreakers.join(", ") : "아직 없음"}
-            </p>
-          </article>
-        </div>
+        <span className="dashboard-pill dashboard-pill--accent">완료</span>
       </div>
-    </section>
+      <p className="dashboard-meta">
+        {state.yearsOfExperience}년 경력 · 최소 적합도 {state.minimumFitScore}+
+      </p>
+      <div className="dashboard-detail">
+        <span className="dashboard-detail__label">Must-haves</span>
+        <div className="dashboard-chip-list">{renderCompactTags(state.mustHaves)}</div>
+      </div>
+      <div className="dashboard-detail">
+        <span className="dashboard-detail__label">Deal-breakers</span>
+        <div className="dashboard-chip-list">{renderCompactTags(state.dealBreakers)}</div>
+      </div>
+      <div className="dashboard-summary-card__footer">
+        <span className="dashboard-summary-card__cta dashboard-summary-card__cta--subtle">
+          설정 보기
+        </span>
+        <span aria-hidden="true" className="dashboard-summary-card__arrow">
+          &gt;
+        </span>
+      </div>
+    </Link>
   );
 }

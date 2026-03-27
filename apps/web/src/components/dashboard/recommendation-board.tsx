@@ -1,19 +1,9 @@
-type Recommendation = {
-  evaluationId: string;
-  status: string;
-  fitScore: number | null;
-  reasoning: string | null;
-  userFeedback: string | null;
-  feedbackReason: string | null;
-  title: string;
-  company: string;
-  url: string;
-  platform: string;
-};
+import React from "react";
+import type { DashboardRecommendation } from "@/lib/dashboard_mapper";
 
 type RecommendationBoardProps = {
   minimumFitScore: number;
-  recommendations: Recommendation[];
+  recommendations: DashboardRecommendation[];
 };
 
 export function RecommendationBoard({
@@ -21,50 +11,60 @@ export function RecommendationBoard({
   recommendations,
 }: RecommendationBoardProps) {
   return (
-    <section className="board">
-      <div className="panel board-card">
-        <div className="meta-row">
-          <span className="eyebrow">기준 점수</span>
-          <span className="score">{minimumFitScore}+</span>
+    <section className="dashboard-board">
+      <div className="dashboard-section__header">
+        <div>
+          <span className="dashboard-kicker">Matches</span>
+          <h2 className="dashboard-section__title">추천 목록</h2>
         </div>
-        <p className="lead" style={{ marginBottom: 0 }}>
-          이 목록은 목업 전용 UI가 아니라 실제 백엔드 대시보드 계약을 그대로 반영합니다.
-        </p>
+        <p className="dashboard-meta">기준 {minimumFitScore}+</p>
       </div>
-      <div className="card-grid">
+      <div className="dashboard-card-grid">
         {recommendations.length === 0 ? (
-          <article className="panel board-card">
-            <h2 style={{ marginTop: 0 }}>아직 추천 결과가 없습니다</h2>
-            <p className="muted" style={{ marginBottom: 0 }}>
-              파이프라인 트리거를 실행해 공고를 수집하고 평가하면 이 보드가 채워집니다.
-            </p>
+          <article className="dashboard-card dashboard-card--full dashboard-empty-state">
+            <span className="dashboard-kicker">Queue</span>
+            <h3 className="dashboard-empty-state__title">아직 비어 있습니다</h3>
+            <p className="dashboard-meta">파이프라인 실행 후 여기에 표시됩니다.</p>
           </article>
         ) : (
           recommendations.map((recommendation) => (
-            <article className="panel board-card" key={recommendation.evaluationId}>
-              <div className="stack">
-                <div className="meta-row">
-                  <span className="score">{recommendation.fitScore ?? "대기 중"}</span>
-                  <span className="status-pill">{recommendation.status}</span>
+            <article
+              className="dashboard-card dashboard-card--interactive dashboard-recommendation"
+              key={recommendation.evaluationId}
+            >
+              <div className="dashboard-recommendation__top">
+                <div className="dashboard-score">
+                  <strong>{recommendation.fitScore ?? "--"}</strong>
+                  <span>{recommendation.fitScore === null ? "대기" : "적합도"}</span>
                 </div>
-                <div>
-                  <h2 style={{ marginBottom: 8 }}>{recommendation.title}</h2>
-                  <p className="muted" style={{ margin: 0 }}>
-                    {recommendation.company} · {recommendation.platform}
-                  </p>
-                </div>
-                <p style={{ margin: 0 }}>{recommendation.reasoning ?? "정밀 평가를 기다리는 중입니다."}</p>
-                <div className="meta-row">
-                  <a className="button secondary" href={recommendation.url} target="_blank">
-                    공고 보기
-                  </a>
-                  {recommendation.userFeedback ? (
-                    <span className="muted">
-                      피드백: {recommendation.userFeedback}
-                      {recommendation.feedbackReason ? ` · ${recommendation.feedbackReason}` : ""}
+                <span className="dashboard-pill">{recommendation.statusLabel}</span>
+              </div>
+              <div>
+                <h3 className="dashboard-recommendation__title">{recommendation.title}</h3>
+                <p className="dashboard-meta">
+                  {recommendation.company} · {recommendation.platform}
+                </p>
+              </div>
+              <p className="dashboard-recommendation__reasoning">
+                {recommendation.reasoning ?? "정밀 평가 대기 중"}
+              </p>
+              <div className="dashboard-recommendation__footer">
+                <div className="dashboard-chip-list">
+                  <span className="dashboard-chip">{recommendation.platform}</span>
+                  {recommendation.feedbackLabel ? (
+                    <span className="dashboard-chip dashboard-chip--muted">
+                      피드백 {recommendation.feedbackLabel}
                     </span>
                   ) : null}
                 </div>
+                <a
+                  className="dashboard-link"
+                  href={recommendation.url}
+                  rel="noreferrer"
+                  target="_blank"
+                >
+                  공고 보기
+                </a>
               </div>
             </article>
           ))
