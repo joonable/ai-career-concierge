@@ -22,6 +22,15 @@ def create_app() -> FastAPI:
     application.include_router(users_router)
     application.include_router(evaluation_router)
 
+    @application.get("/")
+    def root():
+        return {
+            "name": "AI Career Concierge API",
+            "status": "ok",
+            "docs_url": "/docs",
+            "healthcheck_url": "/healthz",
+        }
+
     @application.get("/healthz")
     def healthcheck():
         return {"ok": True, "env": settings.app_env.value}

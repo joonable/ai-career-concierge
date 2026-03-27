@@ -45,7 +45,7 @@ Backend:
 
 ```bash
 poetry install
-PYTHONPATH=src poetry run uvicorn api.main:app --reload
+poetry run dev
 ```
 
 Frontend:
@@ -54,6 +54,7 @@ Frontend:
 cd apps/web
 npm install
 npm run dev
+npm run test
 ```
 
 Database migration:
@@ -76,5 +77,18 @@ The current goal is a single-user PoC that supports:
 ## Scaffold Notes
 
 - The backend ships with a mock scraper, mock LLM evaluator, and logging Slack notifier so the end-to-end loop is runnable before real integrations are wired.
-- Dev and test authentication use a scaffold bearer token (`Authorization: Bearer dev-token`) until Supabase JWT verification is connected.
+- The web app now uses Supabase SSR sessions for Google OAuth and forwards real Supabase bearer tokens to FastAPI.
+- FastAPI verifies Supabase JWTs against the project JWKS before resolving `UserIdentity`.
 - Production-facing secrets are validated through typed settings in `src/common/config.py`.
+- Supabase OAuth redirect URLs must allow the web callback path `/auth/callback`.
+- Local API entry points:
+  - `/` returns a lightweight welcome payload
+  - `/healthz` returns runtime health info
+  - `/docs` opens Swagger UI
+
+## Login QA Checklist
+
+- Open `/login` and confirm the login copy and button render correctly.
+- Click `Continue with Google` and confirm the browser moves to the Google sign-in page.
+- Open a protected route such as `/dashboard`, verify it redirects to `/login?next=/dashboard`, then confirm login returns to `/dashboard`.
+- Use an account with an empty onboarding profile and confirm direct login lands on `/onboarding`.

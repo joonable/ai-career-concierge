@@ -41,7 +41,7 @@ The PoC should support the core loop end to end:
 The repository keeps the backend in a Python `src/*` layout and isolates the frontend in `apps/web`.
 
 - `apps/web`
-  - Next.js App Router, auth entry routes, onboarding form, and dashboard shell
+  - Next.js App Router, Supabase SSR auth entry routes, onboarding form, and dashboard shell
 - `src/api`
   - FastAPI routes, schemas, dependencies, thin application services
 - `src/agent`
@@ -148,6 +148,13 @@ Expected node flow:
   - Updates profile data, guidelines, and notification settings
 - `POST /api/v1/evaluations/{evaluation_id}/feedback`
   - Stores like or dislike feedback from the dashboard flow
+
+### Current Auth Contract
+
+- Web login uses Supabase Google OAuth and stores the resulting session with the App Router SSR cookie pattern.
+- Protected web routes such as `/onboarding` and `/dashboard` require a valid Supabase session.
+- Backend user endpoints require `Authorization: Bearer <Supabase access token>`.
+- Backend authentication verifies Supabase JWTs against the project JWKS and extracts `sub` plus `email`.
 
 ## Definition Of Done
 

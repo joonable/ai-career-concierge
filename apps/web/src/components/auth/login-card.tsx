@@ -1,23 +1,38 @@
 "use client";
 
-import { startTransition, useState } from "react";
+import React, { startTransition, useState } from "react";
 
-import { createSupabaseBrowserClient } from "@/lib/supabase_auth";
+import { FeyButton } from "@/components/ui/fey-button";
+import { resolveSafeNextPath } from "@/lib/login_redirect";
+import { createSupabaseBrowserClient } from "@/lib/supabase_auth_browser";
 
-export function LoginCard() {
-  const [message, setMessage] = useState("Google OAuth will redirect back into `/auth/callback`.");
+type LoginCardProps = {
+  bodyClassName: string;
+  errorMessage?: string;
+  nextPath?: string;
+};
+
+export function LoginCard({ bodyClassName, errorMessage, nextPath }: LoginCardProps) {
+  const [message, setMessage] = useState<string | null>(null);
   const [isPending, setIsPending] = useState(false);
 
   const handleSignIn = () => {
     setIsPending(true);
+    setMessage(null);
+
     startTransition(async () => {
       try {
         const supabase = createSupabaseBrowserClient();
         const origin = window.location.origin;
+        const redirectPath = resolveSafeNextPath(nextPath);
+        const redirectUrl = new URL("/auth/callback", origin);
+        if (redirectPath) {
+          redirectUrl.searchParams.set("next", redirectPath);
+        }
         const { error } = await supabase.auth.signInWithOAuth({
           provider: "google",
           options: {
-            redirectTo: `${origin}/auth/callback`,
+            redirectTo: redirectUrl.toString(),
           },
         });
 
@@ -25,10 +40,9 @@ export function LoginCard() {
           throw error;
         }
 
-        setMessage("Redirecting to Google OAuth.");
+        setMessage("Google 로그인 페이지로 이동합니다.");
       } catch {
-        document.cookie = "acc_session=demo; path=/";
-        window.location.href = "/onboarding";
+        setMessage("Google 로그인을 시작하지 못했습니다. 다시 시도하세요.");
       } finally {
         setIsPending(false);
       }
@@ -36,17 +50,13 @@ export function LoginCard() {
   };
 
   return (
-    <section className="panel" style={{ padding: 28 }}>
-      <div className="stack">
-        <span className="eyebrow">Single-user PoC</span>
-        <h2 style={{ margin: 0, fontSize: "1.9rem" }}>Sign in and set the operating profile.</h2>
-        <p className="muted" style={{ margin: 0 }}>
-          The frontend stays thin: auth here, business logic in FastAPI, evaluation in LangGraph.
-        </p>
-        <button className="button primary" disabled={isPending} onClick={handleSignIn} type="button">
-          {isPending ? "Connecting..." : "Continue with Google"}
-        </button>
-        <p className="muted" style={{ margin: 0 }}>{message}</p>
+    <section className="login-card">
+      <div className="login-card__body">
+        <h2 className={bodyClassName}>Google 계정으로 시작</h2>
+        <p className={`login-card__status ${bodyClassName}`}>{errorMessage ?? message ?? " "}</p>
+        <FeyButton disabled={isPending} onClick={handleSignIn} type="button">
+          {isPending ? "Google 연결 중..." : "Continue with Google"}
+        </FeyButton>
       </div>
     </section>
   );

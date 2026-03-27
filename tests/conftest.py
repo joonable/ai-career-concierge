@@ -74,6 +74,20 @@ class InvalidEvaluator:
         }
 
 
+class FakeTokenVerifier:
+    def verify_access_token(self, token: str):
+        if token != "test-supabase-token":
+            raise ValueError("bad token")
+
+        from api.dependencies.auth import UserIdentity
+
+        return UserIdentity(
+            user_id="89b6698f-d88b-4b83-baa8-23a3a8ee7f92",
+            email="scaffold-user@example.com",
+            oauth_id="89b6698f-d88b-4b83-baa8-23a3a8ee7f92",
+        )
+
+
 def build_runtime(
     *,
     scrapers: Optional[Iterable[object]] = None,
@@ -112,6 +126,7 @@ def runtime():
 
 @pytest.fixture
 def app(test_env, runtime):
+    import api.dependencies.auth as auth_module
     from api.dependencies.database import get_session
     from api.dependencies.runtime import get_runtime
     from api.main import create_app
@@ -130,10 +145,13 @@ def app(test_env, runtime):
     application.dependency_overrides[get_session] = override_session
     application.dependency_overrides[get_runtime] = lambda: runtime
     application.state.test_engine = engine
+    original_get_token_verifier = auth_module.get_token_verifier
+    auth_module.get_token_verifier = lambda: FakeTokenVerifier()
 
     yield application
 
     application.dependency_overrides.clear()
+    auth_module.get_token_verifier = original_get_token_verifier
     SQLModel.metadata.drop_all(engine)
 
 
@@ -155,8 +173,7 @@ def db_session(app):
 
 def auth_headers():
     return {
-        "Authorization": "Bearer dev-token",
-        "X-User-Email": "scaffold-user@example.com",
+        "Authorization": "Bearer test-supabase-token",
     }
 
 

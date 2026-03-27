@@ -1,9 +1,13 @@
 from __future__ import annotations
 
-from typing import Dict
-
 from api.dependencies.auth import UserIdentity
-from api.schemas.users import UserProfilePayload, UserProfileResponse
+from api.schemas.users import (
+    Guidelines,
+    NotificationSettings,
+    ProfileData,
+    UserProfilePayload,
+    UserProfileResponse,
+)
 from db.repositories import UserRepository
 
 
@@ -17,13 +21,12 @@ class ProfileService:
             oauth_id=identity.oauth_id,
             preferred_user_id=identity.user_id,
         )
-        notification_settings = user.notification_settings or {"minimum_fit_score": 80}
         return UserProfileResponse(
             user_id=user.id,
             email=user.email,
-            profile_data=user.profile_data,
-            guidelines=user.guidelines,
-            notification_settings=notification_settings,
+            profile_data=_build_profile_data(user.profile_data),
+            guidelines=_build_guidelines(user.guidelines),
+            notification_settings=_build_notification_settings(user.notification_settings),
         )
 
     def update_profile(
@@ -38,20 +41,45 @@ class ProfileService:
         )
         updated_user = self.user_repository.update_profile(
             user=user,
-            profile_data=payload.profile_data,
-            guidelines=payload.guidelines,
-            notification_settings=_ensure_notification_defaults(payload.notification_settings),
+            profile_data=payload.profile_data.model_dump(),
+            guidelines=payload.guidelines.model_dump(),
+            notification_settings=payload.notification_settings.model_dump(exclude_none=True),
         )
         return UserProfileResponse(
             user_id=updated_user.id,
             email=updated_user.email,
-            profile_data=updated_user.profile_data,
-            guidelines=updated_user.guidelines,
-            notification_settings=updated_user.notification_settings,
+            profile_data=_build_profile_data(updated_user.profile_data),
+            guidelines=_build_guidelines(updated_user.guidelines),
+            notification_settings=_build_notification_settings(updated_user.notification_settings),
         )
 
 
-def _ensure_notification_defaults(notification_settings: Dict[str, object]) -> Dict[str, object]:
-    merged = {"minimum_fit_score": 80}
-    merged.update(notification_settings)
-    return merged
+def _build_profile_data(profile_data: object) -> ProfileData:
+    merged = {
+        "role": "",
+        "years_of_experience": 0,
+        "title_keywords": [],
+    }
+    if isinstance(profile_data, dict):
+        merged.update(profile_data)
+    return ProfileData.model_construct(**merged)
+
+
+def _build_guidelines(guidelines: object) -> Guidelines:
+    merged = {
+        "must_haves": [],
+        "deal_breakers": [],
+    }
+    if isinstance(guidelines, dict):
+        merged.update(guidelines)
+    return Guidelines.model_construct(**merged)
+
+
+def _build_notification_settings(notification_settings: object) -> NotificationSettings:
+    merged = {
+        "minimum_fit_score": 80,
+        "delivery_channel": None,
+    }
+    if isinstance(notification_settings, dict):
+        merged.update(notification_settings)
+    return NotificationSettings.model_construct(**merged)

@@ -52,6 +52,14 @@ class Settings(BaseSettings):
     pipeline_enabled: bool = Field(default=False, alias="PIPELINE_ENABLED")
     allow_dev_schedule: bool = Field(default=False, alias="ALLOW_DEV_SCHEDULE")
 
+    @property
+    def supabase_jwks_url(self) -> str:
+        return f"{self.supabase_url.rstrip('/')}/auth/v1/.well-known/jwks.json"
+
+    @property
+    def supabase_issuer(self) -> str:
+        return f"{self.supabase_url.rstrip('/')}/auth/v1"
+
     @model_validator(mode="after")
     def validate_environment(self) -> "Settings":
         if self.app_env == AppEnv.PRODUCTION:

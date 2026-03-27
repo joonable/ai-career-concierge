@@ -1,9 +1,11 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
+import { createSupabaseMiddlewareClient } from "@/lib/supabase_auth_middleware";
+
 const PROTECTED_PATHS = ["/onboarding", "/dashboard"];
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const isProtected = PROTECTED_PATHS.some((path) =>
     request.nextUrl.pathname.startsWith(path),
   );
@@ -12,11 +14,18 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const hasSession =
-    request.cookies.has("acc_session") || request.cookies.has("sb-access-token");
+  const response = NextResponse.next({
+    request: {
+      headers: request.headers,
+    },
+  });
+  const supabase = createSupabaseMiddlewareClient(request, response);
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
 
-  if (hasSession) {
-    return NextResponse.next();
+  if (session) {
+    return response;
   }
 
   const loginUrl = new URL("/login", request.url);
