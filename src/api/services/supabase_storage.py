@@ -148,7 +148,7 @@ class SupabaseUserStore:
         self.client = client
 
     def upsert_from_identity(self, identity: UserIdentity) -> UserProfileResponse:
-        existing = self._find_by_oauth_or_email(identity.oauth_id, identity.email)
+        existing = self._find_existing_user(identity)
         if existing is None:
             user_id = identity.user_id or uuid4()
             default_sections = serialize_user_profile_sections(
@@ -165,8 +165,7 @@ class SupabaseUserStore:
                 "created_at": utc_now_iso(),
                 "updated_at": utc_now_iso(),
             }
-            created = self.client.insert("users", [payload])[0]
-            return self._to_profile_response(created)
+            existing = self._create_or_recover_user(identity, payload)
 
         updates: Dict[str, Any] = {"updated_at": utc_now_iso()}
         normalized_sections = serialize_user_profile_sections(self._to_profile_response(existing))
@@ -216,6 +215,33 @@ class SupabaseUserStore:
         rows = self.client.select("users", params={"select": "*"})
         return [self._to_profile_response(row) for row in rows]
 
+    def _find_existing_user(self, identity: UserIdentity) -> Optional[Dict[str, Any]]:
+        if identity.user_id is not None:
+            by_id = self.client.select(
+                "users",
+                params={"id": f"eq.{identity.user_id}", "select": "*", "limit": "1"},
+            )
+            if by_id:
+                return by_id[0]
+
+        return self._find_by_oauth_or_email(identity.oauth_id, identity.email)
+
+    def _create_or_recover_user(
+        self,
+        identity: UserIdentity,
+        payload: Dict[str, Any],
+    ) -> Dict[str, Any]:
+        try:
+            return self.client.insert("users", [payload], upsert=True)[0]
+        except HTTPException as exc:
+            if not _is_duplicate_user_insert_error(exc):
+                raise
+
+            existing = self._find_existing_user(identity)
+            if existing is None:
+                raise
+            return existing
+
     def _find_by_oauth_or_email(self, oauth_id: str, email: str) -> Optional[Dict[str, Any]]:
         by_oauth = self.client.select(
             "users",
@@ -241,6 +267,14 @@ class SupabaseUserStore:
             guidelines=row.get("guidelines"),
             notification_settings=row.get("notification_settings"),
         )
+
+
+def _is_duplicate_user_insert_error(exc: HTTPException) -> bool:
+    if exc.status_code != status.HTTP_502_BAD_GATEWAY:
+        return False
+
+    detail = exc.detail if isinstance(exc.detail, str) else ""
+    return '"code":"23505"' in detail or "duplicate key value violates unique constraint" in detail
 
 
 class SupabaseEvaluationStore:

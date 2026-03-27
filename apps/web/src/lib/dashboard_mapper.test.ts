@@ -1,0 +1,71 @@
+import { describe, expect, it } from "vitest";
+
+import { mapDashboardRecommendations } from "@/lib/dashboard_mapper";
+
+describe("mapDashboardRecommendations", () => {
+  it("maps API recommendations to dashboard card props", () => {
+    const recommendations = mapDashboardRecommendations({
+      user_id: "user-1",
+      minimum_fit_score: 80,
+      recommendations: [
+        {
+          evaluation_id: "eval-1",
+          status: "LLM_EVALUATED",
+          fit_score: 91,
+          reasoning: "Strong backend and ML overlap.",
+          user_feedback: "DISLIKE",
+          feedback_reason: "Too much onsite time",
+          job_id: "job-1",
+          title: "Senior Machine Learning Engineer",
+          company: "Signal Labs",
+          url: "https://example.com/jobs/1",
+          platform: "LinkedIn",
+        },
+      ],
+    });
+
+    expect(recommendations).toEqual([
+      {
+        evaluationId: "eval-1",
+        status: "LLM_EVALUATED",
+        statusLabel: "평가 완료",
+        fitScore: 91,
+        reasoning: "Strong backend and ML overlap.",
+        userFeedback: "DISLIKE",
+        feedbackLabel: "제외",
+        feedbackReason: "Too much onsite time",
+        title: "Senior Machine Learning Engineer",
+        company: "Signal Labs",
+        url: "https://example.com/jobs/1",
+        platform: "LinkedIn",
+      },
+    ]);
+  });
+
+  it("formats unknown status and feedback values into readable fallback labels", () => {
+    const recommendations = mapDashboardRecommendations({
+      user_id: "user-1",
+      minimum_fit_score: 80,
+      recommendations: [
+        {
+          evaluation_id: "eval-1",
+          status: "CUSTOM_STATUS",
+          fit_score: null,
+          reasoning: null,
+          user_feedback: "CUSTOM_FEEDBACK",
+          feedback_reason: null,
+          job_id: "job-1",
+          title: "Role",
+          company: "Company",
+          url: "https://example.com/jobs/1",
+          platform: "Wanted",
+        },
+      ],
+    });
+
+    expect(recommendations[0]?.statusLabel).toBe("Custom Status");
+    expect(recommendations[0]?.feedbackLabel).toBe("Custom Feedback");
+    expect(recommendations[0]?.fitScore).toBeNull();
+    expect(recommendations[0]?.reasoning).toBeNull();
+  });
+});

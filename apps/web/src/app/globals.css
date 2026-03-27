@@ -1149,6 +1149,38 @@ main {
   align-content: start;
 }
 
+.dashboard-empty-state--error {
+  border-color: rgba(248, 113, 113, 0.2);
+  background: linear-gradient(180deg, rgba(32, 12, 15, 0.94) 0%, rgba(18, 9, 12, 0.88) 100%);
+}
+
+.dashboard-loading-card {
+  min-height: 180px;
+  align-content: start;
+}
+
+.dashboard-loading-copy {
+  display: grid;
+  gap: 12px;
+}
+
+.dashboard-skeleton {
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.05) 0%, rgba(171, 214, 255, 0.18) 50%, rgba(255, 255, 255, 0.05) 100%);
+  background-size: 200% 100%;
+  animation: dashboard-skeleton-pulse 1.6s ease-in-out infinite;
+}
+
+.dashboard-skeleton--title {
+  width: min(100%, 320px);
+  height: 28px;
+}
+
+.dashboard-skeleton--body {
+  width: min(100%, 260px);
+  height: 14px;
+}
+
 .dashboard-recommendation {
   min-height: 230px;
   align-content: start;
@@ -1171,6 +1203,16 @@ main {
   overflow: hidden;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 3;
+}
+
+@keyframes dashboard-skeleton-pulse {
+  0% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0 50%;
+  }
 }
 
 @media (max-width: 960px) {

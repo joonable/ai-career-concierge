@@ -1,3 +1,5 @@
+from datetime import datetime, timedelta, timezone
+
 from tests.conftest import auth_headers
 
 
@@ -189,6 +191,125 @@ async def test_feedback_and_dashboard_api(client, db_session):
     recommendation = dashboard_response.json()["recommendations"][0]
     assert recommendation["feedback_reason"] == "salary too low"
     assert recommendation["title"] == "Senior Machine Learning Engineer"
+    assert recommendation["company"] == "Signal Labs"
+    assert recommendation["platform"] == "test_source"
+    assert recommendation["url"] == "https://example.com/jobs/seed-job"
+    assert recommendation["fit_score"] is None
+    assert recommendation["reasoning"] is None
+
+
+async def test_dashboard_returns_empty_recommendations_for_new_user(client):
+    response = await client.get("/api/v1/users/me/dashboard", headers=auth_headers())
+
+    assert response.status_code == 200
+    assert response.json()["recommendations"] == []
+
+
+async def test_dashboard_only_returns_rows_for_the_current_user(client, db_session):
+    from db.models import Evaluation, Job
+    from tests.conftest import seed_user
+
+    current_user = seed_user(db_session, email="scaffold-user@example.com")
+    other_user = seed_user(db_session, email="other-user@example.com")
+    current_job = Job(
+        platform="linkedin",
+        external_job_id="current-job",
+        title="Current User Role",
+        company="Alpha",
+        jd_raw_text="Python SQL",
+        url="https://example.com/jobs/current",
+        min_years_experience=5,
+        max_years_experience=8,
+        source_metadata={},
+    )
+    other_job = Job(
+        platform="wanted",
+        external_job_id="other-job",
+        title="Other User Role",
+        company="Beta",
+        jd_raw_text="Python SQL",
+        url="https://example.com/jobs/other",
+        min_years_experience=5,
+        max_years_experience=8,
+        source_metadata={},
+    )
+    db_session.add(current_job)
+    db_session.add(other_job)
+    db_session.commit()
+    db_session.refresh(current_job)
+    db_session.refresh(other_job)
+
+    current_evaluation = Evaluation(user_id=current_user.id, job_id=current_job.id)
+    other_evaluation = Evaluation(user_id=other_user.id, job_id=other_job.id)
+
+    current_evaluation.reasoning = "Current user recommendation"
+    other_evaluation.reasoning = "Other user recommendation"
+    db_session.add(current_evaluation)
+    db_session.add(other_evaluation)
+    db_session.commit()
+
+    response = await client.get("/api/v1/users/me/dashboard", headers=auth_headers())
+
+    assert response.status_code == 200
+    recommendations = response.json()["recommendations"]
+    assert len(recommendations) == 1
+    assert recommendations[0]["reasoning"] == "Current user recommendation"
+
+
+async def test_dashboard_returns_recommendations_in_updated_order(client, db_session):
+    from db.models import Evaluation, Job
+    from tests.conftest import seed_user
+
+    user = seed_user(db_session)
+    first_job = Job(
+        platform="linkedin",
+        external_job_id="job-1",
+        title="First Role",
+        company="Alpha",
+        jd_raw_text="Python SQL",
+        url="https://example.com/jobs/1",
+        min_years_experience=5,
+        max_years_experience=8,
+        source_metadata={},
+    )
+    second_job = Job(
+        platform="wanted",
+        external_job_id="job-2",
+        title="Second Role",
+        company="Beta",
+        jd_raw_text="Python SQL",
+        url="https://example.com/jobs/2",
+        min_years_experience=5,
+        max_years_experience=8,
+        source_metadata={},
+    )
+    db_session.add(first_job)
+    db_session.add(second_job)
+    db_session.commit()
+    db_session.refresh(first_job)
+    db_session.refresh(second_job)
+
+    older_evaluation = Evaluation(
+        user_id=user.id,
+        job_id=first_job.id,
+        reasoning="Older recommendation",
+        updated_at=datetime.now(timezone.utc) - timedelta(days=1),
+    )
+    newer_evaluation = Evaluation(
+        user_id=user.id,
+        job_id=second_job.id,
+        reasoning="Newer recommendation",
+        updated_at=datetime.now(timezone.utc),
+    )
+    db_session.add(older_evaluation)
+    db_session.add(newer_evaluation)
+    db_session.commit()
+
+    response = await client.get("/api/v1/users/me/dashboard", headers=auth_headers())
+
+    assert response.status_code == 200
+    recommendations = response.json()["recommendations"]
+    assert [item["title"] for item in recommendations] == ["Second Role", "First Role"]
 
 
 async def test_profile_requires_real_bearer_token(client, monkeypatch):
@@ -215,5 +336,11 @@ async def test_profile_requires_real_bearer_token(client, monkeypatch):
 
 async def test_profile_rejects_missing_bearer_token(client):
     response = await client.get("/api/v1/users/me/profile")
+
+    assert response.status_code == 401
+
+
+async def test_dashboard_rejects_missing_bearer_token(client):
+    response = await client.get("/api/v1/users/me/dashboard")
 
     assert response.status_code == 401

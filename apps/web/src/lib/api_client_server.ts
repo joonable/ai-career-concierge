@@ -1,24 +1,8 @@
 import { createSupabaseServerClient } from "@/lib/supabase_auth_server";
+import { DashboardDataError } from "@/lib/dashboard_errors";
+import type { DashboardResponse } from "@/lib/dashboard_types";
 import { webEnv } from "@/lib/env";
 import type { UserProfileResponse } from "@/lib/profile_types";
-
-type DashboardResponse = {
-  user_id: string;
-  minimum_fit_score: number;
-  recommendations: Array<{
-    evaluation_id: string;
-    status: string;
-    fit_score: number | null;
-    reasoning: string | null;
-    user_feedback: string | null;
-    feedback_reason: string | null;
-    job_id: string;
-    title: string;
-    company: string;
-    url: string;
-    platform: string;
-  }>;
-};
 
 async function getAccessToken(): Promise<string> {
   const supabase = await createSupabaseServerClient();
@@ -33,6 +17,28 @@ async function getAccessToken(): Promise<string> {
   return session.access_token;
 }
 
+async function readErrorMessage(response: Response, fallbackMessage: string) {
+  try {
+    const data = await response.json();
+    if (typeof data?.detail === "string" && data.detail.trim().length > 0) {
+      return data.detail;
+    }
+  } catch {
+    // Ignore JSON parsing failures and fall back to text.
+  }
+
+  try {
+    const text = await response.text();
+    if (text.trim().length > 0) {
+      return text;
+    }
+  } catch {
+    // Ignore text parsing failures and use the fallback message.
+  }
+
+  return fallbackMessage;
+}
+
 export async function getProfileSnapshot(): Promise<UserProfileResponse> {
   const accessToken = await getAccessToken();
   const response = await fetch(`${webEnv.apiBaseUrl}/api/v1/users/me/profile`, {
@@ -43,7 +49,9 @@ export async function getProfileSnapshot(): Promise<UserProfileResponse> {
   });
 
   if (!response.ok) {
-    throw new Error("Failed to load profile.");
+    throw new DashboardDataError(
+      await readErrorMessage(response, "프로필 데이터를 불러오지 못했습니다."),
+    );
   }
 
   return response.json();
@@ -59,7 +67,9 @@ export async function getDashboardSnapshot(): Promise<DashboardResponse> {
   });
 
   if (!response.ok) {
-    throw new Error("Failed to load dashboard.");
+    throw new DashboardDataError(
+      await readErrorMessage(response, "추천 대시보드를 불러오지 못했습니다."),
+    );
   }
 
   return response.json();

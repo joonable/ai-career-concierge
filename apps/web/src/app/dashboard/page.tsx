@@ -1,13 +1,26 @@
 import React from "react";
 
+import { DashboardErrorState } from "@/components/dashboard/dashboard-error-state";
 import { OnboardingStatusCard } from "@/components/dashboard/onboarding-status-card";
 import { RecommendationBoard } from "@/components/dashboard/recommendation-board";
-import { getDashboardSnapshot, getProfileSnapshot } from "@/lib/api_client_server";
+import { loadDashboardPageData } from "@/lib/dashboard_loader";
 import { mapDashboardRecommendations } from "@/lib/dashboard_mapper";
 import { deriveDashboardOnboardingState } from "@/lib/dashboard_onboarding";
 
 export default async function DashboardPage() {
-  const [dashboard, profile] = await Promise.all([getDashboardSnapshot(), getProfileSnapshot()]);
+  const dashboardPageData = await loadDashboardPageData();
+
+  if (dashboardPageData.status === "error") {
+    return (
+      <main className="dashboard-page">
+        <div className="dashboard-shell">
+          <DashboardErrorState message={dashboardPageData.message} />
+        </div>
+      </main>
+    );
+  }
+
+  const { dashboard, profile } = dashboardPageData;
   const recommendations = mapDashboardRecommendations(dashboard);
   const onboardingState = deriveDashboardOnboardingState(profile);
 

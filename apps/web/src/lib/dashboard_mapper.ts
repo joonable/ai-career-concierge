@@ -1,17 +1,4 @@
-type DashboardResponse = {
-  recommendations: Array<{
-    evaluation_id: string;
-    status: string;
-    fit_score: number | null;
-    reasoning: string | null;
-    user_feedback: string | null;
-    feedback_reason: string | null;
-    title: string;
-    company: string;
-    url: string;
-    platform: string;
-  }>;
-};
+import type { DashboardResponse } from "@/lib/dashboard_types";
 
 export type DashboardRecommendation = {
   evaluationId: string;

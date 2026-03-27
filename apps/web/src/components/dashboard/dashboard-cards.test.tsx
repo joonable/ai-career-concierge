@@ -164,4 +164,33 @@ describe("RecommendationBoard", () => {
       "https://example.com/jobs/1",
     );
   });
+
+  it("renders pending recommendations with null score and reasoning", () => {
+    render(
+      <RecommendationBoard
+        minimumFitScore={85}
+        recommendations={[
+          {
+            evaluationId: "eval-2",
+            status: "PENDING",
+            statusLabel: "대기",
+            fitScore: null,
+            reasoning: null,
+            userFeedback: null,
+            feedbackLabel: null,
+            feedbackReason: null,
+            title: "Platform Engineer",
+            company: "Signal Labs",
+            url: "https://example.com/jobs/2",
+            platform: "LinkedIn",
+          },
+        ]}
+      />,
+    );
+
+    expect(screen.getByText("Platform Engineer")).toBeInTheDocument();
+    expect(screen.getAllByText("대기")).toHaveLength(2);
+    expect(screen.getByText("정밀 평가 대기 중")).toBeInTheDocument();
+    expect(screen.getByText("--")).toBeInTheDocument();
+  });
 });
