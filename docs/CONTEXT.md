@@ -147,9 +147,11 @@ Expected node flow:
 ### Scaffold Endpoints Added For The PoC Loop
 
 - `GET /api/v1/users/me/profile`
-  - Returns the current user profile and notification settings
+  - Returns the current user profile and notification settings in a canonical nested shape
 - `PUT /api/v1/users/me/profile`
   - Updates profile data, guidelines, and notification settings
+  - Accepts onboarding fields for role, years, must-haves, deal-breakers, and minimum fit score
+  - Derives `profile_data.title_keywords` from `role` when omitted and defaults `notification_settings.delivery_channel` to `slack`
 - `POST /api/v1/evaluations/{evaluation_id}/feedback`
   - Stores like or dislike feedback from the dashboard flow
 
@@ -223,6 +225,7 @@ Expected node flow:
 Current scaffold defaults:
 
 - `SUPABASE_URL`, `SUPABASE_ANON_KEY`, and `SUPABASE_SERVICE_ROLE_KEY` are the required backend runtime credentials for the PoC runtime path.
+- The backend also reads `WEB_ORIGIN` to allow authenticated browser requests from the Next.js web app.
 - `DATABASE_URL` is now a legacy optional setting for direct Postgres tooling only, not a required runtime dependency.
 - `ALLOW_DEV_SCHEDULE=false` keeps non-prod scheduling disabled unless explicitly enabled.
 - The web app reads `NEXT_PUBLIC_API_BASE_URL`, `NEXT_PUBLIC_SUPABASE_URL`, and `NEXT_PUBLIC_SUPABASE_ANON_KEY`.

@@ -40,8 +40,9 @@ SaaS 확장을 염두에 두고 처음부터 아키텍처를 이원화(Dev/Prod)
 
 - **`User` (사용자)**
     - `id` (UUID, PK), `oauth_id`, `email`
-    - `profile_data` (JSONB): 직무, 연차, 기술 스택 등 정형 데이터.
+    - `profile_data` (JSONB): 직무, 연차, 기술 스택 등 정형 데이터. 현재 PoC 온보딩 기준 필드는 `role`, `years_of_experience`, `title_keywords`.
     - `guidelines` (JSONB): `must_haves`, `deal_breakers` 등 LLM 주입용 제약 조건.
+    - `notification_settings` (JSONB): `minimum_fit_score`, `delivery_channel` 등 추천 전달 기준. 현재 기본 채널은 `slack`.
 - **`Job` (공고 원본 데이터)**
     - `id` (UUID, PK), `platform`, `external_job_id` (Unique - 중복 수집 방지)
     - `title`, `company`, `jd_raw_text` (공고 원문), `url`

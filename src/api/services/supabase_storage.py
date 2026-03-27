@@ -11,11 +11,10 @@ from fastapi import HTTPException, status
 from agent.schemas.pipeline_job import PipelineJob
 from api.dependencies.auth import UserIdentity
 from api.schemas.users import (
-    Guidelines,
-    NotificationSettings,
-    ProfileData,
     UserProfilePayload,
     UserProfileResponse,
+    build_user_profile_response,
+    serialize_user_profile_sections,
 )
 from common.config import Settings
 from db.enums import EvaluationStatus, FeedbackState, LogLevel
@@ -151,13 +150,18 @@ class SupabaseUserStore:
     def upsert_from_identity(self, identity: UserIdentity) -> UserProfileResponse:
         existing = self._find_by_oauth_or_email(identity.oauth_id, identity.email)
         if existing is None:
+            user_id = identity.user_id or uuid4()
+            default_sections = serialize_user_profile_sections(
+                UserProfileResponse(
+                    user_id=user_id,
+                    email=identity.email,
+                )
+            )
             payload = {
-                "id": str(identity.user_id or uuid4()),
+                "id": str(user_id),
                 "oauth_id": identity.oauth_id,
                 "email": identity.email,
-                "profile_data": {},
-                "guidelines": {},
-                "notification_settings": {},
+                **default_sections,
                 "created_at": utc_now_iso(),
                 "updated_at": utc_now_iso(),
             }
@@ -165,10 +169,17 @@ class SupabaseUserStore:
             return self._to_profile_response(created)
 
         updates: Dict[str, Any] = {"updated_at": utc_now_iso()}
+        normalized_sections = serialize_user_profile_sections(self._to_profile_response(existing))
         if existing.get("oauth_id") != identity.oauth_id:
             updates["oauth_id"] = identity.oauth_id
         if existing.get("email") != identity.email:
             updates["email"] = identity.email
+        if existing.get("profile_data") != normalized_sections["profile_data"]:
+            updates["profile_data"] = normalized_sections["profile_data"]
+        if existing.get("guidelines") != normalized_sections["guidelines"]:
+            updates["guidelines"] = normalized_sections["guidelines"]
+        if existing.get("notification_settings") != normalized_sections["notification_settings"]:
+            updates["notification_settings"] = normalized_sections["notification_settings"]
 
         if len(updates) > 1:
             existing = self.client.update("users", updates, params={"id": f"eq.{existing['id']}"})[0]
@@ -181,12 +192,11 @@ class SupabaseUserStore:
         payload: UserProfilePayload,
     ) -> UserProfileResponse:
         user = self.upsert_from_identity(identity)
+        sections = serialize_user_profile_sections(payload)
         updated = self.client.update(
             "users",
             {
-                "profile_data": payload.profile_data.model_dump(),
-                "guidelines": payload.guidelines.model_dump(),
-                "notification_settings": payload.notification_settings.model_dump(exclude_none=True),
+                **sections,
                 "updated_at": utc_now_iso(),
             },
             params={"id": f"eq.{user.user_id}"},
@@ -224,26 +234,12 @@ class SupabaseUserStore:
         return None
 
     def _to_profile_response(self, row: Dict[str, Any]) -> UserProfileResponse:
-        profile_data = row.get("profile_data") or {}
-        guidelines = row.get("guidelines") or {}
-        notification_settings = row.get("notification_settings") or {}
-
-        return UserProfileResponse(
+        return build_user_profile_response(
             user_id=UUID(str(row["id"])),
             email=row["email"],
-            profile_data=ProfileData.model_construct(
-                role=str(profile_data.get("role", "")),
-                years_of_experience=int(profile_data.get("years_of_experience", 0)),
-                title_keywords=list(profile_data.get("title_keywords", [])),
-            ),
-            guidelines=Guidelines.model_construct(
-                must_haves=list(guidelines.get("must_haves", [])),
-                deal_breakers=list(guidelines.get("deal_breakers", [])),
-            ),
-            notification_settings=NotificationSettings.model_construct(
-                minimum_fit_score=int(notification_settings.get("minimum_fit_score", 80)),
-                delivery_channel=notification_settings.get("delivery_channel"),
-            ),
+            profile_data=row.get("profile_data"),
+            guidelines=row.get("guidelines"),
+            notification_settings=row.get("notification_settings"),
         )
 
 

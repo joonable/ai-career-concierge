@@ -1,7 +1,10 @@
 from tests.conftest import auth_headers
 
 
-async def test_profile_get_and_update_round_trip(client):
+async def test_profile_get_and_update_round_trip(client, db_session):
+    from db.models import User
+    from uuid import UUID
+
     get_response = await client.get(
         "/api/v1/users/me/profile",
         headers=auth_headers(),
@@ -13,7 +16,13 @@ async def test_profile_get_and_update_round_trip(client):
     assert get_response.json()["profile_data"]["title_keywords"] == []
     assert get_response.json()["guidelines"]["must_haves"] == []
     assert get_response.json()["notification_settings"]["minimum_fit_score"] == 80
-    assert get_response.json()["notification_settings"]["delivery_channel"] is None
+    assert get_response.json()["notification_settings"]["delivery_channel"] == "slack"
+
+    stored_user = db_session.get(User, UUID(get_response.json()["user_id"]))
+    assert stored_user is not None
+    assert stored_user.profile_data == get_response.json()["profile_data"]
+    assert stored_user.guidelines == get_response.json()["guidelines"]
+    assert stored_user.notification_settings == get_response.json()["notification_settings"]
 
     update_response = await client.put(
         "/api/v1/users/me/profile",
@@ -36,6 +45,7 @@ async def test_profile_get_and_update_round_trip(client):
     assert update_response.json()["profile_data"]["role"] == "Machine Learning Engineer"
     assert update_response.json()["guidelines"]["must_haves"] == ["Python", "SQL"]
     assert update_response.json()["notification_settings"]["minimum_fit_score"] == 82
+    assert update_response.json()["notification_settings"]["delivery_channel"] == "slack"
 
     second_get_response = await client.get(
         "/api/v1/users/me/profile",
@@ -45,6 +55,13 @@ async def test_profile_get_and_update_round_trip(client):
     assert second_get_response.status_code == 200
     assert second_get_response.json()["profile_data"]["years_of_experience"] == 6
     assert second_get_response.json()["guidelines"]["deal_breakers"] == ["contract-only"]
+
+    db_session.expire_all()
+    updated_user = db_session.get(User, UUID(update_response.json()["user_id"]))
+    assert updated_user is not None
+    assert updated_user.profile_data == second_get_response.json()["profile_data"]
+    assert updated_user.guidelines == second_get_response.json()["guidelines"]
+    assert updated_user.notification_settings == second_get_response.json()["notification_settings"]
 
 
 async def test_profile_normalizes_whitespace_and_duplicates(client):
@@ -74,6 +91,39 @@ async def test_profile_normalizes_whitespace_and_duplicates(client):
     assert body["notification_settings"]["delivery_channel"] == "slack"
 
 
+async def test_profile_update_derives_internal_defaults_for_onboarding_fields(client, db_session):
+    from db.models import User
+    from uuid import UUID
+
+    response = await client.put(
+        "/api/v1/users/me/profile",
+        headers=auth_headers(),
+        json={
+            "profile_data": {
+                "role": "Machine Learning Engineer",
+                "years_of_experience": 6,
+            },
+            "guidelines": {
+                "must_haves": ["Python", "SQL"],
+                "deal_breakers": ["contract-only"],
+            },
+            "notification_settings": {"minimum_fit_score": 85},
+        },
+    )
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["profile_data"]["title_keywords"] == ["machine learning engineer"]
+    assert body["notification_settings"]["delivery_channel"] == "slack"
+
+    db_session.expire_all()
+    stored_user = db_session.get(User, UUID(body["user_id"]))
+    assert stored_user is not None
+    assert stored_user.profile_data == body["profile_data"]
+    assert stored_user.guidelines == body["guidelines"]
+    assert stored_user.notification_settings == body["notification_settings"]
+
+
 async def test_profile_rejects_invalid_payload_shape(client):
     response = await client.put(
         "/api/v1/users/me/profile",
@@ -89,6 +139,29 @@ async def test_profile_rejects_invalid_payload_shape(client):
                 "deal_breakers": "contract-only",
             },
             "notification_settings": {"minimum_fit_score": 120},
+        },
+    )
+
+    assert response.status_code == 422
+
+
+async def test_profile_rejects_unsupported_delivery_channel(client):
+    response = await client.put(
+        "/api/v1/users/me/profile",
+        headers=auth_headers(),
+        json={
+            "profile_data": {
+                "role": "Machine Learning Engineer",
+                "years_of_experience": 6,
+            },
+            "guidelines": {
+                "must_haves": ["Python"],
+                "deal_breakers": [],
+            },
+            "notification_settings": {
+                "minimum_fit_score": 80,
+                "delivery_channel": "email",
+            },
         },
     )
 

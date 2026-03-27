@@ -25,6 +25,7 @@ class Settings(BaseSettings):
     api_host: str = Field(default="0.0.0.0", alias="API_HOST")
     api_port: int = Field(default=8000, alias="API_PORT")
     internal_api_key: str = Field(default="replace-me", alias="INTERNAL_API_KEY")
+    web_origin: str = Field(default="", alias="WEB_ORIGIN")
 
     database_url: str = Field(
         default="",
@@ -68,6 +69,7 @@ class Settings(BaseSettings):
             required = {
                 "SUPABASE_URL": self.supabase_url,
                 "SUPABASE_SERVICE_ROLE_KEY": self.supabase_service_role_key,
+                "WEB_ORIGIN": self.web_origin,
                 "GOOGLE_CLIENT_ID": self.google_client_id,
                 "GOOGLE_CLIENT_SECRET": self.google_client_secret,
                 "SLACK_SIGNING_SECRET": self.slack_signing_secret,

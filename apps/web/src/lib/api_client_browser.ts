@@ -20,6 +20,28 @@ async function buildAuthenticatedHeaders() {
   };
 }
 
+async function readErrorMessage(response: Response, fallbackMessage: string) {
+  try {
+    const data = await response.json();
+    if (typeof data?.detail === "string" && data.detail.trim().length > 0) {
+      return data.detail;
+    }
+  } catch {
+    // Ignore JSON parsing failures and fall back to text.
+  }
+
+  try {
+    const text = await response.text();
+    if (text.trim().length > 0) {
+      return text;
+    }
+  } catch {
+    // Ignore text parsing failures and return the fallback message.
+  }
+
+  return fallbackMessage;
+}
+
 export async function getProfile(): Promise<UserProfileResponse> {
   const response = await fetch(`${webEnv.apiBaseUrl}/api/v1/users/me/profile`, {
     headers: await buildAuthenticatedHeaders(),
@@ -27,7 +49,7 @@ export async function getProfile(): Promise<UserProfileResponse> {
   });
 
   if (!response.ok) {
-    throw new Error("Failed to load profile.");
+    throw new Error(await readErrorMessage(response, "Failed to load profile."));
   }
 
   return response.json();
@@ -41,7 +63,7 @@ export async function updateProfile(payload: UserProfilePayload): Promise<UserPr
   });
 
   if (!response.ok) {
-    throw new Error("Failed to update profile.");
+    throw new Error(await readErrorMessage(response, "Failed to update profile."));
   }
 
   return response.json();

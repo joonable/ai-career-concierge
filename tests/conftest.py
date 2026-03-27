@@ -11,6 +11,7 @@ from httpx import ASGITransport, AsyncClient
 from sqlmodel import Session, SQLModel, create_engine
 
 from agent.schemas.pipeline_job import PipelineJob
+from api.schemas.users import build_user_profile_response, serialize_user_profile_sections
 from api.services.mock_llm_evaluator import MockGeminiEvaluator
 from api.services.runtime import RuntimeServices
 from api.services.slack_notifier import LoggingSlackNotifier
@@ -97,33 +98,38 @@ class FakeUserStore:
         self.repo = UserRepository(session)
 
     def upsert_from_identity(self, identity):
-        from api.schemas.users import Guidelines, NotificationSettings, ProfileData, UserProfileResponse
-
         user = self.repo.upsert_from_identity(
             email=identity.email,
             oauth_id=identity.oauth_id,
             preferred_user_id=identity.user_id,
         )
-        profile_data = user.profile_data or {}
-        guidelines = user.guidelines or {}
-        notification_settings = user.notification_settings or {}
-        return UserProfileResponse(
+        profile = build_user_profile_response(
             user_id=user.id,
             email=user.email,
-            profile_data=ProfileData.model_construct(
-                role=str(profile_data.get("role", "")),
-                years_of_experience=int(profile_data.get("years_of_experience", 0)),
-                title_keywords=list(profile_data.get("title_keywords", [])),
-            ),
-            guidelines=Guidelines.model_construct(
-                must_haves=list(guidelines.get("must_haves", [])),
-                deal_breakers=list(guidelines.get("deal_breakers", [])),
-            ),
-            notification_settings=NotificationSettings.model_construct(
-                minimum_fit_score=int(notification_settings.get("minimum_fit_score", 80)),
-                delivery_channel=notification_settings.get("delivery_channel"),
-            ),
+            profile_data=user.profile_data,
+            guidelines=user.guidelines,
+            notification_settings=user.notification_settings,
         )
+        sections = serialize_user_profile_sections(profile)
+        if (
+            user.profile_data != sections["profile_data"]
+            or user.guidelines != sections["guidelines"]
+            or user.notification_settings != sections["notification_settings"]
+        ):
+            user = self.repo.update_profile(
+                user=user,
+                profile_data=sections["profile_data"],
+                guidelines=sections["guidelines"],
+                notification_settings=sections["notification_settings"],
+            )
+            profile = build_user_profile_response(
+                user_id=user.id,
+                email=user.email,
+                profile_data=user.profile_data,
+                guidelines=user.guidelines,
+                notification_settings=user.notification_settings,
+            )
+        return profile
 
     def update_profile(self, identity, payload):
         user = self.repo.upsert_from_identity(
@@ -131,11 +137,12 @@ class FakeUserStore:
             oauth_id=identity.oauth_id,
             preferred_user_id=identity.user_id,
         )
+        sections = serialize_user_profile_sections(payload)
         updated = self.repo.update_profile(
             user=user,
-            profile_data=payload.profile_data.model_dump(),
-            guidelines=payload.guidelines.model_dump(),
-            notification_settings=payload.notification_settings.model_dump(exclude_none=True),
+            profile_data=sections["profile_data"],
+            guidelines=sections["guidelines"],
+            notification_settings=sections["notification_settings"],
         )
         identity.user_id = updated.id
         return self.upsert_from_identity(identity)
@@ -433,7 +440,7 @@ def seed_user(
             "must_haves": ["Python", "SQL", "recommender systems"],
             "deal_breakers": ["contract-only", "pure frontend"],
         },
-        notification_settings={"minimum_fit_score": 80},
+        notification_settings={"minimum_fit_score": 80, "delivery_channel": "slack"},
     )
     session.add(user)
     session.commit()

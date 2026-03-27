@@ -11,18 +11,27 @@ export type Guidelines = {
 
 export type NotificationSettings = {
   minimum_fit_score: number;
-  delivery_channel: string | null;
+  delivery_channel: "slack";
 };
 
 export type UserProfilePayload = {
-  profile_data: ProfileData;
+  profile_data: {
+    role: string;
+    years_of_experience: number;
+    title_keywords?: string[];
+  };
   guidelines: Guidelines;
-  notification_settings: NotificationSettings;
+  notification_settings: {
+    minimum_fit_score: number;
+    delivery_channel?: "slack";
+  };
 };
 
 export type UserProfileResponse = UserProfilePayload & {
   user_id: string;
   email: string;
+  profile_data: ProfileData;
+  notification_settings: NotificationSettings;
 };
 
 export type OnboardingFormState = {
@@ -51,4 +60,29 @@ export function mapProfileToOnboardingFormState(
     dealBreakers: profile.guidelines.deal_breakers.join(", "),
     minimumFitScore: String(profile.notification_settings.minimum_fit_score),
   };
+}
+
+export function mapOnboardingFormStateToProfilePayload(
+  state: OnboardingFormState,
+): UserProfilePayload {
+  return {
+    profile_data: {
+      role: state.role,
+      years_of_experience: Number(state.yearsOfExperience),
+    },
+    guidelines: {
+      must_haves: splitCommaSeparatedValues(state.mustHaves),
+      deal_breakers: splitCommaSeparatedValues(state.dealBreakers),
+    },
+    notification_settings: {
+      minimum_fit_score: Number(state.minimumFitScore),
+    },
+  };
+}
+
+function splitCommaSeparatedValues(value: string): string[] {
+  return value
+    .split(",")
+    .map((item) => item.trim())
+    .filter(Boolean);
 }
