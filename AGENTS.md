@@ -50,7 +50,8 @@ The PoC must support this loop:
 - LLM: Google Gemini Flash with structured JSON output
 - Scraping: Playwright in Python async runtime
 - Database and auth: Supabase PostgreSQL + Google OAuth
-- ORM: SQLModel
+- Runtime persistence: Supabase Data API with service role access
+- Legacy schema references: SQLModel
 - Scheduling: GitHub Actions cron trigger
 - Tracing: LangSmith
 
@@ -75,7 +76,11 @@ Operational rule:
 
 Prefer a repository layout that matches the system layers from the TRD and keeps boundaries obvious.
 
-Default implementation layout for the current repository:
+Current implementation layout for the repository:
+
+- `apps/web`
+  - Next.js App Router frontend for login, auth callback, onboarding, and dashboard flows
+  - Keep page routes under `src/app`, reusable UI under `src/components`, and runtime integration code under `src/lib`
 
 - `src/api`
   - FastAPI routes, orchestration entrypoints, auth, and integration handlers
@@ -84,7 +89,7 @@ Default implementation layout for the current repository:
 - `src/scraper`
   - Playwright-based ingestion logic and source-specific scrapers
 - `src/db`
-  - SQLModel models, migrations, repository helpers, and DB setup
+  - legacy SQLModel models, migration history, and schema references retained during the PoC transition
 - `src/common`
   - shared config, logging, constants, and typed utility modules
 - `tests`
@@ -92,9 +97,8 @@ Default implementation layout for the current repository:
 - `docs`
   - product and technical documentation
 
-If the project later grows into a multi-app repository, it may evolve into a structure such as:
+If the project later grows beyond the current PoC, it may evolve further into a structure such as:
 
-- `apps/web`
 - `apps/api`
 - `packages/agent`
 - `packages/scraper`
@@ -124,6 +128,14 @@ Folder rules:
 - Keep scraping, rule filtering, LLM evaluation, and delivery as separate concerns.
 - Prefer typed models and structured outputs over ad hoc dict parsing.
 - Keep schemas and APIs aligned with the feedback-driven recommendation workflow.
+
+## Current Auth Boundary
+
+- The web app should use Supabase Google OAuth with the Next.js App Router SSR session pattern.
+- Protected frontend routes should rely on Supabase session cookies rather than custom local auth state.
+- FastAPI should treat `Authorization: Bearer <Supabase access token>` as the backend auth contract.
+- Backend token verification should validate Supabase JWTs against the configured project JWKS and extract stable user identity from token claims.
+- Backend profile, dashboard, feedback, and pipeline persistence should use the Supabase Data API with `SUPABASE_SERVICE_ROLE_KEY` for the current PoC runtime.
 
 ## Core Workflow Contract
 
@@ -172,8 +184,9 @@ Important invariants:
 ## Migration Rules
 
 - Treat database schema changes as contract changes, not local refactors.
-- Any schema change should include a forward migration and a documented rollback or compatibility plan.
-- Keep SQLModel models, database schema, status enums, and API-facing assumptions in sync.
+- Any schema change should include a forward migration path and a documented rollback or compatibility plan.
+- For the current PoC runtime, prefer Supabase SQL/MCP as the schema change workflow.
+- Keep legacy SQLModel references, database schema, status enums, and API-facing assumptions in sync while the transition remains in the repository.
 - If a schema change affects API responses, evaluation lifecycle, or feedback behavior, update tests and docs in the same change.
 - Prefer additive or staged migrations when compatibility matters more than cleanup speed.
 
@@ -224,6 +237,7 @@ Secret handling rules:
 - Never commit real `.env` files.
 - Never reuse prod secrets in development or tests.
 - Treat service role keys and webhook signing secrets as high sensitivity.
+- Treat `DATABASE_URL` as a legacy optional tooling value, not as a required default runtime secret for the PoC path.
 
 ## Prompt Management Rules
 
@@ -265,6 +279,7 @@ Do not spend time on these before the PoC loop works:
 - Centralize environment loading so env-specific branching is explicit and testable.
 - Name configuration fields so it is obvious whether a value is shared, dev-only, or prod-only.
 - Add seams that make scraper, LLM, and Slack integrations mockable in tests.
+- Prefer the Supabase Data API path for new persistence work unless there is a clear reason to introduce direct Postgres access.
 
 ## Testing Priorities
 
