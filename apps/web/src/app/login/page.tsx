@@ -52,14 +52,8 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
 
       <section className="login-hero__content">
         <div className="login-hero__copy">
-          <p className={`login-hero__kicker ${bodyFont.className}`}>P0 Login</p>
-          <h1 className={`login-hero__headline ${headlineFont.className}`}>
-            Google 로그인 후 바로 첫 화면으로 연결합니다.
-          </h1>
-          <p className={bodyFont.className}>
-            로그인 후 온보딩이 비어 있으면 기준 설정 화면으로, 이미 설정되어 있으면 추천
-            대시보드로 이동합니다.
-          </p>
+          <p className={`login-hero__kicker ${bodyFont.className}`}>AI Career Concierge</p>
+          <h1 className={`login-hero__headline ${headlineFont.className}`}>로그인</h1>
         </div>
         <LoginCard
           bodyClassName={bodyFont.className}

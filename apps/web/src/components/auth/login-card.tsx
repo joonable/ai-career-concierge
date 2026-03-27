@@ -52,7 +52,7 @@ export function LoginCard({ bodyClassName, errorMessage, nextPath }: LoginCardPr
   return (
     <section className="login-card">
       <div className="login-card__body">
-        <h2 className={bodyClassName}>Google 계정으로 시작</h2>
+        <h2 className={bodyClassName}>Google로 계속하기</h2>
         <p className={`login-card__status ${bodyClassName}`}>{errorMessage ?? message ?? " "}</p>
         <FeyButton disabled={isPending} onClick={handleSignIn} type="button">
           {isPending ? "Google 연결 중..." : "Continue with Google"}

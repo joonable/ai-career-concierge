@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
-  const response = NextResponse.next();
+  const response = new NextResponse(null, { status: 200 });
   const supabase = await createSupabaseRouteHandlerClient(request, response);
   const {
     data: { session },
@@ -33,8 +33,11 @@ export async function GET(request: NextRequest) {
   const destination = session?.access_token
     ? await resolvePostLoginPath(session.access_token, nextPath)
     : "/onboarding";
+  const redirectResponse = NextResponse.redirect(new URL(destination, request.url));
 
-  return NextResponse.redirect(new URL(destination, request.url), {
-    headers: response.headers,
+  response.cookies.getAll().forEach((cookie) => {
+    redirectResponse.cookies.set(cookie);
   });
+
+  return redirectResponse;
 }

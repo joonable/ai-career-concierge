@@ -41,7 +41,10 @@ The PoC should support the core loop end to end:
 The repository keeps the backend in a Python `src/*` layout and isolates the frontend in `apps/web`.
 
 - `apps/web`
-  - Next.js App Router, Supabase SSR auth entry routes, onboarding form, and dashboard shell
+  - Next.js App Router frontend
+  - `src/app` holds route entrypoints such as `/login`, `/auth/callback`, `/onboarding`, and `/dashboard`
+  - `src/components` holds page-specific UI such as auth, onboarding, and dashboard components
+  - `src/lib` holds Supabase auth helpers, API client code, and frontend runtime adapters
 - `src/api`
   - FastAPI routes, schemas, dependencies, thin application services
 - `src/agent`
@@ -151,6 +154,7 @@ Expected node flow:
 
 ### Current Auth Contract
 
+- Web login flow is `/login -> Google OAuth -> /auth/callback -> /onboarding`.
 - Web login uses Supabase Google OAuth and stores the resulting session with the App Router SSR cookie pattern.
 - Protected web routes such as `/onboarding` and `/dashboard` require a valid Supabase session.
 - Backend user endpoints require `Authorization: Bearer <Supabase access token>`.
@@ -205,16 +209,17 @@ Expected node flow:
 ## Environment Strategy
 
 - Separate dev and prod environments from the start.
-- Dev can use local DB or Supabase dev project with Slack test workspace.
+- Dev should default to a dedicated Supabase dev project plus a Slack test workspace.
 - Prod uses dedicated Supabase and Slack environments plus GitHub Actions CI/CD and scheduling.
 - Never share database, Slack workspace, OAuth credentials, or API keys between dev and prod.
 - Keep environment variables explicitly split so local development cannot accidentally point to prod resources.
 - Treat scheduled pipeline execution as prod-only by default unless a dedicated dev schedule is intentionally configured.
 - Standardize on `APP_ENV` plus separate `.env.development`, `.env.test`, and `.env.production` files.
+- Use local SQLite only for isolated tests or temporary bootstrapping, not as the standard dev runtime path.
 
 Current scaffold defaults:
 
-- `DATABASE_URL` defaults to local SQLite for safe development bootstrapping.
+- `DATABASE_URL` should point to Supabase PostgreSQL for both dev and prod, with separate projects per environment.
 - `ALLOW_DEV_SCHEDULE=false` keeps non-prod scheduling disabled unless explicitly enabled.
 - The web app reads `NEXT_PUBLIC_API_BASE_URL`, `NEXT_PUBLIC_SUPABASE_URL`, and `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
 
@@ -243,4 +248,4 @@ When making implementation decisions, prefer the simplest design that preserves:
 - low LLM cost
 - feedback-aware recommendation quality
 - future extensibility into a SaaS architecture
-- a default Python `src/*` repository layout until a multi-app split is clearly necessary
+- the current hybrid layout of backend `src/*` plus frontend `apps/web`

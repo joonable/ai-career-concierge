@@ -1,10 +1,12 @@
+import { OnboardingStatusCard } from "@/components/dashboard/onboarding-status-card";
 import { RecommendationBoard } from "@/components/dashboard/recommendation-board";
-import { getDashboardSnapshot } from "@/lib/api_client_server";
+import { getDashboardSnapshot, getProfileSnapshot } from "@/lib/api_client_server";
 import { mapDashboardRecommendations } from "@/lib/dashboard_mapper";
 
 export default async function DashboardPage() {
-  const dashboard = await getDashboardSnapshot();
+  const [dashboard, profile] = await Promise.all([getDashboardSnapshot(), getProfileSnapshot()]);
   const recommendations = mapDashboardRecommendations(dashboard);
+  const isOnboardingComplete = profile.profile_data.role.trim().length > 0;
 
   return (
     <main>
@@ -19,6 +21,16 @@ export default async function DashboardPage() {
             </p>
           </div>
         </section>
+        <OnboardingStatusCard
+          summary={{
+            isComplete: isOnboardingComplete,
+            role: profile.profile_data.role,
+            yearsOfExperience: profile.profile_data.years_of_experience,
+            mustHaves: profile.guidelines.must_haves,
+            dealBreakers: profile.guidelines.deal_breakers,
+            minimumFitScore: profile.notification_settings.minimum_fit_score,
+          }}
+        />
         <RecommendationBoard
           minimumFitScore={dashboard.minimum_fit_score}
           recommendations={recommendations}

@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+import os
 from enum import Enum
 from functools import lru_cache
+from pathlib import Path
 from typing import Optional
 
 from pydantic import Field, model_validator
@@ -25,7 +27,7 @@ class Settings(BaseSettings):
     internal_api_key: str = Field(default="replace-me", alias="INTERNAL_API_KEY")
 
     database_url: str = Field(
-        default="sqlite:///./.data/ai_career_concierge.db",
+        default="",
         alias="DATABASE_URL",
     )
 
@@ -62,8 +64,14 @@ class Settings(BaseSettings):
 
     @model_validator(mode="after")
     def validate_environment(self) -> "Settings":
+        if not self.database_url:
+            raise ValueError("DATABASE_URL must be configured.")
+        if "<SUPABASE_DB_PASSWORD>" in self.database_url:
+            raise ValueError("DATABASE_URL must include the real Supabase DB password.")
+
         if self.app_env == AppEnv.PRODUCTION:
             required = {
+                "DATABASE_URL": self.database_url,
                 "SUPABASE_URL": self.supabase_url,
                 "SUPABASE_SERVICE_ROLE_KEY": self.supabase_service_role_key,
                 "GOOGLE_CLIENT_ID": self.google_client_id,
@@ -95,6 +103,17 @@ class Settings(BaseSettings):
         return cls(_env_file=env_file)
 
 
+def resolve_default_env_file() -> Optional[str]:
+    app_env = os.getenv("APP_ENV", AppEnv.DEVELOPMENT.value)
+    candidates = [f".env.{app_env}", ".env"]
+
+    for candidate in candidates:
+        if Path(candidate).exists():
+            return candidate
+
+    return None
+
+
 @lru_cache(maxsize=1)
 def get_settings() -> Settings:
-    return Settings()
+    return Settings.from_env_file(resolve_default_env_file())

@@ -21,9 +21,18 @@ This project separates development and production from the start.
 
 Recommended local setup:
 
-1. Create `.env.development` from `.env.example`.
-2. Fill only dev credentials.
-3. Keep scheduled execution disabled locally unless explicitly testing it.
+1. Create backend env at `/Users/joon/PycharmProjects/ai-career-concierge/.env.development` from [`/.env.example`](/Users/joon/PycharmProjects/ai-career-concierge/.env.example).
+2. Create web env at [`apps/web/.env.development`](/Users/joon/PycharmProjects/ai-career-concierge/apps/web/.env.development) from [`apps/web/.env.example`](/Users/joon/PycharmProjects/ai-career-concierge/apps/web/.env.example).
+3. Fill only dev credentials.
+4. Keep scheduled execution disabled locally unless explicitly testing it.
+
+Environment ownership:
+
+- Root `.env.*` files are for FastAPI and backend services.
+- `apps/web/.env.*` files are for the Next.js app.
+- `NEXT_PUBLIC_*` values must live in `apps/web/.env.*`.
+- Secrets must not use `NEXT_PUBLIC_*`.
+- `DATABASE_URL` should point to Supabase Postgres, not local SQLite.
 
 ## Repository Layout
 
@@ -44,7 +53,9 @@ tests             Unit, integration, contract, resilience coverage
 Backend:
 
 ```bash
+cp .env.example .env.development
 poetry install
+PYTHONPATH=src poetry run alembic upgrade head
 poetry run dev
 ```
 
@@ -52,6 +63,7 @@ Frontend:
 
 ```bash
 cd apps/web
+cp .env.example .env.development
 npm install
 npm run dev
 npm run test
@@ -81,6 +93,7 @@ The current goal is a single-user PoC that supports:
 - FastAPI verifies Supabase JWTs against the project JWKS before resolving `UserIdentity`.
 - Production-facing secrets are validated through typed settings in `src/common/config.py`.
 - Supabase OAuth redirect URLs must allow the web callback path `/auth/callback`.
+- The backend persists application data to `DATABASE_URL`, which should be a Supabase Postgres connection string.
 - Local API entry points:
   - `/` returns a lightweight welcome payload
   - `/healthz` returns runtime health info
