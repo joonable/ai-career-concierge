@@ -3,13 +3,11 @@ from __future__ import annotations
 from uuid import UUID
 
 from fastapi import APIRouter, Depends
-from sqlmodel import Session
 
 from api.dependencies.auth import UserIdentity, get_current_user_identity
-from api.dependencies.database import get_session
+from api.dependencies.supabase_store import get_evaluation_store, get_user_store
 from api.schemas.evaluations import FeedbackRequest, FeedbackResponse
 from api.services.feedback_service import FeedbackService
-from db.repositories import EvaluationRepository, UserRepository
 
 
 router = APIRouter(prefix="/api/v1/evaluations", tags=["evaluations"])
@@ -20,12 +18,12 @@ def record_feedback(
     evaluation_id: UUID,
     payload: FeedbackRequest,
     identity: UserIdentity = Depends(get_current_user_identity),
-    session: Session = Depends(get_session),
+    user_store=Depends(get_user_store),
+    evaluation_store=Depends(get_evaluation_store),
 ) -> FeedbackResponse:
     service = FeedbackService(
-        session=session,
-        user_repository=UserRepository(session),
-        evaluation_repository=EvaluationRepository(session),
+        user_store=user_store,
+        evaluation_store=evaluation_store,
     )
     return service.record_feedback(
         identity=identity,

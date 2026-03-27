@@ -32,7 +32,8 @@ Environment ownership:
 - `apps/web/.env.*` files are for the Next.js app.
 - `NEXT_PUBLIC_*` values must live in `apps/web/.env.*`.
 - Secrets must not use `NEXT_PUBLIC_*`.
-- `DATABASE_URL` should point to Supabase Postgres, not local SQLite.
+- `SUPABASE_SERVICE_ROLE_KEY` is required for backend profile, dashboard, and feedback persistence.
+- `DATABASE_URL` is optional for local auth/profile/dashboard work, but still required for Alembic and current pipeline code paths.
 
 ## Repository Layout
 
@@ -55,7 +56,6 @@ Backend:
 ```bash
 cp .env.example .env.development
 poetry install
-PYTHONPATH=src poetry run alembic upgrade head
 poetry run dev
 ```
 
@@ -93,7 +93,8 @@ The current goal is a single-user PoC that supports:
 - FastAPI verifies Supabase JWTs against the project JWKS before resolving `UserIdentity`.
 - Production-facing secrets are validated through typed settings in `src/common/config.py`.
 - Supabase OAuth redirect URLs must allow the web callback path `/auth/callback`.
-- The backend persists application data to `DATABASE_URL`, which should be a Supabase Postgres connection string.
+- User-facing backend flows now persist through the Supabase Data API with `SUPABASE_SERVICE_ROLE_KEY`.
+- `DATABASE_URL` remains the direct Postgres connection used by Alembic and the current pipeline-oriented ORM path.
 - Local API entry points:
   - `/` returns a lightweight welcome payload
   - `/healthz` returns runtime health info
@@ -104,4 +105,4 @@ The current goal is a single-user PoC that supports:
 - Open `/login` and confirm the login copy and button render correctly.
 - Click `Continue with Google` and confirm the browser moves to the Google sign-in page.
 - Open a protected route such as `/dashboard`, verify it redirects to `/login?next=/dashboard`, then confirm login returns to `/dashboard`.
-- Use an account with an empty onboarding profile and confirm direct login lands on `/onboarding`.
+- Use an account with an empty onboarding profile and confirm direct login lands on `/dashboard` with an onboarding prompt.

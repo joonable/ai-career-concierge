@@ -20,6 +20,8 @@ def _ensure_sqlite_directory(database_url: str) -> None:
 @lru_cache(maxsize=1)
 def get_engine():
     settings = get_settings()
+    if not settings.database_url:
+        raise ValueError("DATABASE_URL is not configured.")
     _ensure_sqlite_directory(settings.database_url)
     connect_args = {"check_same_thread": False} if settings.database_url.startswith("sqlite") else {}
     return create_engine(settings.database_url, connect_args=connect_args)
@@ -27,6 +29,8 @@ def get_engine():
 
 def prepare_database() -> None:
     settings = get_settings()
+    if not settings.database_url:
+        return
     if settings.database_url.startswith("sqlite"):
         SQLModel.metadata.create_all(get_engine())
 

@@ -47,12 +47,14 @@ The repository keeps the backend in a Python `src/*` layout and isolates the fro
   - `src/lib` holds Supabase auth helpers, API client code, and frontend runtime adapters
 - `src/api`
   - FastAPI routes, schemas, dependencies, thin application services
+  - User-facing auth/profile/dashboard/feedback flows use Supabase Auth plus the Supabase Data API
 - `src/agent`
   - LangGraph workflow, node implementations, prompts, typed pipeline state
 - `src/scraper`
   - base scraper interface, normalizer, source registry, source-specific scrapers
 - `src/db`
   - SQLModel models, repositories, session setup, Alembic migrations
+  - Still used for pipeline-oriented persistence and schema ownership
 - `src/common`
   - typed config, logging, telemetry, ids, and shared errors
 - `tests`
@@ -154,11 +156,13 @@ Expected node flow:
 
 ### Current Auth Contract
 
-- Web login flow is `/login -> Google OAuth -> /auth/callback -> /onboarding`.
+- Web login flow is `/login -> Google OAuth -> /auth/callback -> /dashboard`.
+- The dashboard becomes the first landing page and surfaces whether onboarding is still required.
 - Web login uses Supabase Google OAuth and stores the resulting session with the App Router SSR cookie pattern.
 - Protected web routes such as `/onboarding` and `/dashboard` require a valid Supabase session.
 - Backend user endpoints require `Authorization: Bearer <Supabase access token>`.
 - Backend authentication verifies Supabase JWTs against the project JWKS and extracts `sub` plus `email`.
+- Backend user/profile/dashboard/feedback routes currently persist through the Supabase Data API using `SUPABASE_SERVICE_ROLE_KEY`.
 
 ## Definition Of Done
 
@@ -219,7 +223,8 @@ Expected node flow:
 
 Current scaffold defaults:
 
-- `DATABASE_URL` should point to Supabase PostgreSQL for both dev and prod, with separate projects per environment.
+- `SUPABASE_URL`, `SUPABASE_ANON_KEY`, and `SUPABASE_SERVICE_ROLE_KEY` are the required backend runtime credentials for login-adjacent flows.
+- `DATABASE_URL` is optional for local login/profile/dashboard development, but still required for direct SQLModel paths such as Alembic migrations and the current pipeline implementation.
 - `ALLOW_DEV_SCHEDULE=false` keeps non-prod scheduling disabled unless explicitly enabled.
 - The web app reads `NEXT_PUBLIC_API_BASE_URL`, `NEXT_PUBLIC_SUPABASE_URL`, and `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
 

@@ -4,13 +4,11 @@ import json
 from urllib.parse import parse_qs
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Request, status
-from sqlmodel import Session
 
-from api.dependencies.database import get_session
 from api.dependencies.runtime import get_runtime
+from api.dependencies.supabase_store import get_evaluation_store, get_user_store
 from api.schemas.slack import SlackWebhookResponse
 from api.services.feedback_service import FeedbackService
-from db.repositories import EvaluationRepository, UserRepository
 
 
 router = APIRouter(prefix="/api/v1/slack", tags=["slack"])
@@ -21,7 +19,8 @@ async def interactive_webhook(
     request: Request,
     x_slack_request_timestamp: str = Header(alias="X-Slack-Request-Timestamp"),
     x_slack_signature: str = Header(alias="X-Slack-Signature"),
-    session: Session = Depends(get_session),
+    user_store=Depends(get_user_store),
+    evaluation_store=Depends(get_evaluation_store),
     runtime=Depends(get_runtime),
 ) -> SlackWebhookResponse:
     raw_body = await request.body()
@@ -40,9 +39,8 @@ async def interactive_webhook(
         parsed_payload = json.loads(raw_body.decode("utf-8"))
 
     service = FeedbackService(
-        session=session,
-        user_repository=UserRepository(session),
-        evaluation_repository=EvaluationRepository(session),
+        user_store=user_store,
+        evaluation_store=evaluation_store,
     )
     service.record_feedback_from_slack(parsed_payload)
     return SlackWebhookResponse(ok=True)

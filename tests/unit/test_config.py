@@ -27,20 +27,20 @@ def test_settings_reject_dev_schedule_without_explicit_override():
         )
 
 
-def test_settings_require_database_url():
-    with pytest.raises(ValueError):
-        Settings(APP_ENV="development", DATABASE_URL="")
+def test_settings_allow_empty_database_url():
+    settings = Settings(APP_ENV="development", DATABASE_URL="")
+    assert settings.database_url == ""
 
 
-def test_settings_reject_placeholder_database_password():
-    with pytest.raises(ValueError):
-        Settings(
-            APP_ENV="development",
-            DATABASE_URL=(
-                "postgresql+psycopg://postgres:<SUPABASE_DB_PASSWORD>@"
-                "db.example.supabase.co:5432/postgres"
-            ),
-        )
+def test_settings_preserve_placeholder_database_url():
+    settings = Settings(
+        APP_ENV="development",
+        DATABASE_URL=(
+            "postgresql+psycopg://postgres:<SUPABASE_DB_PASSWORD>@"
+            "db.example.supabase.co:5432/postgres"
+        ),
+    )
+    assert "<SUPABASE_DB_PASSWORD>" in settings.database_url
 
 
 def test_resolve_default_env_file_prefers_app_env_specific_file(tmp_path, monkeypatch):

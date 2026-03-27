@@ -14,8 +14,11 @@ from api.services.mock_llm_evaluator import MockGeminiEvaluator
 from api.services.runtime import RuntimeServices
 from api.services.slack_notifier import LoggingSlackNotifier
 from api.services.slack_signature_service import SlackSignatureService
+from api.services.supabase_storage import DashboardRow, FeedbackRecord
 from common.config import get_settings
+from db.enums import FeedbackState
 from db.models import Evaluation, Job, User
+from db.repositories import EvaluationRepository, UserRepository
 from db.session import get_engine
 from scraper.base import ScrapedJob
 from scraper.registry import ScraperRegistry
@@ -88,6 +91,101 @@ class FakeTokenVerifier:
         )
 
 
+class TestUserStore:
+    def __init__(self, session: Session):
+        self.repo = UserRepository(session)
+
+    def upsert_from_identity(self, identity):
+        from api.schemas.users import Guidelines, NotificationSettings, ProfileData, UserProfileResponse
+
+        user = self.repo.upsert_from_identity(
+            email=identity.email,
+            oauth_id=identity.oauth_id,
+            preferred_user_id=identity.user_id,
+        )
+        profile_data = user.profile_data or {}
+        guidelines = user.guidelines or {}
+        notification_settings = user.notification_settings or {}
+        return UserProfileResponse(
+            user_id=user.id,
+            email=user.email,
+            profile_data=ProfileData.model_construct(
+                role=str(profile_data.get("role", "")),
+                years_of_experience=int(profile_data.get("years_of_experience", 0)),
+                title_keywords=list(profile_data.get("title_keywords", [])),
+            ),
+            guidelines=Guidelines.model_construct(
+                must_haves=list(guidelines.get("must_haves", [])),
+                deal_breakers=list(guidelines.get("deal_breakers", [])),
+            ),
+            notification_settings=NotificationSettings.model_construct(
+                minimum_fit_score=int(notification_settings.get("minimum_fit_score", 80)),
+                delivery_channel=notification_settings.get("delivery_channel"),
+            ),
+        )
+
+    def update_profile(self, identity, payload):
+        user = self.repo.upsert_from_identity(
+            email=identity.email,
+            oauth_id=identity.oauth_id,
+            preferred_user_id=identity.user_id,
+        )
+        updated = self.repo.update_profile(
+            user=user,
+            profile_data=payload.profile_data.model_dump(),
+            guidelines=payload.guidelines.model_dump(),
+            notification_settings=payload.notification_settings.model_dump(exclude_none=True),
+        )
+        identity.user_id = updated.id
+        return self.upsert_from_identity(identity)
+
+
+class TestEvaluationStore:
+    def __init__(self, session: Session):
+        self.repo = EvaluationRepository(session)
+
+    def list_dashboard_rows(self, user_id):
+        rows = self.repo.list_dashboard_rows(user_id)
+        return [
+            DashboardRow(
+                evaluation_id=evaluation.id,
+                status=evaluation.status.value if hasattr(evaluation.status, "value") else evaluation.status,
+                fit_score=evaluation.fit_score,
+                reasoning=evaluation.reasoning,
+                user_feedback=(
+                    evaluation.user_feedback.value
+                    if getattr(evaluation.user_feedback, "value", None)
+                    else evaluation.user_feedback
+                ),
+                feedback_reason=evaluation.feedback_reason,
+                job_id=job.id,
+                title=job.title,
+                company=job.company,
+                url=job.url,
+                platform=job.platform,
+            )
+            for evaluation, job in rows
+        ]
+
+    def update_feedback(self, *, evaluation_id, feedback, feedback_reason, user_id=None):
+        evaluation = self.repo.update_feedback(
+            evaluation_id=evaluation_id,
+            feedback=feedback,
+            feedback_reason=feedback_reason,
+        )
+        if user_id is not None and evaluation.user_id != user_id:
+            raise ValueError("Evaluation not found.")
+        return FeedbackRecord(
+            evaluation_id=evaluation.id,
+            feedback=FeedbackState(
+                evaluation.user_feedback.value
+                if getattr(evaluation.user_feedback, "value", None)
+                else evaluation.user_feedback
+            ),
+            feedback_reason=evaluation.feedback_reason,
+        )
+
+
 def build_runtime(
     *,
     scrapers: Optional[Iterable[object]] = None,
@@ -127,6 +225,7 @@ def runtime():
 @pytest.fixture
 def app(test_env, runtime):
     import api.dependencies.auth as auth_module
+    from api.dependencies.supabase_store import get_evaluation_store, get_user_store
     from api.dependencies.database import get_session
     from api.dependencies.runtime import get_runtime
     from api.main import create_app
@@ -142,7 +241,17 @@ def app(test_env, runtime):
         with Session(engine) as session:
             yield session
 
+    def override_user_store():
+        with Session(engine) as session:
+            yield TestUserStore(session)
+
+    def override_evaluation_store():
+        with Session(engine) as session:
+            yield TestEvaluationStore(session)
+
     application.dependency_overrides[get_session] = override_session
+    application.dependency_overrides[get_user_store] = override_user_store
+    application.dependency_overrides[get_evaluation_store] = override_evaluation_store
     application.dependency_overrides[get_runtime] = lambda: runtime
     application.state.test_engine = engine
     original_get_token_verifier = auth_module.get_token_verifier

@@ -2,45 +2,39 @@ from __future__ import annotations
 
 from api.dependencies.auth import UserIdentity
 from api.schemas.users import DashboardRecommendation, DashboardResponse
-from db.repositories import EvaluationRepository, UserRepository
 
 
 class DashboardService:
     def __init__(
         self,
-        user_repository: UserRepository,
-        evaluation_repository: EvaluationRepository,
+        user_store,
+        evaluation_store,
     ):
-        self.user_repository = user_repository
-        self.evaluation_repository = evaluation_repository
+        self.user_store = user_store
+        self.evaluation_store = evaluation_store
 
     def get_dashboard(self, identity: UserIdentity) -> DashboardResponse:
-        user = self.user_repository.upsert_from_identity(
-            email=identity.email,
-            oauth_id=identity.oauth_id,
-            preferred_user_id=identity.user_id,
-        )
-        notification_settings = user.notification_settings or {"minimum_fit_score": 80}
-        rows = self.evaluation_repository.list_dashboard_rows(user.id)
+        user = self.user_store.upsert_from_identity(identity)
+        rows = self.evaluation_store.list_dashboard_rows(user.user_id)
 
         recommendations = [
             DashboardRecommendation(
-                evaluation_id=evaluation.id,
-                status=evaluation.status,
-                fit_score=evaluation.fit_score,
-                reasoning=evaluation.reasoning,
-                user_feedback=evaluation.user_feedback,
-                feedback_reason=evaluation.feedback_reason,
-                job_id=job.id,
-                title=job.title,
-                company=job.company,
-                url=job.url,
-                platform=job.platform,
+                evaluation_id=row.evaluation_id,
+                status=row.status,
+                fit_score=row.fit_score,
+                reasoning=row.reasoning,
+                user_feedback=row.user_feedback,
+                feedback_reason=row.feedback_reason,
+                job_id=row.job_id,
+                title=row.title,
+                company=row.company,
+                url=row.url,
+                platform=row.platform,
             )
-            for evaluation, job in rows
+            for row in rows
         ]
         return DashboardResponse(
-            user_id=user.id,
-            minimum_fit_score=int(notification_settings.get("minimum_fit_score", 80)),
+            user_id=user.user_id,
+            minimum_fit_score=user.notification_settings.minimum_fit_score,
             recommendations=recommendations,
         )

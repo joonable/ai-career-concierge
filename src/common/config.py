@@ -64,14 +64,8 @@ class Settings(BaseSettings):
 
     @model_validator(mode="after")
     def validate_environment(self) -> "Settings":
-        if not self.database_url:
-            raise ValueError("DATABASE_URL must be configured.")
-        if "<SUPABASE_DB_PASSWORD>" in self.database_url:
-            raise ValueError("DATABASE_URL must include the real Supabase DB password.")
-
         if self.app_env == AppEnv.PRODUCTION:
             required = {
-                "DATABASE_URL": self.database_url,
                 "SUPABASE_URL": self.supabase_url,
                 "SUPABASE_SERVICE_ROLE_KEY": self.supabase_service_role_key,
                 "GOOGLE_CLIENT_ID": self.google_client_id,
