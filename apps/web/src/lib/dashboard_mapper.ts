@@ -6,9 +6,12 @@ export type DashboardRecommendation = {
   statusLabel: string;
   fitScore: number | null;
   reasoning: string | null;
+  ruleRejectionReason: string | null;
   userFeedback: string | null;
   feedbackLabel: string | null;
   feedbackReason: string | null;
+  createdAt: string;
+  updatedAt: string;
   title: string;
   company: string;
   url: string;
@@ -24,9 +27,12 @@ export function mapDashboardRecommendations(
     statusLabel: formatEvaluationStatus(recommendation.status),
     fitScore: recommendation.fit_score,
     reasoning: recommendation.reasoning,
+    ruleRejectionReason: recommendation.rule_rejection_reason,
     userFeedback: recommendation.user_feedback,
     feedbackLabel: formatFeedback(recommendation.user_feedback),
     feedbackReason: recommendation.feedback_reason,
+    createdAt: recommendation.created_at,
+    updatedAt: recommendation.updated_at,
     title: recommendation.title,
     company: recommendation.company,
     url: recommendation.url,

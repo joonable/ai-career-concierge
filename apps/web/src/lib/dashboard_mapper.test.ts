@@ -13,8 +13,11 @@ describe("mapDashboardRecommendations", () => {
           status: "LLM_EVALUATED",
           fit_score: 91,
           reasoning: "Strong backend and ML overlap.",
+          rule_rejection_reason: null,
           user_feedback: "DISLIKE",
           feedback_reason: "Too much onsite time",
+          created_at: "2026-03-30T00:00:00Z",
+          updated_at: "2026-03-30T01:00:00Z",
           job_id: "job-1",
           title: "Senior Machine Learning Engineer",
           company: "Signal Labs",
@@ -31,9 +34,12 @@ describe("mapDashboardRecommendations", () => {
         statusLabel: "평가 완료",
         fitScore: 91,
         reasoning: "Strong backend and ML overlap.",
+        ruleRejectionReason: null,
         userFeedback: "DISLIKE",
         feedbackLabel: "제외",
         feedbackReason: "Too much onsite time",
+        createdAt: "2026-03-30T00:00:00Z",
+        updatedAt: "2026-03-30T01:00:00Z",
         title: "Senior Machine Learning Engineer",
         company: "Signal Labs",
         url: "https://example.com/jobs/1",
@@ -52,8 +58,11 @@ describe("mapDashboardRecommendations", () => {
           status: "CUSTOM_STATUS",
           fit_score: null,
           reasoning: null,
+          rule_rejection_reason: "TITLE_MISMATCH",
           user_feedback: "CUSTOM_FEEDBACK",
           feedback_reason: null,
+          created_at: "2026-03-30T00:00:00Z",
+          updated_at: "2026-03-30T01:00:00Z",
           job_id: "job-1",
           title: "Role",
           company: "Company",
@@ -67,5 +76,6 @@ describe("mapDashboardRecommendations", () => {
     expect(recommendations[0]?.feedbackLabel).toBe("Custom Feedback");
     expect(recommendations[0]?.fitScore).toBeNull();
     expect(recommendations[0]?.reasoning).toBeNull();
+    expect(recommendations[0]?.ruleRejectionReason).toBe("TITLE_MISMATCH");
   });
 });

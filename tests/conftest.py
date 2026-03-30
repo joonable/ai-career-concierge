@@ -237,12 +237,15 @@ class FakeEvaluationStore:
                 status=evaluation.status.value if hasattr(evaluation.status, "value") else evaluation.status,
                 fit_score=evaluation.fit_score,
                 reasoning=evaluation.reasoning,
+                rule_rejection_reason=evaluation.rule_rejection_reason,
                 user_feedback=(
                     evaluation.user_feedback.value
                     if getattr(evaluation.user_feedback, "value", None)
                     else evaluation.user_feedback
                 ),
                 feedback_reason=evaluation.feedback_reason,
+                created_at=evaluation.created_at,
+                updated_at=evaluation.updated_at,
                 job_id=job.id,
                 title=job.title,
                 company=job.company,

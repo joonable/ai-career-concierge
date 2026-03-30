@@ -940,6 +940,20 @@ main {
   color: rgba(189, 201, 221, 0.76);
 }
 
+.dashboard-chip--success {
+  background: rgba(16, 185, 129, 0.16);
+  color: #bbf7d0;
+}
+
+.dashboard-chip--warning {
+  background: rgba(245, 158, 11, 0.16);
+  color: #fde68a;
+}
+
+.dashboard-chip--subtle {
+  color: rgba(215, 224, 238, 0.68);
+}
+
 .dashboard-link {
   display: inline-flex;
   align-items: center;
@@ -1149,6 +1163,161 @@ main {
   align-content: start;
 }
 
+.dashboard-section__header--responsive {
+  align-items: end;
+}
+
+.dashboard-board__summary {
+  display: grid;
+  gap: 4px;
+  justify-items: end;
+}
+
+.dashboard-board__filter-panel,
+.dashboard-board__filter-top,
+.dashboard-filter-grid,
+.dashboard-filter-group,
+.dashboard-segmented {
+  display: grid;
+  gap: 14px;
+}
+
+.dashboard-board__filter-panel {
+  gap: 18px;
+}
+
+.dashboard-board__filter-top,
+.dashboard-filter-grid {
+  grid-template-columns: minmax(0, 1.6fr) minmax(220px, 0.8fr);
+  align-items: end;
+}
+
+.dashboard-filter-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.dashboard-filter-group {
+  gap: 10px;
+}
+
+.dashboard-segmented {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.dashboard-segmented__button,
+.dashboard-chip-filter {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  padding: 10px 14px;
+  font: inherit;
+  color: rgba(231, 237, 245, 0.84);
+  background: rgba(255, 255, 255, 0.03);
+  transition:
+    border-color 180ms ease,
+    background 180ms ease,
+    transform 180ms ease;
+}
+
+.dashboard-segmented__button:hover,
+.dashboard-chip-filter:hover {
+  transform: translateY(-1px);
+  border-color: rgba(171, 214, 255, 0.24);
+}
+
+.dashboard-segmented__button--active,
+.dashboard-chip-filter--active {
+  border-color: rgba(96, 165, 250, 0.32);
+  background: rgba(96, 165, 250, 0.16);
+  color: #e0f2fe;
+}
+
+.dashboard-toggle-list,
+.dashboard-chip-filter-list,
+.dashboard-select,
+.dashboard-search {
+  display: grid;
+  gap: 10px;
+}
+
+.dashboard-toggle-list,
+.dashboard-chip-filter-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.dashboard-toggle {
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  cursor: pointer;
+  color: rgba(231, 237, 245, 0.9);
+  font-size: 0.92rem;
+}
+
+.dashboard-toggle--surface {
+  padding: 12px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.dashboard-toggle input {
+  width: 18px;
+  height: 18px;
+  accent-color: #60a5fa;
+}
+
+.dashboard-select {
+  width: 100%;
+}
+
+.dashboard-select--wide {
+  justify-self: stretch;
+}
+
+.dashboard-select__label {
+  color: rgba(189, 201, 221, 0.72);
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.dashboard-select select {
+  width: 100%;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 12px 14px;
+  font: inherit;
+  color: rgba(244, 247, 251, 0.96);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.dashboard-select select:focus {
+  outline: none;
+  border-color: rgba(171, 214, 255, 0.4);
+  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.12);
+}
+
+.dashboard-search__input {
+  width: 100%;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 18px;
+  padding: 13px 16px;
+  font: inherit;
+  color: rgba(244, 247, 251, 0.96);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.dashboard-search__input:focus {
+  outline: none;
+  border-color: rgba(171, 214, 255, 0.4);
+  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.12);
+}
+
+.dashboard-search__input::placeholder {
+  color: rgba(189, 201, 221, 0.54);
+}
+
 .dashboard-empty-state--error {
   border-color: rgba(248, 113, 113, 0.2);
   background: linear-gradient(180deg, rgba(32, 12, 15, 0.94) 0%, rgba(18, 9, 12, 0.88) 100%);
@@ -1205,6 +1374,17 @@ main {
   -webkit-line-clamp: 3;
 }
 
+.dashboard-recommendation__note {
+  margin: 0;
+  padding: 12px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.03);
+  color: rgba(226, 232, 240, 0.78);
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
 @keyframes dashboard-skeleton-pulse {
   0% {
     background-position: 100% 50%;
@@ -1222,6 +1402,11 @@ main {
 
   .dashboard-card--span-2 {
     grid-column: 1 / -1;
+  }
+
+  .dashboard-board__filter-top,
+  .dashboard-filter-grid {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -1310,6 +1495,14 @@ main {
 
   .dashboard-checklist__badge {
     justify-self: start;
+  }
+
+  .dashboard-board__summary {
+    justify-items: start;
+  }
+
+  .dashboard-segmented {
+    grid-template-columns: 1fr;
   }
 }
 

@@ -145,6 +145,7 @@ PoC는 핵심 루프를 엔드투엔드(end-to-end)로 지원해야 합니다:
   - 평가 피드백 상태를 업데이트합니다.
 - `GET /api/v1/users/me/dashboard`
   - 대시보드를 위한 개인화된 추천 데이터를 반환합니다.
+  - 각 추천 항목에는 대시보드 필터/정렬을 지원하기 위한 `created_at`, `updated_at` 타임스탬프와 제외 사유 표시를 위한 `rule_rejection_reason`이 포함되어야 합니다.
 
 ### PoC 루프를 위해 추가된 스캐폴드 엔드포인트 (Scaffold Endpoints Added For The PoC Loop)
 

@@ -31,8 +31,11 @@ class DashboardRow:
     status: str
     fit_score: Optional[int]
     reasoning: Optional[str]
+    rule_rejection_reason: Optional[str]
     user_feedback: Optional[str]
     feedback_reason: Optional[str]
+    created_at: datetime
+    updated_at: datetime
     job_id: UUID
     title: str
     company: str
@@ -287,7 +290,7 @@ class SupabaseEvaluationStore:
             params={
                 "user_id": f"eq.{user_id}",
                 "select": (
-                    "id,status,fit_score,reasoning,user_feedback,feedback_reason,"
+                    "id,status,fit_score,reasoning,rule_rejection_reason,user_feedback,feedback_reason,created_at,updated_at,"
                     "job:jobs!inner(id,title,company,url,platform)"
                 ),
                 "order": "updated_at.desc",
@@ -302,8 +305,11 @@ class SupabaseEvaluationStore:
                     status=row["status"],
                     fit_score=row.get("fit_score"),
                     reasoning=row.get("reasoning"),
+                    rule_rejection_reason=row.get("rule_rejection_reason"),
                     user_feedback=row.get("user_feedback"),
                     feedback_reason=row.get("feedback_reason"),
+                    created_at=_parse_iso_datetime(row["created_at"]),
+                    updated_at=_parse_iso_datetime(row["updated_at"]),
                     job_id=UUID(str(job["id"])),
                     title=job["title"],
                     company=job["company"],
@@ -312,7 +318,6 @@ class SupabaseEvaluationStore:
                 )
             )
         return payload
-
     def update_feedback(
         self,
         *,
@@ -487,6 +492,11 @@ class SupabaseEvaluationStore:
             user_feedback=FeedbackState(str(user_feedback)) if user_feedback else None,
             feedback_reason=row.get("feedback_reason"),
         )
+
+
+def _parse_iso_datetime(value: Any) -> datetime:
+    normalized = str(value).replace("Z", "+00:00")
+    return datetime.fromisoformat(normalized)
 
 
 class SupabaseJobStore:

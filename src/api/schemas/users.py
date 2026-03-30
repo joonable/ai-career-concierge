@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from datetime import datetime
 from typing import Any, List, Optional
 from uuid import UUID
 
@@ -95,8 +96,11 @@ class DashboardRecommendation(BaseModel):
     status: EvaluationStatus
     fit_score: Optional[int] = None
     reasoning: Optional[str] = None
+    rule_rejection_reason: Optional[str] = None
     user_feedback: Optional[FeedbackState] = None
     feedback_reason: Optional[str] = None
+    created_at: datetime
+    updated_at: datetime
     job_id: UUID
     title: str
     company: str

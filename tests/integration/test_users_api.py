@@ -196,6 +196,9 @@ async def test_feedback_and_dashboard_api(client, db_session):
     assert recommendation["url"] == "https://example.com/jobs/seed-job"
     assert recommendation["fit_score"] is None
     assert recommendation["reasoning"] is None
+    assert recommendation["rule_rejection_reason"] is None
+    assert recommendation["created_at"]
+    assert recommendation["updated_at"]
 
 
 async def test_dashboard_returns_empty_recommendations_for_new_user(client):
