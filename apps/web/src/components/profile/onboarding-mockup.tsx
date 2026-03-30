@@ -80,13 +80,7 @@ const exclusionOptions: ToneOption[] = [
   { id: "visa-none", label: "비자 지원 없음" },
 ];
 
-const comparisonScale = [
-  "강하게 왼쪽",
-  "약하게 왼쪽",
-  "중립",
-  "약하게 오른쪽",
-  "강하게 오른쪽",
-] as const;
+const comparisonScale = [-2, -1, 0, 1, 2] as const;
 
 const comparisonPrompts: ComparisonPrompt[] = [
   {
@@ -127,9 +121,13 @@ const comparisonPrompts: ComparisonPrompt[] = [
   },
 ];
 
-const scaleIndexToLabel = new Map<number, string>(
-  comparisonScale.map((label, index) => [index, label]),
-);
+const scaleValueToLabel = new Map<number, string>([
+  [-2, "강하게 왼쪽"],
+  [-1, "약하게 왼쪽"],
+  [0, "중립"],
+  [1, "약하게 오른쪽"],
+  [2, "강하게 오른쪽"],
+]);
 
 function ToggleGroup({
   label,
@@ -219,17 +217,17 @@ export function OnboardingMockup() {
   const [exclusions, setExclusions] = useState<string[]>(["contract", "internship", "onsite-only"]);
   const [customExclusions, setCustomExclusions] = useState<string[]>(["논문 실적 필수"]);
   const [exclusionInput, setExclusionInput] = useState("");
-  const [comparisonState, setComparisonState] = useState<Record<string, number>>({
-    "delivery-vs-research": 1,
-    "company-shape": 0,
-    "llm-vs-classic": 0,
-    "ownership-shape": 2,
-    "speed-vs-process": 1,
-    "build-vs-operate": 3,
+  const [comparisonState, setComparisonState] = useState<Record<string, number | null>>({
+    "delivery-vs-research": null,
+    "company-shape": null,
+    "llm-vs-classic": null,
+    "ownership-shape": null,
+    "speed-vs-process": null,
+    "build-vs-operate": null,
   });
   const [isAdvancedOpen, setIsAdvancedOpen] = useState(false);
   const [note, setNote] = useState(
-    "텍스트 입력은 꼭 필요한 보충 설명만 받도록 마지막에 짧게 남깁니다.",
+    "꼭 반영하고 싶은 조건이 있다면 짧게 남겨주세요.",
   );
 
   const toggleSelection = (
@@ -257,35 +255,39 @@ export function OnboardingMockup() {
     `${exclusions.length + customExclusions.length}개 제외 조건`,
   ];
 
+  const selectedComparisons = comparisonPrompts.filter(
+    (prompt) => comparisonState[prompt.id] !== null,
+  );
+
   return (
     <>
       <section className="dashboard-grid onboarding-page__grid onboarding-mockup__hero-grid">
         <article className="dashboard-card dashboard-card--active dashboard-card--span-2 onboarding-hero-card">
           <div className="dashboard-hero">
             <div className="dashboard-hero__copy">
-              <span className="dashboard-kicker">Onboarding Mockup</span>
-              <h1 className="dashboard-title onboarding-page__title">텍스트 대신 선택으로 기준을 빠르게 맞춥니다</h1>
+              <span className="dashboard-kicker">Onboarding</span>
+              <h1 className="dashboard-title onboarding-page__title">원하는 공고 기준을 빠르게 맞춰보세요</h1>
               <p className="dashboard-subcopy">
-                새 화면은 자유 입력을 뒤로 내리고, 실제 공고에서 판별 가능한 신호를 중심으로
-                선호를 고르게 구성했습니다.
+                길게 설명하지 않아도 괜찮습니다. 선택만으로도 추천 기준을 충분히 맞출 수 있도록
+                구성했습니다.
               </p>
             </div>
             <div className="dashboard-chip-list">
-              <span className="dashboard-chip">직무 카드</span>
-              <span className="dashboard-chip">핵심 스킬</span>
-              <span className="dashboard-chip">빠른 제외 조건</span>
+              <span className="dashboard-chip">직무</span>
+              <span className="dashboard-chip">스킬</span>
+              <span className="dashboard-chip">제외 조건</span>
               <span className="dashboard-chip">고급 설정</span>
-              <span className="dashboard-chip dashboard-chip--muted">Front-end mock only</span>
+              <span className="dashboard-chip dashboard-chip--muted">설정은 언제든 수정할 수 있어요</span>
             </div>
           </div>
         </article>
         <article className="dashboard-card onboarding-page__summary">
           <div className="dashboard-summary__header">
             <div className="dashboard-summary-card__copy">
-              <span className="dashboard-kicker">Prototype</span>
-              <h2 className="dashboard-section__title">구성 상태</h2>
+              <span className="dashboard-kicker">Progress</span>
+              <h2 className="dashboard-section__title">지금까지 선택한 내용</h2>
             </div>
-            <span className="dashboard-pill dashboard-pill--accent">{completedSections}/5 준비</span>
+            <span className="dashboard-pill dashboard-pill--accent">{completedSections}/5 완료</span>
           </div>
           <div className="dashboard-checklist" role="list">
             {summaryLines.map((line) => (
@@ -295,7 +297,7 @@ export function OnboardingMockup() {
                 </span>
                 <div className="dashboard-checklist__copy">
                   <span className="dashboard-detail__label">{line}</span>
-                  <p className="dashboard-checklist__meta">선택형 입력으로 바로 조정 가능</p>
+                  <p className="dashboard-checklist__meta">지금 바로 바꿀 수 있습니다</p>
                 </div>
               </div>
             ))}
@@ -306,10 +308,10 @@ export function OnboardingMockup() {
       <section className="dashboard-card onboarding-form-card onboarding-mockup">
         <div className="onboarding-form__header">
           <div className="dashboard-summary-card__copy">
-            <span className="dashboard-kicker">Step 1</span>
-            <h2 className="dashboard-section__title">목표 프로필을 선택형으로 구성</h2>
+            <span className="dashboard-kicker">Preferences</span>
+            <h2 className="dashboard-section__title">어떤 공고를 받고 싶은지 알려주세요</h2>
           </div>
-          <span className="dashboard-pill">No backend</span>
+          <span className="dashboard-pill">저장 전 미리보기</span>
         </div>
 
         <div className="onboarding-mockup__layout">
@@ -493,9 +495,7 @@ export function OnboardingMockup() {
               <summary className="onboarding-advanced__summary">
                 <div>
                   <span className="dashboard-detail__label">고급 설정</span>
-                  <p className="onboarding-mockup__helper">
-                    기본 선택만으로 부족할 때 펼쳐서 더 세밀한 선호 톤을 조정합니다.
-                  </p>
+                  <p className="onboarding-mockup__helper">필요할 때만 더 세밀하게 조정하세요.</p>
                 </div>
                 <span className="dashboard-pill">{isAdvancedOpen ? "접기" : "펼치기"}</span>
               </summary>
@@ -503,32 +503,41 @@ export function OnboardingMockup() {
                 <div className="onboarding-comparison-list">
                   {comparisonPrompts.map((prompt) => (
                     <article className="onboarding-comparison-card" key={prompt.id}>
-                      <div className="onboarding-comparison-card__copy">
-                        <p className="dashboard-detail__label">
-                          {prompt.leftLabel} vs {prompt.rightLabel}
-                        </p>
-                        <p className="onboarding-mockup__helper">{prompt.description}</p>
-                      </div>
                       <div className="onboarding-comparison-scale" role="group" aria-label={prompt.description}>
-                        {comparisonScale.map((optionLabel, index) => {
-                          const isSelected = comparisonState[prompt.id] === index;
-                          return (
-                            <button
-                              aria-pressed={isSelected}
-                              className={[
-                                "onboarding-scale-button",
-                                isSelected ? "onboarding-scale-button--selected" : "",
-                              ].join(" ")}
-                              key={optionLabel}
-                              onClick={() =>
-                                setComparisonState((current) => ({ ...current, [prompt.id]: index }))
-                              }
-                              type="button"
-                            >
-                              {optionLabel}
-                            </button>
-                          );
-                        })}
+                        <div className="onboarding-slider">
+                          <div className="onboarding-slider__labels" aria-hidden="true">
+                            <span>{prompt.leftLabel}</span>
+                            <span>{prompt.rightLabel}</span>
+                          </div>
+                          <input
+                            aria-label={`${prompt.leftLabel}와 ${prompt.rightLabel} 사이 선호도`}
+                            className="onboarding-slider__input"
+                            max={2}
+                            min={-2}
+                            onChange={(event) =>
+                              setComparisonState((current) => ({
+                                ...current,
+                                [prompt.id]: Number(event.target.value),
+                              }))
+                            }
+                            step={1}
+                            type="range"
+                            value={comparisonState[prompt.id] ?? 0}
+                          />
+                          <div className="onboarding-slider__dots" aria-hidden="true">
+                            {comparisonScale.map((value) => (
+                              <span
+                                className={[
+                                  "onboarding-slider__dot",
+                                  comparisonState[prompt.id] === value
+                                    ? "onboarding-slider__dot--selected"
+                                    : "",
+                                ].join(" ")}
+                                key={value}
+                              />
+                            ))}
+                          </div>
+                        </div>
                       </div>
                     </article>
                   ))}
@@ -556,12 +565,12 @@ export function OnboardingMockup() {
 
           <aside className="onboarding-mockup__aside">
             <div className="onboarding-preview-card">
-              <span className="dashboard-kicker">Preview</span>
-              <h3 className="dashboard-section__title">이렇게 해석됩니다</h3>
+              <span className="dashboard-kicker">Summary</span>
+              <h3 className="dashboard-section__title">추천 기준 요약</h3>
               <div className="onboarding-preview-card__group">
                 <span className="dashboard-detail__label">핵심 조합</span>
                 <p className="onboarding-preview-card__text">
-                  {roles.length > 0 ? roleOptions.filter((option) => roles.includes(option.id)).map((option) => option.label).join(", ") : "직무 미선택"}
+                  {roles.length > 0 ? roleOptions.filter((option) => roles.includes(option.id)).map((option) => option.label).join(", ") : "아직 선택한 직무가 없습니다."}
                 </p>
                 <p className="onboarding-preview-card__text">
                   {seniority.length > 0
@@ -569,7 +578,7 @@ export function OnboardingMockup() {
                         .filter((option) => seniority.includes(option.id))
                         .map((option) => option.label)
                         .join(", ")
-                    : "경력 레벨 미선택"}
+                    : "아직 선택한 경력 레벨이 없습니다."}
                 </p>
               </div>
               <div className="onboarding-preview-card__group">
@@ -591,21 +600,19 @@ export function OnboardingMockup() {
                     : "아직 선택한 팀 맥락이 없습니다."}
                 </p>
               </div>
-              <div className="onboarding-preview-card__group">
-                <span className="dashboard-detail__label">비교 선택 요약</span>
-                {isAdvancedOpen ? (
+              {isAdvancedOpen && selectedComparisons.length > 0 ? (
+                <div className="onboarding-preview-card__group">
+                  <span className="dashboard-detail__label">세부 선호</span>
                   <ul className="onboarding-preview-card__list">
-                    {comparisonPrompts.map((prompt) => (
+                    {selectedComparisons.map((prompt) => (
                       <li key={prompt.id}>
-                        {scaleIndexToLabel.get(comparisonState[prompt.id])}: {prompt.leftLabel} /{" "}
+                        {scaleValueToLabel.get(comparisonState[prompt.id] ?? 99)}: {prompt.leftLabel} /{" "}
                         {prompt.rightLabel}
                       </li>
                     ))}
                   </ul>
-                ) : (
-                  <p className="onboarding-preview-card__text">고급 설정을 펼치면 세부 선호 톤이 여기에 반영됩니다.</p>
-                )}
-              </div>
+                </div>
+              ) : null}
               <div className="onboarding-preview-card__group">
                 <span className="dashboard-detail__label">빠른 제외 조건</span>
                 <p className="onboarding-preview-card__text">

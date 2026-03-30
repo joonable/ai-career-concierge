@@ -12,7 +12,7 @@ describe("OnboardingMockup", () => {
     render(<OnboardingMockup />);
 
     expect(
-      screen.getByRole("heading", { name: "텍스트 대신 선택으로 기준을 빠르게 맞춥니다" }),
+      screen.getByRole("heading", { name: "원하는 공고 기준을 빠르게 맞춰보세요" }),
     ).toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: "Data Scientist" }));
@@ -25,7 +25,7 @@ describe("OnboardingMockup", () => {
 
     expect(screen.getByText(/ML Engineer, LLM Engineer, Data Scientist/)).toBeInTheDocument();
     expect(screen.getAllByText(/Feature Store/).length).toBeGreaterThan(0);
-    expect(screen.getAllByRole("button", { name: /강하게 왼쪽/ }).length).toBeGreaterThan(0);
-    expect(screen.getByText("Front-end mock only")).toBeInTheDocument();
+    expect(screen.getAllByRole("slider").length).toBeGreaterThan(0);
+    expect(screen.getByText("설정은 언제든 수정할 수 있어요")).toBeInTheDocument();
   });
 });

@@ -6,6 +6,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { OnboardingStatusCard } from "@/components/dashboard/onboarding-status-card";
 import { RecommendationBoard } from "@/components/dashboard/recommendation-board";
 import type { DashboardOnboardingState } from "@/lib/dashboard_onboarding";
+import type { DashboardRecommendation } from "@/lib/dashboard_mapper";
 import type { UserProfileResponse } from "@/lib/profile_types";
 
 const recordEvaluationFeedback = vi.fn();
@@ -67,16 +68,20 @@ function buildOnboardingState(
   };
 }
 
-function buildRecommendation(
-  overrides?: Partial<React.ComponentProps<typeof RecommendationBoard>["recommendations"][number]>,
-) {
-  return {
+function buildRecommendation(overrides: Partial<DashboardRecommendation> = {}): DashboardRecommendation {
+  const recommendation: DashboardRecommendation = {
     evaluationId: "eval-1",
     status: "LLM_EVALUATED",
     statusLabel: "평가 완료",
     fitScore: 92,
     reasoning: "LLM 평가에서 높은 적합도로 분류됐습니다.",
+    decisionSummary: "적합도 92점으로 추천 기준을 충족했습니다.",
+    matchHighlights: ["필수 조건 일치: Python", "직무 키워드가 공고 제목과 일치합니다."],
+    riskHighlights: ["JD에 구조화된 요구사항이 부족해 사람이 한 번 더 확인하는 편이 안전합니다."],
+    confidenceLevel: "HIGH",
     ruleRejectionReason: null,
+    ruleMatchReasons: ["목표 직무 'ML Engineer' 기준에서 공고 제목이 관련 키워드와 일치합니다."],
+    ruleRejectionDetails: [],
     userFeedback: "LIKE",
     feedbackLabel: "좋아요",
     feedbackReason: null,
@@ -93,8 +98,14 @@ function buildRecommendation(
       location: "Seoul",
       employment_type: "Full-time",
     },
-    ...overrides,
+    responsibilities: ["Production ML systems ownership", "Platform improvement"],
+    requirements: ["Python experience", "SQL experience"],
+    preferredRequirements: ["MLOps experience"],
+    location: "Seoul",
+    employmentType: "Full-time",
   };
+
+  return { ...recommendation, ...overrides };
 }
 
 function buildProfile(overrides?: Partial<UserProfileResponse>): UserProfileResponse {
