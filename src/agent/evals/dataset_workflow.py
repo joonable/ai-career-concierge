@@ -6,6 +6,28 @@ from typing import Any, Dict, List, Union
 from uuid import UUID
 
 from langsmith.schemas import ExampleCreate
+from pydantic import BaseModel, ConfigDict, Field
+
+
+class CuratedExampleOutputs(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    should_pass: bool
+    fit_score_range: Dict[str, int]
+    expected_must_have_matches: List[str] = Field(default_factory=list)
+    expected_deal_breaker_flags: List[str] = Field(default_factory=list)
+    expected_strength_keywords: List[str] = Field(default_factory=list)
+    expected_concern_keywords: List[str] = Field(default_factory=list)
+    expected_confidence: str = Field(default="")
+
+
+class CuratedExample(BaseModel):
+    model_config = ConfigDict(extra="allow")
+
+    id: UUID
+    inputs: Dict[str, Any]
+    outputs: CuratedExampleOutputs
+    metadata: Dict[str, Any] = Field(default_factory=dict)
 
 
 def load_curated_examples(path: Union[str, Path]) -> List[Dict[str, Any]]:
@@ -13,7 +35,7 @@ def load_curated_examples(path: Union[str, Path]) -> List[Dict[str, Any]]:
     payload = json.loads(dataset_path.read_text(encoding="utf-8"))
     if not isinstance(payload, list):
         raise ValueError("Dataset fixture must be a list of examples.")
-    return payload
+    return [CuratedExample.model_validate(example).model_dump(mode="json") for example in payload]
 
 
 def ensure_dataset(client, *, dataset_name: str, description: str) -> Any:

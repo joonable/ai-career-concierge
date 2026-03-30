@@ -8,7 +8,7 @@ from langchain_core.prompts import PromptTemplate
 from agent.schemas.pipeline_job import PipelineJob
 from common.errors import PromptLoadError
 
-PROMPT_SCHEMA_VERSION = "1"
+PROMPT_SCHEMA_VERSION = "2"
 
 EVALUATION_PROMPT_TEMPLATE = """당신은 한 명의 사용자를 기준으로 채용 공고 적합도를 평가하는 심사자입니다.
 재현율보다 정밀도를 우선하고, 애매하면 보수적으로 판단하세요.
@@ -23,9 +23,12 @@ EVALUATION_PROMPT_TEMPLATE = """당신은 한 명의 사용자를 기준으로 �
 반드시 아래 키만 가진 유효한 JSON 객체만 반환하세요:
 {{
   "fit_score": 1부터 100 사이의 정수,
-  "reasoning": 2~3줄 이내의 짧은 문자열,
-  "must_have_hits": 문자열 배열,
-  "deal_breakers_found": 문자열 배열
+  "summary": 2~3줄 이내의 짧은 문자열,
+  "strengths": 핵심 강점 문자열 배열,
+  "concerns": 우려 포인트 문자열 배열,
+  "must_have_matches": 충족한 필수 조건 문자열 배열,
+  "deal_breaker_flags": 감지된 결격 사유 문자열 배열,
+  "confidence": "HIGH", "MEDIUM", "LOW" 중 하나
 }}
 마크다운 코드펜스나 추가 설명은 절대 포함하지 마세요."""
 

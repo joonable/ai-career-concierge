@@ -146,6 +146,44 @@ PoC는 핵심 루프를 엔드투엔드(end-to-end)로 지원해야 합니다:
 - `GET /api/v1/users/me/dashboard`
   - 대시보드를 위한 개인화된 추천 데이터를 반환합니다.
   - 각 추천 항목에는 대시보드 필터/정렬을 지원하기 위한 `created_at`, `updated_at`, 제외 사유 표시를 위한 `rule_rejection_reason`, 상세 패널 구성을 위한 `jd_raw_text`, 경력 범위, `source_metadata`가 포함되어야 합니다.
+  - 상세 패널은 추가로 `decision_summary`, `match_highlights`, `risk_highlights`, `confidence_level`, `rule_match_reasons`, `rule_rejection_details`, `responsibilities`, `requirements`, `preferred_requirements`, `location`, `employment_type`를 내려주며, 이 필드들은 현재 DB 저장값과 사용자 프로필을 바탕으로 백엔드에서 구조화해 응답합니다.
+
+## 대시보드 상세 데이터 책임 분리
+
+- DB 원본:
+  - `title`, `company`, `url`, `platform`, `jd_raw_text`, `min_years_experience`, `max_years_experience`, `source_metadata`
+  - `status`, `fit_score`, `reasoning`, `rule_rejection_reason`, `user_feedback`, `feedback_reason`, `created_at`, `updated_at`
+- 규칙 엔진 결과:
+  - `status=RULE_REJECTED`
+  - `rule_rejection_reason`
+  - `rule_match_reasons`, `rule_rejection_details`의 기반 판단
+- LLM 생성:
+  - `fit_score`
+  - `reasoning`
+- 백엔드 파생/구조화:
+  - `decision_summary`
+  - `match_highlights`
+  - `risk_highlights`
+  - `confidence_level`
+  - `responsibilities`
+  - `requirements`
+  - `preferred_requirements`
+  - `location`
+  - `employment_type`
+- 프론트 가공:
+  - 상태/피드백 라벨 번역
+  - 상대 시각 표기
+  - 필터/정렬/검색에 따른 일시적 목록 상태
+
+## 저장 대상과 비저장 대상
+
+- 저장 대상:
+  - 평가 상태, 점수, reasoning, 규칙 제외 사유
+  - 사용자 피드백 상태와 피드백 메모
+  - 공고 원문과 메타데이터
+- 현재 비저장 대상:
+  - 상세 패널 표시용 구조화 요약 필드(`decision_summary`, `match_highlights`, `risk_highlights`, `confidence_level`, `rule_match_reasons`, `rule_rejection_details`, `responsibilities`, `requirements`, `preferred_requirements`, `location`, `employment_type`)
+  - 이 값들은 대시보드 응답 시점에 백엔드가 계산합니다.
 
 ### PoC 루프를 위해 추가된 스캐폴드 엔드포인트 (Scaffold Endpoints Added For The PoC Loop)
 
@@ -212,6 +250,7 @@ PoC는 핵심 루프를 엔드투엔드(end-to-end)로 지원해야 합니다:
 - `LANGSMITH_API_KEY`가 비어 있으면 LangSmith tracing은 비활성화되며, 기존 구조화 로그와 `System_Log` 기록만 유지됩니다.
 - 평가 프롬프트는 `LANGSMITH_EVAL_PROMPT_IDENTIFIER`, `LANGSMITH_MEMORY_PROMPT_IDENTIFIER`로 Prompt Hub 태그 참조(`job-evaluation:staging`, `memory-summary:staging`)를 우선 사용하며, trace에는 요청한 태그와 실제 commit hash를 함께 남깁니다. 조회 실패 시 저장소 내 fallback 템플릿을 사용합니다.
 - curated fixture 기반 LangSmith dataset과 offline experiment 러너를 통해 프롬프트 버전, 모델, 점수 기준을 비교할 수 있습니다.
+- 현재 gold fixture는 단순 점수/통과 여부 외에 `expected_strength_keywords`, `expected_concern_keywords`, `expected_must_have_matches`, `expected_deal_breaker_flags`, `expected_confidence`까지 포함하며, fixture 로딩 시 계약 검증을 통과해야 합니다.
 - production trace는 dataset 승격 후보로 추출할 수 있지만, v1에서는 수동 승인된 경우에만 dataset example로 추가합니다.
 
 ## 프롬프트 관리 가드레일 (Prompt Management Guardrails)

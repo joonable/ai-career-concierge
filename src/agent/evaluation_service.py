@@ -118,6 +118,12 @@ async def evaluate_job(
                 {
                     "fit_score": result.fit_score,
                     "reasoning": result.reasoning,
+                    "summary": result.summary,
+                    "strengths": result.strengths,
+                    "concerns": result.concerns,
+                    "must_have_matches": result.must_have_matches,
+                    "deal_breaker_flags": result.deal_breaker_flags,
+                    "confidence": result.confidence,
                     "must_have_hits": result.must_have_hits,
                     "deal_breakers_found": result.deal_breakers_found,
                     "parsed_payload": payload,

@@ -96,7 +96,13 @@ class DashboardRecommendation(BaseModel):
     status: EvaluationStatus
     fit_score: Optional[int] = None
     reasoning: Optional[str] = None
+    decision_summary: Optional[str] = None
+    match_highlights: List[str] = Field(default_factory=list)
+    risk_highlights: List[str] = Field(default_factory=list)
+    confidence_level: str = "LOW"
     rule_rejection_reason: Optional[str] = None
+    rule_match_reasons: List[str] = Field(default_factory=list)
+    rule_rejection_details: List[str] = Field(default_factory=list)
     user_feedback: Optional[FeedbackState] = None
     feedback_reason: Optional[str] = None
     created_at: datetime
@@ -110,6 +116,11 @@ class DashboardRecommendation(BaseModel):
     min_years_experience: Optional[int] = None
     max_years_experience: Optional[int] = None
     source_metadata: dict[str, Any] = Field(default_factory=dict)
+    responsibilities: List[str] = Field(default_factory=list)
+    requirements: List[str] = Field(default_factory=list)
+    preferred_requirements: List[str] = Field(default_factory=list)
+    location: Optional[str] = None
+    employment_type: Optional[str] = None
 
 
 class DashboardResponse(BaseModel):

@@ -6,6 +6,7 @@ from agent.evals.rule_based_evaluators import (
     evaluate_job_match,
     evaluate_reasoning_quality,
     evaluate_signal_alignment,
+    evaluate_structured_explanations,
 )
 from agent.prompts.prompt_manager import PromptManager
 from agent.schemas.pipeline_job import PipelineJob
@@ -134,9 +135,12 @@ def test_curated_dataset_fixture_and_rule_based_evaluators():
     class Run:
         outputs = {
             "fit_score": 88,
-            "reasoning": "Strong fit\nMatches must-haves",
-            "must_have_hits": ["Python", "SQL", "MLOps"],
-            "deal_breakers_found": [],
+            "summary": "Strong fit\nMatches must-haves",
+            "strengths": ["Python strength", "SQL strength", "MLOps strength"],
+            "concerns": [],
+            "must_have_matches": ["Python", "SQL", "MLOps"],
+            "deal_breaker_flags": [],
+            "confidence": "HIGH",
         }
 
     class Example:
@@ -148,3 +152,7 @@ def test_curated_dataset_fixture_and_rule_based_evaluators():
     signal_alignment = evaluate_signal_alignment(Run(), Example())
     assert signal_alignment["results"][0].score == 1
     assert signal_alignment["results"][1].score == 1
+    structured_alignment = evaluate_structured_explanations(Run(), Example())
+    assert structured_alignment["results"][0].score == 1
+    assert structured_alignment["results"][1].score == 1
+    assert structured_alignment["results"][2].score == 1

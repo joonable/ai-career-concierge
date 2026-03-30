@@ -14,9 +14,12 @@ def test_slack_payload_contains_required_job_fields():
                 "company": "Signal Labs",
                 "url": "https://example.com/jobs/1",
                 "fit_score": 91,
-                "reasoning": "High signal match",
-                "must_have_hits": [],
-                "deal_breakers_found": [],
+                "summary": "High signal match",
+                "strengths": ["Core stack alignment"],
+                "concerns": [],
+                "must_have_matches": [],
+                "deal_breaker_flags": [],
+                "confidence": "HIGH",
             }
         ),
     )

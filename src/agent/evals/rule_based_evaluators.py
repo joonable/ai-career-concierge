@@ -35,22 +35,22 @@ def evaluate_fit_score_band(run, example=None):
 def evaluate_reasoning_quality(run, example=None):
     del example
     outputs = (run.outputs or {}) if run else {}
-    reasoning = str(outputs.get("reasoning") or "").strip()
-    line_count = len([line for line in reasoning.splitlines() if line.strip()])
+    summary = str(outputs.get("summary") or outputs.get("reasoning") or "").strip()
+    line_count = len([line for line in summary.splitlines() if line.strip()])
     return EvaluationResult(
-        key="reasoning_concise",
-        score=1 if reasoning and line_count <= 3 else 0,
-        comment=f"line_count={line_count}, has_reasoning={bool(reasoning)}",
+        key="summary_concise",
+        score=1 if summary and line_count <= 3 else 0,
+        comment=f"line_count={line_count}, has_summary={bool(summary)}",
     )
 
 
 def evaluate_signal_alignment(run, example=None):
     outputs = (run.outputs or {}) if run else {}
     reference = (example.outputs or {}) if example else {}
-    actual_must_haves = set(outputs.get("must_have_hits") or [])
-    expected_must_haves = set(reference.get("expected_must_have_hits") or [])
-    actual_deal_breakers = set(outputs.get("deal_breakers_found") or [])
-    expected_deal_breakers = set(reference.get("expected_deal_breakers_found") or [])
+    actual_must_haves = set(outputs.get("must_have_matches") or outputs.get("must_have_hits") or [])
+    expected_must_haves = set(reference.get("expected_must_have_matches") or [])
+    actual_deal_breakers = set(outputs.get("deal_breaker_flags") or outputs.get("deal_breakers_found") or [])
+    expected_deal_breakers = set(reference.get("expected_deal_breaker_flags") or [])
     return EvaluationResults(
         results=[
             EvaluationResult(
@@ -67,9 +67,45 @@ def evaluate_signal_alignment(run, example=None):
     )
 
 
+def evaluate_structured_explanations(run, example=None):
+    outputs = (run.outputs or {}) if run else {}
+    reference = (example.outputs or {}) if example else {}
+
+    actual_strengths = " ".join(str(item) for item in (outputs.get("strengths") or []))
+    actual_concerns = " ".join(str(item) for item in (outputs.get("concerns") or []))
+    expected_strengths = [str(item).lower() for item in (reference.get("expected_strength_keywords") or [])]
+    expected_concerns = [str(item).lower() for item in (reference.get("expected_concern_keywords") or [])]
+    actual_confidence = str(outputs.get("confidence") or "").upper()
+    expected_confidence = str(reference.get("expected_confidence") or "").upper()
+
+    strengths_match = all(keyword in actual_strengths.lower() for keyword in expected_strengths)
+    concerns_match = all(keyword in actual_concerns.lower() for keyword in expected_concerns)
+
+    return EvaluationResults(
+        results=[
+            EvaluationResult(
+                key="strength_keywords_match",
+                score=1 if strengths_match else 0,
+                comment=f"expected={expected_strengths}, actual={actual_strengths}",
+            ),
+            EvaluationResult(
+                key="concern_keywords_match",
+                score=1 if concerns_match else 0,
+                comment=f"expected={expected_concerns}, actual={actual_concerns}",
+            ),
+            EvaluationResult(
+                key="confidence_alignment",
+                score=1 if not expected_confidence or actual_confidence == expected_confidence else 0,
+                comment=f"expected={expected_confidence}, actual={actual_confidence}",
+            ),
+        ]
+    )
+
+
 RULE_BASED_EVALUATORS = [
     evaluate_job_match,
     evaluate_fit_score_band,
     evaluate_reasoning_quality,
     evaluate_signal_alignment,
+    evaluate_structured_explanations,
 ]

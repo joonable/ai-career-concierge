@@ -671,6 +671,10 @@ function buildRecommendationDetail(
   const verdict = getVerdict(recommendation, minimumFitScore);
   const matchReasons: string[] = [];
   const risks: string[] = [];
+  const backendMatchHighlights = recommendation.matchHighlights;
+  const backendRiskHighlights = recommendation.riskHighlights;
+  const backendRuleMatchReasons = recommendation.ruleMatchReasons;
+  const backendRuleRejectionDetails = recommendation.ruleRejectionDetails;
 
   if (recommendation.fitScore !== null) {
     matchReasons.push(`현재 적합도는 ${recommendation.fitScore}점으로 최소 기준 ${minimumFitScore}점과 비교됩니다.`);
@@ -724,23 +728,39 @@ function buildRecommendationDetail(
           ? `기준 대비 +${recommendation.fitScore - minimumFitScore}`
           : `기준 대비 ${recommendation.fitScore - minimumFitScore}`,
     summary:
+      recommendation.decisionSummary ??
       recommendation.reasoning ??
       (verdict === "보류"
         ? "아직 정밀 평가가 끝나지 않았거나 추가 확인이 필요한 공고입니다."
         : verdict === "비추천"
           ? "규칙 필터나 낮은 적합도로 인해 우선순위가 낮은 공고입니다."
           : "프로필 기준에서 주요 조건이 맞아 떨어지는 공고입니다."),
-    matchBadges: matchedMustHaves.length > 0 ? matchedMustHaves.slice(0, 4) : ["직무 맥락 확인 필요"],
-    matchReasons,
-    risks,
+    matchBadges:
+      backendMatchHighlights.length > 0
+        ? backendMatchHighlights.slice(0, 4)
+        : matchedMustHaves.length > 0
+          ? matchedMustHaves.slice(0, 4)
+          : ["직무 맥락 확인 필요"],
+    matchReasons: backendRuleMatchReasons.length > 0 ? backendRuleMatchReasons : matchReasons,
+    risks:
+      backendRiskHighlights.length > 0 || backendRuleRejectionDetails.length > 0
+        ? [...backendRiskHighlights, ...backendRuleRejectionDetails]
+        : risks,
     experienceRange: formatExperienceRange(recommendation),
-    workMode: readMetadataLabel(recommendation.sourceMetadata, [
-      "employment_type",
-      "experience_text",
-      "employmentType",
-    ]),
-    location: readMetadataLabel(recommendation.sourceMetadata, ["location", "region", "workplace"]),
-    jobPreview: truncateText(recommendation.jdRawText, 320),
+    workMode:
+      recommendation.employmentType ??
+      readMetadataLabel(recommendation.sourceMetadata, [
+        "employment_type",
+        "experience_text",
+        "employmentType",
+      ]),
+    location:
+      recommendation.location ??
+      readMetadataLabel(recommendation.sourceMetadata, ["location", "region", "workplace"]),
+    jobPreview:
+      recommendation.responsibilities.length > 0
+        ? recommendation.responsibilities.join(" · ")
+        : truncateText(recommendation.jdRawText, 320),
     mustHaveTags: mustHaves.length > 0 ? mustHaves : ["아직 필수 조건 없음"],
     dealBreakerTags: dealBreakers.length > 0 ? dealBreakers : ["아직 비선호 조건 없음"],
   };

@@ -87,9 +87,12 @@ class InvalidEvaluator:
         del evaluation_id
         return {
             "fit_score": 999,
-            "reasoning": "invalid output",
-            "must_have_hits": [],
-            "deal_breakers_found": [],
+            "summary": "invalid output",
+            "strengths": [],
+            "concerns": [],
+            "must_have_matches": [],
+            "deal_breaker_flags": [],
+            "confidence": "LOW",
         }
 
 
@@ -115,9 +118,10 @@ class ValidGeminiTransport:
                             "parts": [
                                 {
                                     "text": (
-                                        '{"fit_score": 91, "reasoning": "Strong ML systems fit\\n'
-                                        'Matches must-have stack", "must_have_hits": ["Python", "SQL"], '
-                                        '"deal_breakers_found": []}'
+                                        '{"fit_score": 91, "summary": "Strong ML systems fit\\n'
+                                        'Matches must-have stack", "strengths": ["Python match", "SQL match"], '
+                                        '"concerns": [], "must_have_matches": ["Python", "SQL"], '
+                                        '"deal_breaker_flags": [], "confidence": "HIGH"}'
                                     )
                                 }
                             ]

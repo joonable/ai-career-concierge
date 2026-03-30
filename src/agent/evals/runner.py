@@ -79,11 +79,6 @@ def main() -> None:
             )
         )
 
-
-if __name__ == "__main__":
-    main()
-
-
 async def _run_experiment(*, client, dataset_name: str, model: str, experiment_prefix: str) -> None:
     settings = get_settings()
     tracer = LangSmithTracer.from_settings(settings)
@@ -151,3 +146,7 @@ async def _promote_trace(*, client, run_id: str, dataset_name: str, approve: boo
         examples=[{"id": str(uuid4()), **candidate}],
     )
     print(json.dumps({"dataset_name": dataset_name, "promoted_run_id": run_id}, indent=2))
+
+
+if __name__ == "__main__":
+    main()

@@ -200,7 +200,31 @@ async def test_feedback_and_dashboard_api(client, db_session):
     assert recommendation["source_metadata"] == {}
     assert recommendation["fit_score"] is None
     assert recommendation["reasoning"] is None
+    assert recommendation["decision_summary"] == "규칙 필터는 통과했지만 아직 LLM 정밀 평가가 끝나지 않아 추가 확인이 필요합니다."
+    assert "필수 조건 일치: Python" in recommendation["match_highlights"]
+    assert "필수 조건 일치: SQL" in recommendation["match_highlights"]
+    assert "직무 키워드가 공고 제목과 일치합니다." in recommendation["match_highlights"]
+    assert "경력 6년이 권장 범위 5년 ~ 8년에 들어옵니다." in recommendation["match_highlights"]
+    assert recommendation["risk_highlights"] == [
+        "JD에 구조화된 요구사항이 부족해 사람이 한 번 더 확인하는 편이 안전합니다."
+    ]
+    assert recommendation["confidence_level"] == "LOW"
     assert recommendation["rule_rejection_reason"] is None
+    assert recommendation["rule_match_reasons"] == [
+        "목표 직무 'Machine Learning Engineer' 기준에서 공고 제목이 관련 키워드와 일치합니다.",
+        "현재 경력 6년이 권장 범위 5년 ~ 8년 안에 있습니다.",
+    ]
+    assert recommendation["rule_rejection_details"] == []
+    assert recommendation["responsibilities"] == ["Python SQL recommender systems and ML platform ownership"]
+    assert recommendation["requirements"] == [
+        "Python 경험",
+        "SQL 경험",
+        "recommender systems 경험",
+        "권장 경력 5년 ~ 8년",
+    ]
+    assert recommendation["preferred_requirements"] == []
+    assert recommendation["location"] is None
+    assert recommendation["employment_type"] is None
     assert recommendation["created_at"]
     assert recommendation["updated_at"]
 

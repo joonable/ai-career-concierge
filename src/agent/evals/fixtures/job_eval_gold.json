@@ -31,8 +31,11 @@
     "outputs": {
       "should_pass": true,
       "fit_score_range": {"min": 80, "max": 100},
-      "expected_must_have_hits": ["Python", "SQL", "MLOps"],
-      "expected_deal_breakers_found": []
+      "expected_must_have_matches": ["Python", "SQL", "MLOps"],
+      "expected_deal_breaker_flags": [],
+      "expected_strength_keywords": ["python", "sql", "mlops"],
+      "expected_concern_keywords": [],
+      "expected_confidence": "HIGH"
     },
     "metadata": {
       "scenario_type": "strong_match",
@@ -73,8 +76,11 @@
     "outputs": {
       "should_pass": false,
       "fit_score_range": {"min": 1, "max": 59},
-      "expected_must_have_hits": [],
-      "expected_deal_breakers_found": ["contract-only", "onsite-only"]
+      "expected_must_have_matches": [],
+      "expected_deal_breaker_flags": ["contract-only", "onsite-only"],
+      "expected_strength_keywords": [],
+      "expected_concern_keywords": ["contract", "onsite"],
+      "expected_confidence": "HIGH"
     },
     "metadata": {
       "scenario_type": "obvious_reject",
@@ -115,8 +121,11 @@
     "outputs": {
       "should_pass": false,
       "fit_score_range": {"min": 55, "max": 79},
-      "expected_must_have_hits": ["Python"],
-      "expected_deal_breakers_found": []
+      "expected_must_have_matches": ["Python"],
+      "expected_deal_breaker_flags": [],
+      "expected_strength_keywords": ["python", "ranking"],
+      "expected_concern_keywords": ["sql", "mlops"],
+      "expected_confidence": "MEDIUM"
     },
     "metadata": {
       "scenario_type": "borderline_case",
@@ -157,8 +166,11 @@
     "outputs": {
       "should_pass": false,
       "fit_score_range": {"min": 1, "max": 70},
-      "expected_must_have_hits": ["Python", "MLOps"],
-      "expected_deal_breakers_found": ["onsite-only"]
+      "expected_must_have_matches": ["Python", "MLOps"],
+      "expected_deal_breaker_flags": ["onsite-only"],
+      "expected_strength_keywords": ["python", "mlops", "deployment"],
+      "expected_concern_keywords": ["onsite"],
+      "expected_confidence": "HIGH"
     },
     "metadata": {
       "scenario_type": "deal_breaker_hit",
@@ -199,8 +211,11 @@
     "outputs": {
       "should_pass": false,
       "fit_score_range": {"min": 40, "max": 79},
-      "expected_must_have_hits": ["Python", "SQL"],
-      "expected_deal_breakers_found": []
+      "expected_must_have_matches": ["Python", "SQL"],
+      "expected_deal_breaker_flags": [],
+      "expected_strength_keywords": ["python", "sql"],
+      "expected_concern_keywords": ["mlops", "serving"],
+      "expected_confidence": "MEDIUM"
     },
     "metadata": {
       "scenario_type": "must_have_mismatch",

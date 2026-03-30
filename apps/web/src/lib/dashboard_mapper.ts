@@ -6,7 +6,13 @@ export type DashboardRecommendation = {
   statusLabel: string;
   fitScore: number | null;
   reasoning: string | null;
+  decisionSummary: string | null;
+  matchHighlights: string[];
+  riskHighlights: string[];
+  confidenceLevel: string;
   ruleRejectionReason: string | null;
+  ruleMatchReasons: string[];
+  ruleRejectionDetails: string[];
   userFeedback: string | null;
   feedbackLabel: string | null;
   feedbackReason: string | null;
@@ -20,6 +26,11 @@ export type DashboardRecommendation = {
   minYearsExperience: number | null;
   maxYearsExperience: number | null;
   sourceMetadata: Record<string, unknown>;
+  responsibilities: string[];
+  requirements: string[];
+  preferredRequirements: string[];
+  location: string | null;
+  employmentType: string | null;
 };
 
 export function mapDashboardRecommendations(
@@ -31,7 +42,13 @@ export function mapDashboardRecommendations(
     statusLabel: formatEvaluationStatus(recommendation.status),
     fitScore: recommendation.fit_score,
     reasoning: recommendation.reasoning,
+    decisionSummary: recommendation.decision_summary,
+    matchHighlights: recommendation.match_highlights,
+    riskHighlights: recommendation.risk_highlights,
+    confidenceLevel: recommendation.confidence_level,
     ruleRejectionReason: recommendation.rule_rejection_reason,
+    ruleMatchReasons: recommendation.rule_match_reasons,
+    ruleRejectionDetails: recommendation.rule_rejection_details,
     userFeedback: recommendation.user_feedback,
     feedbackLabel: formatFeedback(recommendation.user_feedback),
     feedbackReason: recommendation.feedback_reason,
@@ -45,6 +62,11 @@ export function mapDashboardRecommendations(
     minYearsExperience: recommendation.min_years_experience,
     maxYearsExperience: recommendation.max_years_experience,
     sourceMetadata: recommendation.source_metadata,
+    responsibilities: recommendation.responsibilities,
+    requirements: recommendation.requirements,
+    preferredRequirements: recommendation.preferred_requirements,
+    location: recommendation.location,
+    employmentType: recommendation.employment_type,
   }));
 }
 

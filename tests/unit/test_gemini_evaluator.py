@@ -18,9 +18,11 @@ async def test_gemini_evaluator_maps_valid_json_response():
                             "parts": [
                                 {
                                     "text": (
-                                        '{"fit_score": 88, "reasoning": "Strong platform fit\\n'
-                                        'Matches core stack", "must_have_hits": ["Python"], '
-                                        '"deal_breakers_found": []}'
+                                        '{"fit_score": 88, "summary": "Strong platform fit\\n'
+                                        'Matches core stack", "strengths": ["Python match"], '
+                                        '"concerns": ["Need infra scope confirmation"], '
+                                        '"must_have_matches": ["Python"], '
+                                        '"deal_breaker_flags": [], "confidence": "MEDIUM"}'
                                     )
                                 }
                             ]
@@ -41,7 +43,7 @@ async def test_gemini_evaluator_maps_valid_json_response():
     )
 
     assert result["fit_score"] == 88
-    assert result["must_have_hits"] == ["Python"]
+    assert result["must_have_matches"] == ["Python"]
     assert result["_provider_metadata"]["model"] == "gemini-2.0-flash"
     assert "Strong platform fit" in result["_raw_response_text"]
     await client.aclose()

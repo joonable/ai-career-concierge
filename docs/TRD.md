@@ -71,6 +71,7 @@ SaaS 확장을 염두에 두고 처음부터 아키텍처를 이원화(Dev/Prod)
 1. **`IngestNode`:** 타겟 채널(예: 인크루트) 비동기 스크래핑 → `Job` DB 적재 및 중복 필터링.
 2. **`RuleFilterNode`:** DB 쿼리(연차, 직무 키워드 등)를 통한 1차 Hard Filtering → `Evaluation` 상태 업데이트.
 3. **`LLMEvalNode`:** (비용 발생 구간) Rule 노드를 통과한 공고들을 Batch로 묶어 Gemini API 호출 → Deal-breaker 분석 및 점수화.
+    - Structured output 기본 계약은 `fit_score`, `summary`, `strengths`, `concerns`, `must_have_matches`, `deal_breaker_flags`, `confidence`를 포함합니다.
 4. **`DeliverNode`:** 기준 점수(예: 80점) 이상인 공고들을 포맷팅하여 Slack Interactive Webhook 발송.
 
 ## 6. Non-Functional Requirements (비기능 요구사항)
@@ -83,6 +84,7 @@ SaaS 확장을 염두에 두고 처음부터 아키텍처를 이원화(Dev/Prod)
     - `LANGSMITH_API_KEY`가 없으면 tracing은 비활성화되고 기존 애플리케이션 로그와 `System_Log` 기반 관측만 유지됩니다.
     - Prompt Hub 자산은 `LANGSMITH_EVAL_PROMPT_IDENTIFIER`, `LANGSMITH_MEMORY_PROMPT_IDENTIFIER`를 통해 태그 기준(`:staging`, 필요 시 `:production`)으로 선택하고, 조회 실패 시 로컬 fallback prompt를 사용합니다.
     - 실험 비교는 curated gold dataset과 LangSmith experiment workflow를 통해 수행하고, production trace는 수동 승인 흐름으로 dataset candidate에 승격합니다.
+    - curated gold dataset은 pass/fail과 점수대만 아니라 구조화 설명 품질까지 평가할 수 있도록 strength/concern keyword, must-have/deal-breaker expectation, confidence expectation을 포함해야 합니다.
     - **Application Logging:** FastAPI의 내장 Structured Logging을 사용하여 API 호출 및 일반 시스템 에러를 기록합니다.
 - **6.2 Resilience & Fallback Policy (복원력 및 장애 대응)**
     - **Graceful Degradation (우아한 기능 저하):** 채용 사이트(예: 인크루트)의 DOM 구조 변경 등으로 Playwright 스크래핑이 실패하더라도 전체 파이프라인은 중단되지 않습니다.
@@ -99,3 +101,5 @@ SaaS 확장을 염두에 두고 처음부터 아키텍처를 이원화(Dev/Prod)
     - Slack에서 사용자가 👍/👎 버튼 클릭 시 Action payload를 수신합니다. DB의 `Evaluation` 테이블 업데이트 로직을 수행하고 성공 시 HTTP 200을 반환합니다.
 - **`GET /api/v1/users/me/dashboard`**
     - Next.js 프론트엔드에서 칸반 보드를 렌더링하기 위한 개인화된 추천 공고 목록을 반환합니다.
+    - 각 추천 항목은 기본 평가 필드 외에도 상세 패널용 구조화 필드(`decision_summary`, `match_highlights`, `risk_highlights`, `confidence_level`, `rule_match_reasons`, `rule_rejection_details`, `responsibilities`, `requirements`, `preferred_requirements`, `location`, `employment_type`)를 포함합니다.
+    - 위 구조화 필드는 현재 PoC 단계에서 DB에 별도 컬럼으로 저장하지 않고, 공고 원문/메타데이터와 사용자 프로필, 평가 결과를 바탕으로 백엔드에서 파생하여 응답합니다.

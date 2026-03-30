@@ -37,10 +37,25 @@ class MockGeminiEvaluator:
         reasoning_bits = must_have_hits[:2] or ["profile fit inferred from title and description"]
         if deal_breakers_found:
             reasoning_bits.append(f"watch-outs: {', '.join(deal_breakers_found[:2])}")
+        concerns = [f"deal-breaker: {item}" for item in deal_breakers_found]
+        if not concerns and "contract" in text:
+            concerns.append("contract terms need review")
+        strengths = [f"matched: {item}" for item in must_have_hits[:3]]
+        if "machine learning" in text or "ml" in text:
+            strengths.append("ml scope is explicit in the role")
+
+        confidence = "LOW"
+        if fit_score >= 85 and len(must_have_hits) >= 2 and not deal_breakers_found:
+            confidence = "HIGH"
+        elif fit_score >= 60:
+            confidence = "MEDIUM"
 
         return {
             "fit_score": fit_score,
-            "reasoning": " / ".join(reasoning_bits),
-            "must_have_hits": must_have_hits,
-            "deal_breakers_found": deal_breakers_found,
+            "summary": " / ".join(reasoning_bits),
+            "strengths": strengths,
+            "concerns": concerns,
+            "must_have_matches": must_have_hits,
+            "deal_breaker_flags": deal_breakers_found,
+            "confidence": confidence,
         }

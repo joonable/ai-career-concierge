@@ -14,14 +14,19 @@ def test_llm_evaluation_result_accepts_valid_payload():
             "company": "Signal Labs",
             "url": "https://example.com/jobs/1",
             "fit_score": 92,
-            "reasoning": "Strong ML systems fit / matches core stack",
-            "must_have_hits": ["Python", "SQL"],
-            "deal_breakers_found": [],
+            "summary": "Strong ML systems fit / matches core stack",
+            "strengths": ["Python match", "SQL match"],
+            "concerns": ["Need location confirmation"],
+            "must_have_matches": ["Python", "SQL"],
+            "deal_breaker_flags": [],
+            "confidence": "HIGH",
         }
     )
 
     assert payload.fit_score == 92
     assert payload.company == "Signal Labs"
+    assert payload.reasoning == "Strong ML systems fit / matches core stack"
+    assert payload.must_have_hits == ["Python", "SQL"]
 
 
 def test_llm_evaluation_result_rejects_invalid_score():
@@ -35,6 +40,11 @@ def test_llm_evaluation_result_rejects_invalid_score():
                 "company": "Signal Labs",
                 "url": "https://example.com/jobs/1",
                 "fit_score": 120,
-                "reasoning": "Bad payload",
+                "summary": "Bad payload",
+                "strengths": [],
+                "concerns": [],
+                "must_have_matches": [],
+                "deal_breaker_flags": [],
+                "confidence": "LOW",
             }
         )

@@ -19,6 +19,7 @@
     - **[Future Phase]:** 이력서(PDF) 업로드 시 RAG(Retrieval-Augmented Generation) 파이프라인을 통한 자동 완성(Auto-fill).
 - **수신 설정:** 알림 채널(Slack 등), 수신 주기(매일 오전 9시 등), 최소 매칭 점수(예: 80점 이상) 설정.
 - **대시보드 뷰:** 추천 공고 리스트 확인 및 상태 관리용 칸반(Kanban) 뷰.
+    - 공고 상세에서는 추천 요약, 매칭 근거, 리스크, 구조화된 JD 핵심을 함께 제공하여 사용자가 왜 추천/보류/제외되었는지 빠르게 판단할 수 있어야 합니다.
 
 ### 2.2 Multi-stage Evaluation Pipeline (다단 평가 파이프라인)
 
@@ -29,7 +30,8 @@
     - 로직: 기평가 공고 제외(De-duplication) → 직무명 확인 → 연차 조건 부합 여부 확인.
 - **[Stage 2] Agentic Deep Evaluation:**
     - 1차 통과 공고에 한해 LLM 에이전트 투입.
-    - 로직: Deal-breaker 문맥 분석 → Must-haves 충족 여부 추론 → 매칭 점수(1~100) 산정 → 2줄 추천 사유(Reasoning) 도출.
+    - 로직: Deal-breaker 문맥 분석 → Must-haves 충족 여부 추론 → 매칭 점수(1~100) 산정 → 요약/강점/우려/신뢰도까지 포함한 구조화 평가 생성.
+    - 상세 패널에 필요한 구조화 설명은 평가 결과와 공고 메타데이터를 바탕으로 백엔드가 조합하여 제공하며, 향후 LLM 구조화 출력으로 단계적으로 이전할 수 있어야 합니다.
 
 ### 2.3 Continuous Learning & Feedback Loop (지속 학습 및 피드백 루프)
 

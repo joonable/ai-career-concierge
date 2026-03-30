@@ -41,9 +41,12 @@ class FakeEvaluator:
         del kwargs
         return {
             "fit_score": 91,
-            "reasoning": "Strong fit\nMatches must-haves",
-            "must_have_hits": ["Python"],
-            "deal_breakers_found": [],
+            "summary": "Strong fit\nMatches must-haves",
+            "strengths": ["Python match", "ML systems scope"],
+            "concerns": [],
+            "must_have_matches": ["Python"],
+            "deal_breaker_flags": [],
+            "confidence": "HIGH",
             "_provider_metadata": {"model": self.model, "latency_ms": 25},
             "_raw_response_text": '{"fit_score": 91}',
         }
