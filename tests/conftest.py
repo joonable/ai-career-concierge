@@ -19,6 +19,7 @@ from api.services.slack_notifier import LoggingSlackNotifier
 from api.services.slack_signature_service import SlackSignatureService
 from api.services.supabase_storage import DashboardRow, EvaluationRecord, FeedbackRecord
 from common.config import get_settings
+from common.telemetry import LangSmithTracer
 from db.enums import EvaluationStatus, FeedbackState, LogLevel
 from db.models import Evaluation, Job, User
 from db.repositories import EvaluationRepository, JobRepository, SystemLogRepository, UserRepository
@@ -348,12 +349,15 @@ def build_runtime(
     evaluator: Optional[object] = None,
     notifier: Optional[LoggingSlackNotifier] = None,
     signing_secret: str = "dev-slack-secret",
+    tracer: Optional[LangSmithTracer] = None,
 ) -> RuntimeServices:
+    langsmith_tracer = tracer or LangSmithTracer.disabled()
     return RuntimeServices(
         scraper_registry=ScraperRegistry(scrapers or [StaticScraper()]),
         llm_evaluator=evaluator or MockGeminiEvaluator(),
         slack_notifier=notifier or LoggingSlackNotifier(),
         slack_signature_service=SlackSignatureService(signing_secret),
+        langsmith_tracer=langsmith_tracer,
     )
 
 

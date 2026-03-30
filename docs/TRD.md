@@ -78,7 +78,9 @@ SaaS 확장을 염두에 두고 처음부터 아키텍처를 이원화(Dev/Prod)
 시스템의 안정성과 유지보수성을 보장하기 위한 핵심 정책입니다.
 
 - **6.1 Observability & Tracing (관측성)**
-    - **LLM Tracing:** `LangSmith` (Free Tier)를 연동하여 각 LangGraph 노드의 입력/출력, 소요 시간, 토큰 사용량, 그리고 환각(Hallucination) 여부를 시각적으로 모니터링합니다.
+    - **LLM Tracing:** `LangSmith` (Free Tier)를 연동하여 사용자별 파이프라인 실행을 root trace로, Gemini 평가 호출을 child trace로 기록합니다.
+    - 파이프라인 trace에는 `run_id`, `user_id`, `dry_run`, `app_env`를 metadata로 남기고, Gemini trace에는 `job_id`, `external_job_id`, `platform`, `title`, `model`, `latency_ms`를 남깁니다.
+    - `LANGSMITH_API_KEY`가 없으면 tracing은 비활성화되고 기존 애플리케이션 로그와 `System_Log` 기반 관측만 유지됩니다.
     - **Application Logging:** FastAPI의 내장 Structured Logging을 사용하여 API 호출 및 일반 시스템 에러를 기록합니다.
 - **6.2 Resilience & Fallback Policy (복원력 및 장애 대응)**
     - **Graceful Degradation (우아한 기능 저하):** 채용 사이트(예: 인크루트)의 DOM 구조 변경 등으로 Playwright 스크래핑이 실패하더라도 전체 파이프라인은 중단되지 않습니다.

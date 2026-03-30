@@ -8,6 +8,7 @@ from api.services.mock_llm_evaluator import MockGeminiEvaluator
 from api.services.slack_notifier import LoggingSlackNotifier
 from api.services.slack_signature_service import SlackSignatureService
 from common.config import Settings
+from common.telemetry import LangSmithTracer
 from scraper.registry import ScraperRegistry
 from scraper.sources.incruit import IncruitScraper
 from scraper.sources.mock_platform import MockPlatformScraper
@@ -19,12 +20,14 @@ class RuntimeServices:
     llm_evaluator: Any
     slack_notifier: LoggingSlackNotifier
     slack_signature_service: SlackSignatureService
+    langsmith_tracer: LangSmithTracer
 
 
 def build_default_runtime(settings: Settings) -> RuntimeServices:
     signing_secret = settings.slack_signing_secret or "dev-slack-secret"
     if not settings.gemini_api_key:
         raise ValueError("GEMINI_API_KEY is required for the default runtime evaluator.")
+    langsmith_tracer = LangSmithTracer.from_settings(settings)
     return RuntimeServices(
         scraper_registry=ScraperRegistry(
             [
@@ -39,7 +42,9 @@ def build_default_runtime(settings: Settings) -> RuntimeServices:
         llm_evaluator=GeminiEvaluator(
             api_key=settings.gemini_api_key,
             model=settings.gemini_model,
+            tracer=langsmith_tracer,
         ),
         slack_notifier=LoggingSlackNotifier(),
         slack_signature_service=SlackSignatureService(signing_secret),
+        langsmith_tracer=langsmith_tracer,
     )

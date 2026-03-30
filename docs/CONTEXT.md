@@ -207,6 +207,8 @@ PoC는 핵심 루프를 엔드투엔드(end-to-end)로 지원해야 합니다:
 - 각 파이프라인 실행은 `run_id` 또는 `trace_id`로 추적할 수 있어야 합니다.
 - 중요한 로그는 `user_id`, `job_id`, `platform`, `status`, `error_type`의 관련 부분 집합을 캡처해야 합니다.
 - 스크래퍼 실패, 평가 상태 전환, LLM 호출, Slack 전송, 웹훅 동작은 시크릿이나 불필요한 PII를 노출하지 않고 관찰할 수 있어야 합니다.
+- 현재 구현은 `LANGSMITH_API_KEY`가 설정된 경우 파이프라인 실행 단위 root trace와 Gemini 평가 단위 child trace를 LangSmith에 기록합니다.
+- `LANGSMITH_API_KEY`가 비어 있으면 LangSmith tracing은 비활성화되며, 기존 구조화 로그와 `System_Log` 기록만 유지됩니다.
 
 ## 프롬프트 관리 가드레일 (Prompt Management Guardrails)
 
