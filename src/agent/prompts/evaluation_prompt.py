@@ -17,6 +17,7 @@ def build_evaluation_prompt(
 
     return (
         "You are evaluating whether a job is a strong match for one user.\n"
+        "Be conservative and optimize for precision over recall.\n"
         f"Target role: {profile_data.get('role', 'unknown')}\n"
         f"Years of experience: {profile_data.get('years_of_experience', 'unknown')}\n"
         f"Must-haves: {must_haves}\n"
@@ -25,5 +26,12 @@ def build_evaluation_prompt(
         f"Job title: {job.title}\n"
         f"Company: {job.company}\n"
         f"Job description: {job.jd_raw_text}\n"
-        "Return JSON with fit_score, reasoning, must_have_hits, and deal_breakers_found."
+        "Return only valid JSON with exactly these keys:\n"
+        "{\n"
+        '  "fit_score": integer from 1 to 100,\n'
+        '  "reasoning": short string within 2-3 concise lines,\n'
+        '  "must_have_hits": array of strings,\n'
+        '  "deal_breakers_found": array of strings\n'
+        "}\n"
+        "Do not include markdown fences or extra commentary."
     )

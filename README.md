@@ -56,6 +56,7 @@ Backend:
 ```bash
 cp .env.example .env.development
 poetry install
+poetry run playwright install chromium
 poetry run dev
 ```
 
@@ -89,6 +90,8 @@ The current goal is a single-user PoC that supports:
 ## Scaffold Notes
 
 - The backend ships with a mock scraper, mock LLM evaluator, and logging Slack notifier so the end-to-end loop is runnable before real integrations are wired.
+- The default runtime now uses a real Gemini evaluator when `GEMINI_API_KEY` is configured; tests still inject mock or fixture evaluators explicitly.
+- The default runtime now targets an Incruit scraper, while tests and local fixtures can still inject mock scrapers explicitly.
 - The web app now uses Supabase SSR sessions for Google OAuth and forwards real Supabase bearer tokens to FastAPI.
 - FastAPI verifies Supabase JWTs against the project JWKS before resolving `UserIdentity`.
 - Production-facing secrets are validated through typed settings in `src/common/config.py`.
@@ -99,6 +102,13 @@ The current goal is a single-user PoC that supports:
   - `/` returns a lightweight welcome payload
   - `/healthz` returns runtime health info
   - `/docs` opens Swagger UI
+
+## Scraper Notes
+
+- The scraper runtime is configured from root backend env files.
+- `SCRAPER_MAX_PAGES` limits pagination during development so local runs stay safe.
+- `SCRAPER_HEADLESS=true` is the recommended default for local and CI runs.
+- Live scraping is not part of the automated test suite; scraper tests use HTML fixtures and injected fetchers.
 
 ## Login QA Checklist
 

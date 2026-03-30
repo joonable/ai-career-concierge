@@ -8,7 +8,11 @@ from pydantic import ValidationError
 
 from agent.prompts.evaluation_prompt import build_evaluation_prompt
 from agent.schemas.evaluation_result import LLMEvaluationResult
+from common.logging import get_logger
 from db.enums import LogLevel
+
+
+logger = get_logger(__name__)
 
 
 class LLMEvaluator(Protocol):
@@ -47,6 +51,7 @@ class LLMEvalNode:
                     user_context=state["user_context"],
                     recent_memory=state.get("recent_memory", ""),
                 )
+                provider_metadata = payload.pop("_provider_metadata", {}) if isinstance(payload, dict) else {}
                 result = LLMEvaluationResult.model_validate(
                     {
                         "evaluation_id": evaluation.id,
@@ -63,6 +68,17 @@ class LLMEvalNode:
                     job_id=job.job_id,
                     fit_score=result.fit_score,
                     reasoning=result.reasoning,
+                )
+                logger.info(
+                    "LLM evaluation completed.",
+                    extra={
+                        "run_id": state["run_id"],
+                        "user_id": str(user_id),
+                        "job_id": str(job.job_id),
+                        "platform": job.platform,
+                        "model": provider_metadata.get("model"),
+                        "latency_ms": provider_metadata.get("latency_ms"),
+                    },
                 )
                 results.append(result)
             except (ValidationError, ValueError) as exc:

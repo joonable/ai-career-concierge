@@ -7,6 +7,7 @@ from uuid import UUID
 from agent.schemas.pipeline_job import PipelineJob
 from common.logging import get_logger
 from db.enums import LogLevel
+from scraper.normalizers.job_normalizer import InvalidScrapedJobError
 from scraper.normalizers.job_normalizer import normalize_scraped_job
 from scraper.registry import ScraperRegistry
 
@@ -29,9 +30,19 @@ class IngestNode:
             try:
                 scraped_jobs = await source.fetch_jobs(state["user_context"])
                 for scraped_job in scraped_jobs:
-                    normalized_job = normalize_scraped_job(scraped_job)
-                    stored_job = self.job_store.upsert_job(normalized_job)
-                    current_jobs.append(stored_job)
+                    try:
+                        normalized_job = normalize_scraped_job(scraped_job)
+                        stored_job = self.job_store.upsert_job(normalized_job)
+                        current_jobs.append(stored_job)
+                    except InvalidScrapedJobError as exc:
+                        logger.warning(
+                            "Discarded invalid scraped job before storage.",
+                            extra={
+                                "source": source.source_name,
+                                "external_job_id": getattr(scraped_job, "external_job_id", ""),
+                                "discard_reason": str(exc),
+                            },
+                        )
             except Exception as exc:  # pragma: no cover - exercised by resilience tests
                 logger.exception("Scraper source failed.", extra={"source": source.source_name})
                 source_errors.append(source.source_name)

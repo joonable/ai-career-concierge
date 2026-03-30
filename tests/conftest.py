@@ -12,6 +12,7 @@ from sqlmodel import Session, SQLModel, create_engine
 
 from agent.schemas.pipeline_job import PipelineJob
 from api.schemas.users import build_user_profile_response, serialize_user_profile_sections
+from api.services.gemini_evaluator import GeminiEvaluator
 from api.services.mock_llm_evaluator import MockGeminiEvaluator
 from api.services.runtime import RuntimeServices
 from api.services.slack_notifier import LoggingSlackNotifier
@@ -77,6 +78,41 @@ class InvalidEvaluator:
             "must_have_hits": [],
             "deal_breakers_found": [],
         }
+
+
+class FailingGeminiTransport:
+    def __call__(self, request):
+        import httpx
+
+        del request
+        return httpx.Response(500, json={"error": {"message": "provider unavailable"}})
+
+
+class ValidGeminiTransport:
+    def __call__(self, request):
+        import httpx
+
+        del request
+        return httpx.Response(
+            200,
+            json={
+                "candidates": [
+                    {
+                        "content": {
+                            "parts": [
+                                {
+                                    "text": (
+                                        '{"fit_score": 91, "reasoning": "Strong ML systems fit\\n'
+                                        'Matches must-have stack", "must_have_hits": ["Python", "SQL"], '
+                                        '"deal_breakers_found": []}'
+                                    )
+                                }
+                            ]
+                        }
+                    }
+                ]
+            },
+        )
 
 
 class FakeTokenVerifier:

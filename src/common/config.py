@@ -45,6 +45,7 @@ class Settings(BaseSettings):
     slack_alerts_channel: str = Field(default="#system-alerts", alias="SLACK_ALERTS_CHANNEL")
 
     gemini_api_key: str = Field(default="", alias="GEMINI_API_KEY")
+    gemini_model: str = Field(default="gemini-2.0-flash", alias="GEMINI_MODEL")
 
     langsmith_api_key: str = Field(default="", alias="LANGSMITH_API_KEY")
     langsmith_project: str = Field(
@@ -54,6 +55,14 @@ class Settings(BaseSettings):
 
     pipeline_enabled: bool = Field(default=False, alias="PIPELINE_ENABLED")
     allow_dev_schedule: bool = Field(default=False, alias="ALLOW_DEV_SCHEDULE")
+
+    scraper_headless: bool = Field(default=True, alias="SCRAPER_HEADLESS")
+    scraper_timeout_ms: int = Field(default=15000, alias="SCRAPER_TIMEOUT_MS")
+    scraper_max_pages: int = Field(default=2, alias="SCRAPER_MAX_PAGES")
+    scraper_incruit_base_url: str = Field(
+        default="https://job.incruit.com",
+        alias="SCRAPER_INCRUIT_BASE_URL",
+    )
 
     @property
     def supabase_jwks_url(self) -> str:
@@ -91,6 +100,15 @@ class Settings(BaseSettings):
                 "PIPELINE_ENABLED cannot be true outside production unless "
                 "ALLOW_DEV_SCHEDULE is also true."
             )
+
+        if self.scraper_timeout_ms <= 0:
+            raise ValueError("SCRAPER_TIMEOUT_MS must be greater than 0.")
+
+        if self.scraper_max_pages <= 0:
+            raise ValueError("SCRAPER_MAX_PAGES must be greater than 0.")
+
+        if not self.scraper_incruit_base_url:
+            raise ValueError("SCRAPER_INCRUIT_BASE_URL must not be empty.")
 
         return self
 
