@@ -28,6 +28,28 @@ LISTING_HTML = """
 </section>
 """
 
+LISTING_HTML_FROM_INCRUIT = """
+<div class="cBbslist_contenst">
+  <ul class="c_row" jobno="2603090000132">
+    <li class="c_col">
+      <div class="cell_first">
+        <div class="cl_top">
+          <a href="https://www.incruit.com/company/1682190468" class="cpname" target="_blank">(주)버즈빌</a>
+        </div>
+      </div>
+      <div class="cell_mid">
+        <div class="cl_top">
+          <a target="_blank" href="https://job.incruit.com/jobdb_info/jobpost.asp?job=2603090000132&src=gsw*etc">Machine Learning Engineer, Ads & Recommendation</a>
+        </div>
+        <div class="cl_md">
+          <span>경력 3~8년</span>
+        </div>
+      </div>
+    </li>
+  </ul>
+</div>
+"""
+
 DETAIL_HTML = """
 <html>
   <head>
@@ -39,6 +61,29 @@ DETAIL_HTML = """
       Own production model deployment and experimentation pipelines across ranking surfaces.
     </section>
     <div class="career-info">경력 5~8년</div>
+  </body>
+</html>
+"""
+
+DETAIL_HTML_WITH_JSON_LD = """
+<html>
+  <head>
+    <link rel="canonical" href="https://job.incruit.com/jobdb_info/jobpost.asp?job=2603230002546" />
+    <script type="application/ld+json">
+      {
+        "@context": "http://schema.org/",
+        "@type": "JobPosting",
+        "title": "[디지털] AI Agent 개발 및 프로젝트 기획 담당자 채용",
+        "description": "(주)신한디지털<br><br>AI Agent 개발 및 프로젝트 기획 담당자 채용<br>Python 기반의 AI 시스템을 설계하고 운영합니다.",
+        "hiringOrganization": {
+          "@type": "Organization",
+          "name": "신한디지털"
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <div class="career-info">경력 5년</div>
   </body>
 </html>
 """
@@ -60,6 +105,16 @@ def test_parse_listing_page_extracts_multiple_cards():
     assert previews[0].external_hint == "1001"
 
 
+def test_parse_listing_page_extracts_real_incruit_card_shape():
+    previews = parse_listing_page(LISTING_HTML_FROM_INCRUIT)
+
+    assert len(previews) == 1
+    assert previews[0].title == "Machine Learning Engineer, Ads & Recommendation"
+    assert previews[0].company == "(주)버즈빌"
+    assert previews[0].external_hint == "2603090000132"
+    assert previews[0].detail_url.startswith("https://job.incruit.com/jobdb_info/jobpost.asp?job=2603090000132")
+
+
 def test_parse_detail_page_extracts_job_description_and_identifier():
     detail = parse_detail_page(DETAIL_HTML, detail_url="/job/1001", hint="1001")
 
@@ -67,6 +122,20 @@ def test_parse_detail_page_extracts_job_description_and_identifier():
     assert detail.external_job_id == "1001"
     assert detail.canonical_url == "https://job.incruit.com/job/1001?job=1001"
     assert detail.experience_text == "경력 5~8년"
+
+
+def test_parse_detail_page_prefers_job_posting_json_ld_when_available():
+    detail = parse_detail_page(
+        DETAIL_HTML_WITH_JSON_LD,
+        detail_url="https://job.incruit.com/jobdb_info/jobpost.asp?job=2603230002546",
+        hint="",
+    )
+
+    assert detail.external_job_id == "2603230002546"
+    assert detail.canonical_url == "https://job.incruit.com/jobdb_info/jobpost.asp?job=2603230002546"
+    assert detail.company == "신한디지털"
+    assert "Python 기반의 AI 시스템" in detail.jd_raw_text
+    assert detail.title == "[디지털] AI Agent 개발 및 프로젝트 기획 담당자 채용"
 
 
 def test_parse_experience_years_handles_ranges_and_minimums():

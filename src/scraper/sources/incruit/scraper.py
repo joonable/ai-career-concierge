@@ -163,7 +163,9 @@ class IncruitScraper:
             browser = await playwright.chromium.launch(headless=self.headless)
             try:
                 page = await browser.new_page()
-                await page.goto(url, wait_until="networkidle", timeout=self.timeout_ms)
+                # Incruit pages keep background requests alive for ads and trackers,
+                # so waiting for DOM readiness is more reliable than network idle.
+                await page.goto(url, wait_until="domcontentloaded", timeout=self.timeout_ms)
                 return await page.content()
             finally:
                 await browser.close()

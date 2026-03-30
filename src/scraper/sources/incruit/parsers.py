@@ -1,9 +1,10 @@
 from __future__ import annotations
 
+import json
 import re
 from dataclasses import dataclass
 from html.parser import HTMLParser
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 from urllib.parse import parse_qs, urlparse
 
 from scraper.sources.incruit.selectors import (
@@ -44,6 +45,13 @@ def attrs_to_dict(attrs: List[tuple[str, Optional[str]]]) -> Dict[str, str]:
     return {key.lower(): (value or "") for key, value in attrs}
 
 
+def looks_like_job_detail_link(href: str) -> bool:
+    normalized_href = href.lower()
+    parsed = urlparse(normalized_href)
+    path = parsed.path or normalized_href
+    return "jobdb_info/jobpost" in path or path.startswith("/job/")
+
+
 @dataclass
 class ListingPreview:
     title: str
@@ -59,6 +67,8 @@ class JobDetail:
     external_job_id: str
     canonical_url: str = ""
     experience_text: str = ""
+    title: str = ""
+    company: str = ""
 
 
 class _ListingParser(HTMLParser):
@@ -66,6 +76,7 @@ class _ListingParser(HTMLParser):
         super().__init__(convert_charrefs=True)
         self.previews: List[ListingPreview] = []
         self._card_depth = 0
+        self._card_tags: List[str] = []
         self._current: Optional[dict] = None
         self._capture_title = False
         self._capture_company = False
@@ -73,8 +84,8 @@ class _ListingParser(HTMLParser):
 
     def handle_starttag(self, tag: str, attrs: List[tuple[str, Optional[str]]]) -> None:
         attr_map = attrs_to_dict(attrs)
-        if tag in {"article", "li", "div"} and (
-            any(hint in attr_map for hint in ("data-job-id", "data-posting-id"))
+        if tag in {"article", "li", "div", "ul"} and (
+            any(hint in attr_map for hint in ("data-job-id", "data-posting-id", "jobno"))
             or class_matches(attr_map, LISTING_CARD_HINTS)
         ):
             if self._card_depth == 0:
@@ -84,10 +95,12 @@ class _ListingParser(HTMLParser):
                     "detail_url": "",
                     "external_hint": attr_map.get("data-job-id")
                     or attr_map.get("data-posting-id")
+                    or attr_map.get("jobno")
                     or "",
                     "experience_text": "",
                 }
             self._card_depth += 1
+            self._card_tags.append(tag)
 
         if self._card_depth == 0 or self._current is None:
             return
@@ -99,15 +112,19 @@ class _ListingParser(HTMLParser):
                 or attr_map.get("data-posting-id")
                 or self._current["external_hint"]
             )
-            if not self._current["detail_url"] or class_matches(attr_map, TITLE_HINTS):
+            is_job_link = looks_like_job_detail_link(href)
+            if is_job_link:
                 self._current["detail_url"] = href
                 self._current["external_hint"] = data_hint
                 self._capture_title = True
-            elif not self._current["title"]:
+            elif (
+                (not self._current["detail_url"] and class_matches(attr_map, TITLE_HINTS))
+                or (not self._current["title"] and class_matches(attr_map, TITLE_HINTS))
+            ):
                 self._current["detail_url"] = href
                 self._capture_title = True
 
-        if class_matches(attr_map, COMPANY_HINTS):
+        if tag in {"a", "span", "div", "strong"} and class_matches(attr_map, COMPANY_HINTS):
             self._capture_company = True
 
         if class_matches(attr_map, EXPERIENCE_HINTS):
@@ -120,7 +137,8 @@ class _ListingParser(HTMLParser):
         self._capture_company = False
         self._capture_experience = False
 
-        if self._card_depth > 0 and tag in {"article", "li", "div"}:
+        if self._card_depth > 0 and self._card_tags and tag == self._card_tags[-1]:
+            self._card_tags.pop()
             self._card_depth -= 1
             if self._card_depth == 0 and self._current is not None:
                 title = normalize_text(self._current["title"])
@@ -159,8 +177,10 @@ class _DetailParser(HTMLParser):
         super().__init__(convert_charrefs=True)
         self._capture_detail = False
         self._capture_experience = False
+        self._capture_json_ld = False
         self.detail_chunks: List[str] = []
         self.experience_chunks: List[str] = []
+        self.json_ld_chunks: List[str] = []
         self.canonical_url = ""
         self.external_hint = ""
 
@@ -178,6 +198,12 @@ class _DetailParser(HTMLParser):
                 attr_map.get("data-job-id") or attr_map.get("data-posting-id") or self.external_hint
             )
 
+        if (
+            tag == "script"
+            and attr_map.get("type", "").lower() == "application/ld+json"
+        ):
+            self._capture_json_ld = True
+
         if class_matches(attr_map, DETAIL_HINTS):
             self._capture_detail = True
 
@@ -185,14 +211,21 @@ class _DetailParser(HTMLParser):
             self._capture_experience = True
 
     def handle_endtag(self, tag: str) -> None:
+        if tag == "script":
+            self._capture_json_ld = False
+
         del tag
         self._capture_detail = False
         self._capture_experience = False
 
     def handle_data(self, data: str) -> None:
+        if self._capture_json_ld:
+            self.json_ld_chunks.append(data)
+
         text = normalize_text(data)
         if not text:
             return
+
         if self._capture_detail:
             self.detail_chunks.append(text)
         if self._capture_experience:
@@ -256,11 +289,53 @@ def parse_experience_years(raw_text: str) -> tuple[Optional[int], Optional[int]]
     return None, None
 
 
+def _extract_job_posting_payload(json_ld_blocks: List[str]) -> Dict[str, Any]:
+    for block in json_ld_blocks:
+        raw_block = block.strip()
+        if not raw_block:
+            continue
+        try:
+            parsed = json.loads(raw_block)
+        except json.JSONDecodeError:
+            continue
+
+        posting = _find_job_posting(parsed)
+        if posting is not None:
+            return posting
+
+    return {}
+
+
+def _find_job_posting(payload: Any) -> Optional[Dict[str, Any]]:
+    if isinstance(payload, dict):
+        if str(payload.get("@type", "")).lower() == "jobposting":
+            return payload
+        graph = payload.get("@graph")
+        if graph is not None:
+            return _find_job_posting(graph)
+
+    if isinstance(payload, list):
+        for item in payload:
+            posting = _find_job_posting(item)
+            if posting is not None:
+                return posting
+
+    return None
+
+
 def parse_detail_page(html: str, *, detail_url: str, hint: str = "") -> JobDetail:
     parser = _DetailParser()
     parser.feed(html)
 
-    jd_raw_text = normalize_text(" ".join(parser.detail_chunks))
+    job_posting = _extract_job_posting_payload(parser.json_ld_chunks)
+    structured_description = strip_tags(str(job_posting.get("description", "")))
+    structured_title = normalize_text(str(job_posting.get("title", "")))
+    hiring_org = job_posting.get("hiringOrganization")
+    structured_company = ""
+    if isinstance(hiring_org, dict):
+        structured_company = normalize_text(str(hiring_org.get("name", "")))
+
+    jd_raw_text = structured_description or normalize_text(" ".join(parser.detail_chunks))
     experience_text = normalize_text(" ".join(parser.experience_chunks))
     canonical_url = parser.canonical_url.strip()
     external_job_id = extract_external_job_id(
@@ -274,4 +349,6 @@ def parse_detail_page(html: str, *, detail_url: str, hint: str = "") -> JobDetai
         external_job_id=external_job_id,
         canonical_url=canonical_url,
         experience_text=experience_text,
+        title=structured_title,
+        company=structured_company,
     )
