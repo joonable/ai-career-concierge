@@ -26,6 +26,6 @@ describe("OnboardingMockup", () => {
     expect(screen.getByText(/ML Engineer, LLM Engineer, Data Scientist/)).toBeInTheDocument();
     expect(screen.getAllByText(/Feature Store/).length).toBeGreaterThan(0);
     expect(screen.getAllByRole("slider").length).toBeGreaterThan(0);
-    expect(screen.getByText("설정은 언제든 수정할 수 있어요")).toBeInTheDocument();
+    expect(screen.getByText("맞춤 추천 기준")).toBeInTheDocument();
   });
 });

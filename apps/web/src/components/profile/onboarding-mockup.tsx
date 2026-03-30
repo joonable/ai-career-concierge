@@ -226,9 +226,7 @@ export function OnboardingMockup() {
     "build-vs-operate": null,
   });
   const [isAdvancedOpen, setIsAdvancedOpen] = useState(false);
-  const [note, setNote] = useState(
-    "꼭 반영하고 싶은 조건이 있다면 짧게 남겨주세요.",
-  );
+  const [note, setNote] = useState("");
 
   const toggleSelection = (
     id: string,
@@ -247,12 +245,22 @@ export function OnboardingMockup() {
     isAdvancedOpen,
   ].filter(Boolean).length;
 
-  const summaryLines = [
-    `${roles.length}개 직무 카드 선택`,
-    `${seniority.length}개 경력 레벨 선택`,
-    `${workModes.length}개 근무 형태 + ${locations.length}개 지역`,
-    `${skills.length + customSkills.length}개 핵심 스킬`,
-    `${exclusions.length + customExclusions.length}개 제외 조건`,
+  const summaryItems = [
+    { label: "직무", value: `${roles.length}개 선택` },
+    {
+      label: "경력",
+      value:
+        seniority.length > 0
+          ? seniorityOptions
+              .filter((option) => seniority.includes(option.id))
+              .map((option) => option.label)
+              .join(", ")
+          : "None",
+    },
+    { label: "근무/지역", value: `${workModes.length} / ${locations.length}` },
+    { label: "스킬", value: `${skills.length + customSkills.length}개` },
+    { label: "제외 조건", value: `${exclusions.length + customExclusions.length}개` },
+    { label: "보조 메모", value: note.trim().length > 0 ? "입력됨" : "None" },
   ];
 
   const selectedComparisons = comparisonPrompts.filter(
@@ -277,7 +285,7 @@ export function OnboardingMockup() {
               <span className="dashboard-chip">스킬</span>
               <span className="dashboard-chip">제외 조건</span>
               <span className="dashboard-chip">고급 설정</span>
-              <span className="dashboard-chip dashboard-chip--muted">설정은 언제든 수정할 수 있어요</span>
+              <span className="dashboard-chip dashboard-chip--muted">맞춤 추천 기준</span>
             </div>
           </div>
         </article>
@@ -285,19 +293,16 @@ export function OnboardingMockup() {
           <div className="dashboard-summary__header">
             <div className="dashboard-summary-card__copy">
               <span className="dashboard-kicker">Progress</span>
-              <h2 className="dashboard-section__title">지금까지 선택한 내용</h2>
+              <h2 className="dashboard-section__title">설정 현황</h2>
             </div>
             <span className="dashboard-pill dashboard-pill--accent">{completedSections}/5 완료</span>
           </div>
-          <div className="dashboard-checklist" role="list">
-            {summaryLines.map((line) => (
-              <div className="dashboard-checklist__item dashboard-checklist__item--complete" key={line}>
-                <span className="dashboard-checklist__status" aria-hidden="true">
-                  <span className="dashboard-checklist__dot dashboard-checklist__dot--complete" />
-                </span>
-                <div className="dashboard-checklist__copy">
-                  <span className="dashboard-detail__label">{line}</span>
-                  <p className="dashboard-checklist__meta">지금 바로 바꿀 수 있습니다</p>
+          <div className="onboarding-summary-grid" role="list">
+            {summaryItems.map((item) => (
+              <div className="onboarding-summary-item" key={item.label} role="listitem">
+                <span className="onboarding-summary-item__label">{item.label}</span>
+                <div className="onboarding-summary-item__value-row">
+                  <span className="onboarding-summary-item__value">{item.value}</span>
                 </div>
               </div>
             ))}
@@ -558,6 +563,7 @@ export function OnboardingMockup() {
                 className="onboarding-field__input onboarding-field__textarea"
                 name="mockupNote"
                 onChange={(event) => setNote(event.target.value)}
+                placeholder="필요한 경우에만 짧게 남겨주세요"
                 value={note}
               />
             </section>
@@ -624,7 +630,7 @@ export function OnboardingMockup() {
               </div>
               <div className="onboarding-preview-card__group">
                 <span className="dashboard-detail__label">보조 메모</span>
-                <p className="onboarding-preview-card__text">{note}</p>
+                <p className="onboarding-preview-card__text">{note.trim().length > 0 ? note : "None"}</p>
               </div>
             </div>
           </aside>
