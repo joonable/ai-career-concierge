@@ -251,6 +251,10 @@ class FakeEvaluationStore:
                 company=job.company,
                 url=job.url,
                 platform=job.platform,
+                jd_raw_text=job.jd_raw_text,
+                min_years_experience=job.min_years_experience,
+                max_years_experience=job.max_years_experience,
+                source_metadata=job.source_metadata,
             )
             for evaluation, job in rows
         ]
@@ -523,7 +527,7 @@ def seed_job_and_evaluation(session: Session, user: User):
         external_job_id="seed-job",
         title="Senior Machine Learning Engineer",
         company="Signal Labs",
-        jd_raw_text="Python SQL recommender systems",
+        jd_raw_text="Python SQL recommender systems and ML platform ownership.",
         url="https://example.com/jobs/seed-job",
         min_years_experience=5,
         max_years_experience=8,

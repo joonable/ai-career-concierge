@@ -66,6 +66,7 @@ export default async function DashboardPage() {
         </section>
         <RecommendationBoard
           minimumFitScore={dashboard.minimum_fit_score}
+          profile={profile}
           recommendations={recommendations}
         />
       </div>

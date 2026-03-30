@@ -106,6 +106,10 @@ class DashboardRecommendation(BaseModel):
     company: str
     url: str
     platform: str
+    jd_raw_text: str
+    min_years_experience: Optional[int] = None
+    max_years_experience: Optional[int] = None
+    source_metadata: dict[str, Any] = Field(default_factory=dict)
 
 
 class DashboardResponse(BaseModel):

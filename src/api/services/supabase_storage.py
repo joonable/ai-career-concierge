@@ -41,6 +41,10 @@ class DashboardRow:
     company: str
     url: str
     platform: str
+    jd_raw_text: str
+    min_years_experience: Optional[int]
+    max_years_experience: Optional[int]
+    source_metadata: Dict[str, Any]
 
 
 @dataclass
@@ -291,7 +295,7 @@ class SupabaseEvaluationStore:
                 "user_id": f"eq.{user_id}",
                 "select": (
                     "id,status,fit_score,reasoning,rule_rejection_reason,user_feedback,feedback_reason,created_at,updated_at,"
-                    "job:jobs!inner(id,title,company,url,platform)"
+                    "job:jobs!inner(id,title,company,url,platform,jd_raw_text,min_years_experience,max_years_experience,source_metadata)"
                 ),
                 "order": "updated_at.desc",
             },
@@ -315,6 +319,10 @@ class SupabaseEvaluationStore:
                     company=job["company"],
                     url=job["url"],
                     platform=job["platform"],
+                    jd_raw_text=job["jd_raw_text"],
+                    min_years_experience=job.get("min_years_experience"),
+                    max_years_experience=job.get("max_years_experience"),
+                    source_metadata=job.get("source_metadata") or {},
                 )
             )
         return payload

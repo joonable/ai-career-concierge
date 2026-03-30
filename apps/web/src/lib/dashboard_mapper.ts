@@ -16,6 +16,10 @@ export type DashboardRecommendation = {
   company: string;
   url: string;
   platform: string;
+  jdRawText: string;
+  minYearsExperience: number | null;
+  maxYearsExperience: number | null;
+  sourceMetadata: Record<string, unknown>;
 };
 
 export function mapDashboardRecommendations(
@@ -37,6 +41,10 @@ export function mapDashboardRecommendations(
     company: recommendation.company,
     url: recommendation.url,
     platform: recommendation.platform,
+    jdRawText: recommendation.jd_raw_text,
+    minYearsExperience: recommendation.min_years_experience,
+    maxYearsExperience: recommendation.max_years_experience,
+    sourceMetadata: recommendation.source_metadata,
   }));
 }
 
@@ -59,6 +67,8 @@ function formatFeedback(feedback: string | null) {
       return "좋아요";
     case "DISLIKE":
       return "제외";
+    case "LATER":
+      return "나중에 보기";
     default:
       return feedback ? formatFallbackLabel(feedback) : null;
   }

@@ -12,6 +12,7 @@ class EvaluationStatus(str, Enum):
 class FeedbackState(str, Enum):
     LIKE = "LIKE"
     DISLIKE = "DISLIKE"
+    LATER = "LATER"
 
 
 class LogLevel(str, Enum):

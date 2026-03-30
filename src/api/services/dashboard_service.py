@@ -33,6 +33,10 @@ class DashboardService:
                 company=row.company,
                 url=row.url,
                 platform=row.platform,
+                jd_raw_text=row.jd_raw_text,
+                min_years_experience=row.min_years_experience,
+                max_years_experience=row.max_years_experience,
+                source_metadata=row.source_metadata,
             )
             for row in rows
         ]

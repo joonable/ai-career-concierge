@@ -23,6 +23,10 @@ describe("mapDashboardRecommendations", () => {
           company: "Signal Labs",
           url: "https://example.com/jobs/1",
           platform: "LinkedIn",
+          jd_raw_text: "Python SQL ML platform ownership.",
+          min_years_experience: 5,
+          max_years_experience: 8,
+          source_metadata: { location: "Seoul" },
         },
       ],
     });
@@ -44,6 +48,10 @@ describe("mapDashboardRecommendations", () => {
         company: "Signal Labs",
         url: "https://example.com/jobs/1",
         platform: "LinkedIn",
+        jdRawText: "Python SQL ML platform ownership.",
+        minYearsExperience: 5,
+        maxYearsExperience: 8,
+        sourceMetadata: { location: "Seoul" },
       },
     ]);
   });
@@ -68,6 +76,10 @@ describe("mapDashboardRecommendations", () => {
           company: "Company",
           url: "https://example.com/jobs/1",
           platform: "Wanted",
+          jd_raw_text: "Contract-only onsite role.",
+          min_years_experience: null,
+          max_years_experience: null,
+          source_metadata: {},
         },
       ],
     });

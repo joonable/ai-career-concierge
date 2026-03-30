@@ -4,6 +4,11 @@ import { createSupabaseBrowserClient } from "@/lib/supabase_auth_browser";
 import { webEnv } from "@/lib/env";
 import type { UserProfilePayload, UserProfileResponse } from "@/lib/profile_types";
 
+export type FeedbackPayload = {
+  feedback: "LIKE" | "DISLIKE" | "LATER";
+  feedback_reason?: string | null;
+};
+
 async function buildAuthenticatedHeaders() {
   const supabase = createSupabaseBrowserClient();
   const {
@@ -64,6 +69,27 @@ export async function updateProfile(payload: UserProfilePayload): Promise<UserPr
 
   if (!response.ok) {
     throw new Error(await readErrorMessage(response, "Failed to update profile."));
+  }
+
+  return response.json();
+}
+
+export async function recordEvaluationFeedback(
+  evaluationId: string,
+  payload: FeedbackPayload,
+): Promise<{
+  evaluation_id: string;
+  feedback: FeedbackPayload["feedback"];
+  feedback_reason: string | null;
+}> {
+  const response = await fetch(`${webEnv.apiBaseUrl}/api/v1/evaluations/${evaluationId}/feedback`, {
+    method: "POST",
+    headers: await buildAuthenticatedHeaders(),
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) {
+    throw new Error(await readErrorMessage(response, "Failed to save feedback."));
   }
 
   return response.json();

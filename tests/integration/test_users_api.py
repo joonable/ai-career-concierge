@@ -194,6 +194,10 @@ async def test_feedback_and_dashboard_api(client, db_session):
     assert recommendation["company"] == "Signal Labs"
     assert recommendation["platform"] == "test_source"
     assert recommendation["url"] == "https://example.com/jobs/seed-job"
+    assert recommendation["jd_raw_text"] == "Python SQL recommender systems and ML platform ownership."
+    assert recommendation["min_years_experience"] == 5
+    assert recommendation["max_years_experience"] == 8
+    assert recommendation["source_metadata"] == {}
     assert recommendation["fit_score"] is None
     assert recommendation["reasoning"] is None
     assert recommendation["rule_rejection_reason"] is None

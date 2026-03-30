@@ -1,11 +1,14 @@
 import React from "react";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { OnboardingStatusCard } from "@/components/dashboard/onboarding-status-card";
 import { RecommendationBoard } from "@/components/dashboard/recommendation-board";
 import type { DashboardOnboardingState } from "@/lib/dashboard_onboarding";
+import type { UserProfileResponse } from "@/lib/profile_types";
+
+const recordEvaluationFeedback = vi.fn();
 
 vi.mock("next/link", () => ({
   default: ({
@@ -17,6 +20,10 @@ vi.mock("next/link", () => ({
       {children}
     </a>
   ),
+}));
+
+vi.mock("@/lib/api_client_browser", () => ({
+  recordEvaluationFeedback: (...args: unknown[]) => recordEvaluationFeedback(...args),
 }));
 
 function buildOnboardingState(
@@ -79,6 +86,34 @@ function buildRecommendation(
     company: "OpenAI",
     url: "https://example.com/jobs/1",
     platform: "LinkedIn",
+    jdRawText: "Python SQL MLOps recommender systems ownership in Seoul.",
+    minYearsExperience: 5,
+    maxYearsExperience: 8,
+    sourceMetadata: {
+      location: "Seoul",
+      employment_type: "Full-time",
+    },
+    ...overrides,
+  };
+}
+
+function buildProfile(overrides?: Partial<UserProfileResponse>): UserProfileResponse {
+  return {
+    user_id: "user-1",
+    email: "scaffold-user@example.com",
+    profile_data: {
+      role: "ML Engineer",
+      years_of_experience: 6,
+      title_keywords: ["ml engineer"],
+    },
+    guidelines: {
+      must_haves: ["Python", "SQL", "MLOps"],
+      deal_breakers: ["contract-only", "onsite-only"],
+    },
+    notification_settings: {
+      minimum_fit_score: 85,
+      delivery_channel: "slack",
+    },
     ...overrides,
   };
 }
@@ -150,15 +185,30 @@ describe("OnboardingStatusCard", () => {
 });
 
 describe("RecommendationBoard", () => {
+  beforeEach(() => {
+    recordEvaluationFeedback.mockReset();
+    recordEvaluationFeedback.mockResolvedValue({
+      evaluation_id: "eval-1",
+      feedback: "LIKE",
+      feedback_reason: null,
+    });
+  });
+
   it("renders the empty state when there are no recommendations", () => {
-    render(<RecommendationBoard minimumFitScore={80} recommendations={[]} />);
+    render(<RecommendationBoard minimumFitScore={80} profile={buildProfile()} recommendations={[]} />);
 
     expect(screen.getByText("아직 비어 있습니다")).toBeInTheDocument();
     expect(screen.getByText("기준 80+ 추천 중심")).toBeInTheDocument();
   });
 
   it("renders friendly filters and recommendation cards", () => {
-    render(<RecommendationBoard minimumFitScore={85} recommendations={[buildRecommendation()]} />);
+    render(
+      <RecommendationBoard
+        minimumFitScore={85}
+        profile={buildProfile()}
+        recommendations={[buildRecommendation()]}
+      />,
+    );
 
     expect(screen.getByPlaceholderText("회사명이나 직무명으로 찾기")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "추천만" })).toBeInTheDocument();
@@ -174,6 +224,7 @@ describe("RecommendationBoard", () => {
     render(
       <RecommendationBoard
         minimumFitScore={85}
+        profile={buildProfile()}
         recommendations={[
           buildRecommendation({
             evaluationId: "eval-2",
@@ -194,7 +245,6 @@ describe("RecommendationBoard", () => {
     expect(screen.getByText("현재 필터와 일치하는 공고가 없습니다")).toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: "검토 필요" }));
-    await user.click(screen.getByLabelText("추천 기준 85점 이상만 보기"));
 
     expect(screen.getByText("Platform Engineer")).toBeInTheDocument();
     expect(screen.getAllByText("대기")).toHaveLength(2);
@@ -207,6 +257,7 @@ describe("RecommendationBoard", () => {
     render(
       <RecommendationBoard
         minimumFitScore={85}
+        profile={buildProfile()}
         recommendations={[
           buildRecommendation(),
           buildRecommendation({
@@ -227,6 +278,7 @@ describe("RecommendationBoard", () => {
 
     expect(screen.queryByText("Junior Analyst")).not.toBeInTheDocument();
 
+    await user.click(screen.getByRole("button", { name: "검토 필요" }));
     await user.click(screen.getByLabelText("규칙에서 제외된 공고도 포함"));
 
     expect(screen.getByText("Junior Analyst")).toBeInTheDocument();
@@ -239,6 +291,7 @@ describe("RecommendationBoard", () => {
     render(
       <RecommendationBoard
         minimumFitScore={70}
+        profile={buildProfile()}
         recommendations={[
           buildRecommendation({
             evaluationId: "eval-1",
@@ -274,6 +327,7 @@ describe("RecommendationBoard", () => {
     render(
       <RecommendationBoard
         minimumFitScore={80}
+        profile={buildProfile()}
         recommendations={[
           buildRecommendation({
             evaluationId: "eval-1",
@@ -303,6 +357,7 @@ describe("RecommendationBoard", () => {
     render(
       <RecommendationBoard
         minimumFitScore={85}
+        profile={buildProfile()}
         recommendations={[
           buildRecommendation({
             evaluationId: "eval-1",
@@ -323,9 +378,120 @@ describe("RecommendationBoard", () => {
     );
 
     await user.click(screen.getByRole("button", { name: "검토 필요" }));
-    await user.click(screen.getByLabelText("추천 기준 85점 이상만 보기"));
 
     expect(screen.getByText("Needs Review Role")).toBeInTheDocument();
     expect(screen.queryByText("Recommended Role")).not.toBeInTheDocument();
+  });
+
+  it("opens a centered detail modal with structured explanation when a card is clicked", async () => {
+    const user = userEvent.setup();
+
+    render(
+      <RecommendationBoard
+        minimumFitScore={85}
+        profile={buildProfile()}
+        recommendations={[buildRecommendation()]}
+      />,
+    );
+
+    await user.click(screen.getByRole("button", { name: "Senior ML Engineer 상세 보기" }));
+
+    expect(screen.getByRole("dialog", { name: "공고 상세 패널" })).toBeInTheDocument();
+    expect(screen.getByText("피드백 저장")).toBeInTheDocument();
+    expect(screen.getByText("매칭 근거")).toBeInTheDocument();
+    expect(screen.getByText("리스크와 경고")).toBeInTheDocument();
+    expect(screen.getByText("JD 핵심")).toBeInTheDocument();
+    expect(screen.getByText("내 기준과 비교")).toBeInTheDocument();
+    expect(screen.getByText("원문 공고 보기")).toHaveAttribute("href", "https://example.com/jobs/1");
+  });
+
+  it("closes the detail modal on escape and backdrop click", async () => {
+    const user = userEvent.setup();
+
+    render(
+      <RecommendationBoard
+        minimumFitScore={85}
+        profile={buildProfile()}
+        recommendations={[buildRecommendation()]}
+      />,
+    );
+
+    await user.click(screen.getByRole("button", { name: "Senior ML Engineer 상세 보기" }));
+    expect(screen.getByRole("dialog", { name: "공고 상세 패널" })).toBeInTheDocument();
+
+    await user.keyboard("{Escape}");
+    expect(screen.queryByRole("dialog", { name: "공고 상세 패널" })).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "Senior ML Engineer 상세 보기" }));
+    await user.click(screen.getByRole("dialog", { name: "공고 상세 패널" }));
+    expect(screen.queryByRole("dialog", { name: "공고 상세 패널" })).not.toBeInTheDocument();
+  });
+
+  it("saves feedback actions from the detail panel", async () => {
+    const user = userEvent.setup();
+    recordEvaluationFeedback.mockResolvedValue({
+      evaluation_id: "eval-1",
+      feedback: "LATER",
+      feedback_reason: "next week",
+    });
+
+    render(
+      <RecommendationBoard
+        minimumFitScore={85}
+        profile={buildProfile()}
+        recommendations={[buildRecommendation()]}
+      />,
+    );
+
+    await user.click(screen.getByRole("button", { name: "Senior ML Engineer 상세 보기" }));
+    await user.type(screen.getByLabelText("피드백 메모"), "next week");
+    await user.click(screen.getByRole("button", { name: "나중에 보기 저장" }));
+
+    expect(recordEvaluationFeedback).toHaveBeenCalledWith("eval-1", {
+      feedback: "LATER",
+      feedback_reason: "next week",
+    });
+    expect(screen.getByText("피드백이 저장되었습니다.")).toBeInTheDocument();
+    expect(screen.getByText("피드백 나중에 보기")).toBeInTheDocument();
+  });
+
+  it("updates the current filtered list immediately after saving feedback", async () => {
+    const user = userEvent.setup();
+    recordEvaluationFeedback.mockResolvedValue({
+      evaluation_id: "eval-2",
+      feedback: "LATER",
+      feedback_reason: "follow up later",
+    });
+
+    render(
+      <RecommendationBoard
+        minimumFitScore={70}
+        profile={buildProfile()}
+        recommendations={[
+          buildRecommendation({
+            evaluationId: "eval-1",
+            title: "Saved Like Role",
+            userFeedback: "LIKE",
+            feedbackLabel: "좋아요",
+          }),
+          buildRecommendation({
+            evaluationId: "eval-2",
+            title: "Unsure Role",
+            userFeedback: null,
+            feedbackLabel: null,
+          }),
+        ]}
+      />,
+    );
+
+    await user.click(screen.getByRole("button", { name: "미응답" }));
+    expect(screen.getByText("Unsure Role")).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "Unsure Role 상세 보기" }));
+    await user.type(screen.getByLabelText("피드백 메모"), "follow up later");
+    await user.click(screen.getByRole("button", { name: "나중에 보기 저장" }));
+
+    expect(screen.queryByRole("button", { name: "Unsure Role 상세 보기" })).not.toBeInTheDocument();
+    expect(screen.getByText("현재 필터와 일치하는 공고가 없습니다")).toBeInTheDocument();
   });
 });

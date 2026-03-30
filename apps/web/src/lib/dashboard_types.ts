@@ -13,6 +13,10 @@ export type DashboardApiRecommendation = {
   company: string;
   url: string;
   platform: string;
+  jd_raw_text: string;
+  min_years_experience: number | null;
+  max_years_experience: number | null;
+  source_metadata: Record<string, unknown>;
 };
 
 export type DashboardResponse = {
