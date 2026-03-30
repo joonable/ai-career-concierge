@@ -1,13 +1,15 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, Dict, List, Protocol
+from typing import Any, Dict, List
 from uuid import UUID
 
 from pydantic import ValidationError
 
-from agent.prompts.evaluation_prompt import build_evaluation_prompt
+from agent.evaluation_service import evaluate_job
+from agent.prompts.prompt_manager import PromptManager
 from agent.schemas.evaluation_result import LLMEvaluationResult
+from common.errors import PromptLoadError, ProviderRequestError, ProviderResponseParseError
 from common.logging import get_logger
 from db.enums import LogLevel
 
@@ -15,21 +17,11 @@ from db.enums import LogLevel
 logger = get_logger(__name__)
 
 
-class LLMEvaluator(Protocol):
-    async def evaluate(
-        self,
-        *,
-        job,
-        prompt: str,
-        user_context: Dict[str, Any],
-        recent_memory: str,
-    ) -> Dict[str, Any]:
-        ...
-
-
 @dataclass
 class LLMEvalNode:
     evaluator: LLMEvaluator
+    prompt_manager: PromptManager
+    tracer: object
     evaluation_store: object
     system_log_store: object
 
@@ -38,31 +30,18 @@ class LLMEvalNode:
         results: List[LLMEvaluationResult] = []
 
         for job in state.get("current_jobs", []):
-            prompt = build_evaluation_prompt(
-                user_context=state["user_context"],
-                recent_memory=state.get("recent_memory", ""),
-                job=job,
-            )
             try:
                 evaluation = self.evaluation_store.ensure_pending(user_id=user_id, job_id=job.job_id)
-                payload = await self.evaluator.evaluate(
-                    job=job,
-                    prompt=prompt,
+                execution = await evaluate_job(
+                    evaluator=self.evaluator,
+                    prompt_manager=self.prompt_manager,
+                    tracer=self.tracer,
                     user_context=state["user_context"],
                     recent_memory=state.get("recent_memory", ""),
+                    job=job,
+                    evaluation_id=str(evaluation.id),
                 )
-                provider_metadata = payload.pop("_provider_metadata", {}) if isinstance(payload, dict) else {}
-                result = LLMEvaluationResult.model_validate(
-                    {
-                        "evaluation_id": evaluation.id,
-                        "job_id": job.job_id,
-                        "platform": job.platform,
-                        "title": job.title,
-                        "company": job.company,
-                        "url": job.url,
-                        **payload,
-                    }
-                )
+                result = execution.result
                 self.evaluation_store.mark_llm_evaluated(
                     user_id=user_id,
                     job_id=job.job_id,
@@ -76,32 +55,58 @@ class LLMEvalNode:
                         "user_id": str(user_id),
                         "job_id": str(job.job_id),
                         "platform": job.platform,
-                        "model": provider_metadata.get("model"),
-                        "latency_ms": provider_metadata.get("latency_ms"),
+                        "model": execution.provider_metadata.get("model"),
+                        "latency_ms": execution.provider_metadata.get("latency_ms"),
                     },
                 )
                 results.append(result)
-            except (ValidationError, ValueError) as exc:
-                self.system_log_store.create(
-                    run_id=state["run_id"],
-                    event_type="llm_eval_invalid_output",
-                    level=LogLevel.ERROR,
-                    message=f"LLM evaluation failed for {job.external_job_id}: {exc}",
+            except (ValidationError, ProviderResponseParseError) as exc:
+                self._record_failure(
+                    state=state,
                     user_id=user_id,
-                    job_id=job.job_id,
-                    platform=job.platform,
-                    metadata={"error_type": exc.__class__.__name__},
+                    job=job,
+                    exc=exc,
+                    event_type="llm_eval_invalid_output",
+                    failure_stage="schema_validate" if isinstance(exc, ValidationError) else "json_parse",
+                )
+            except PromptLoadError as exc:
+                self._record_failure(
+                    state=state,
+                    user_id=user_id,
+                    job=job,
+                    exc=exc,
+                    event_type="llm_eval_failure",
+                    failure_stage="prompt_load",
+                )
+            except ProviderRequestError as exc:
+                self._record_failure(
+                    state=state,
+                    user_id=user_id,
+                    job=job,
+                    exc=exc,
+                    event_type="llm_eval_failure",
+                    failure_stage="provider_request",
                 )
             except Exception as exc:  # pragma: no cover - exercised by resilience tests
-                self.system_log_store.create(
-                    run_id=state["run_id"],
-                    event_type="llm_eval_failure",
-                    level=LogLevel.ERROR,
-                    message=f"LLM evaluation crashed for {job.external_job_id}: {exc}",
+                self._record_failure(
+                    state=state,
                     user_id=user_id,
-                    job_id=job.job_id,
-                    platform=job.platform,
-                    metadata={"error_type": exc.__class__.__name__},
+                    job=job,
+                    exc=exc,
+                    event_type="llm_eval_failure",
+                    failure_stage="unknown",
                 )
 
         return {"evaluation_results": results}
+
+    def _record_failure(self, *, state: Dict[str, Any], user_id: UUID, job, exc: Exception, event_type: str, failure_stage: str) -> None:
+        self.system_log_store.create(
+            run_id=state["run_id"],
+            event_type=event_type,
+            level=LogLevel.ERROR,
+            message=f"LLM evaluation failed for {job.external_job_id}: {exc}",
+            user_id=user_id,
+            job_id=job.job_id,
+            platform=job.platform,
+            metadata={"error_type": exc.__class__.__name__, "failure_stage": failure_stage},
+        )

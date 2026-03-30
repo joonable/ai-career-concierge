@@ -76,6 +76,14 @@ Database migration:
 PYTHONPATH=src poetry run alembic upgrade head
 ```
 
+Offline evaluation workflow:
+
+```bash
+poetry run eval-jobs sync-dataset
+poetry run eval-jobs run-experiment --experiment-prefix eval-prompt
+poetry run eval-jobs promote-trace --run-id <langsmith-run-id>
+```
+
 ## Current Scope
 
 The current goal is a single-user PoC that supports:
@@ -92,6 +100,8 @@ The current goal is a single-user PoC that supports:
 - The backend ships with a mock scraper, mock LLM evaluator, and logging Slack notifier so the end-to-end loop is runnable before real integrations are wired.
 - The default runtime now uses a real Gemini evaluator when `GEMINI_API_KEY` is configured; tests still inject mock or fixture evaluators explicitly.
 - The default runtime now targets an Incruit scraper, while tests and local fixtures can still inject mock scrapers explicitly.
+- Prompt rendering can now load LangSmith Prompt Hub assets when `LANGSMITH_EVAL_PROMPT_IDENTIFIER` or `LANGSMITH_MEMORY_PROMPT_IDENTIFIER` are configured, and falls back to the in-repo template when Prompt Hub is unavailable.
+- Offline prompt/model experiments can now be run against the curated LangSmith dataset fixture with `poetry run eval-jobs`.
 - The web app now uses Supabase SSR sessions for Google OAuth and forwards real Supabase bearer tokens to FastAPI.
 - FastAPI verifies Supabase JWTs against the project JWKS before resolving `UserIdentity`.
 - Production-facing secrets are validated through typed settings in `src/common/config.py`.

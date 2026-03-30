@@ -52,6 +52,43 @@ class Settings(BaseSettings):
         default="ai-career-concierge-dev",
         alias="LANGSMITH_PROJECT",
     )
+    langsmith_eval_prompt_identifier: str = Field(
+        default="",
+        alias="LANGSMITH_EVAL_PROMPT_IDENTIFIER",
+    )
+    langsmith_eval_prompt_name: str = Field(
+        default="job-evaluation",
+        alias="LANGSMITH_EVAL_PROMPT_NAME",
+    )
+    langsmith_eval_prompt_version: str = Field(
+        default="local-v1",
+        alias="LANGSMITH_EVAL_PROMPT_VERSION",
+    )
+    langsmith_eval_prompt_variant: str = Field(
+        default="default",
+        alias="LANGSMITH_EVAL_PROMPT_VARIANT",
+    )
+    langsmith_memory_prompt_identifier: str = Field(
+        default="",
+        alias="LANGSMITH_MEMORY_PROMPT_IDENTIFIER",
+    )
+    langsmith_memory_prompt_name: str = Field(
+        default="memory-summary",
+        alias="LANGSMITH_MEMORY_PROMPT_NAME",
+    )
+    langsmith_memory_prompt_version: str = Field(
+        default="local-v1",
+        alias="LANGSMITH_MEMORY_PROMPT_VERSION",
+    )
+    langsmith_memory_prompt_variant: str = Field(
+        default="default",
+        alias="LANGSMITH_MEMORY_PROMPT_VARIANT",
+    )
+    langsmith_eval_dataset_name: str = Field(
+        default="job-eval-gold-dev",
+        alias="LANGSMITH_EVAL_DATASET_NAME",
+    )
+    pipeline_version: str = Field(default="v1", alias="PIPELINE_VERSION")
 
     pipeline_enabled: bool = Field(default=False, alias="PIPELINE_ENABLED")
     allow_dev_schedule: bool = Field(default=False, alias="ALLOW_DEV_SCHEDULE")

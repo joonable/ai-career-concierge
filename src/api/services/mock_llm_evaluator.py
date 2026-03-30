@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 
 class MockGeminiEvaluator:
@@ -11,9 +11,13 @@ class MockGeminiEvaluator:
         prompt: str,
         user_context: Dict[str, Any],
         recent_memory: str,
+        prompt_metadata: Optional[Dict[str, Any]] = None,
+        evaluation_id: Optional[str] = None,
     ) -> Dict[str, Any]:
         del prompt
         del recent_memory
+        del prompt_metadata
+        del evaluation_id
 
         text = f"{job.title} {job.jd_raw_text}".lower()
         guidelines = user_context.get("guidelines", {})

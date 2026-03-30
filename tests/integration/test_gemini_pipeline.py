@@ -117,7 +117,7 @@ async def test_pipeline_records_langsmith_root_and_llm_traces(client, db_session
     http_client = httpx.AsyncClient(transport=httpx.MockTransport(ValidGeminiTransport()))
     runtime = build_runtime(
         scrapers=[StaticScraper()],
-        evaluator=GeminiEvaluator(api_key="test-key", http_client=http_client, tracer=tracer),
+        evaluator=GeminiEvaluator(api_key="test-key", http_client=http_client),
         tracer=tracer,
     )
     app.dependency_overrides[get_runtime] = lambda: runtime
@@ -132,9 +132,11 @@ async def test_pipeline_records_langsmith_root_and_llm_traces(client, db_session
     assert response.status_code == 200
     assert len(tracer.pipeline_runs) == 1
     assert tracer.pipeline_runs[0]["user_id"] == str(user.id)
+    assert tracer.pipeline_runs[0]["handle"].metadata["pipeline_version"] == "test-v1"
     assert tracer.pipeline_runs[0]["handle"].outputs["jobs_ingested"] >= 1
     assert len(tracer.llm_runs) >= 1
     assert tracer.llm_runs[0]["name"] == "gemini.evaluate"
-    assert tracer.llm_runs[0]["metadata"]["model"] == "gemini-2.0-flash"
-    assert "prompt" in tracer.llm_runs[0]["inputs"]
+    assert tracer.llm_runs[0]["metadata"]["prompt_name"] == "job-evaluation"
+    assert tracer.llm_runs[0]["handle"].metadata["model"] == "gemini-2.0-flash"
+    assert "rendered_prompt" in tracer.llm_runs[0]["inputs"]
     await http_client.aclose()

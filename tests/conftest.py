@@ -11,6 +11,7 @@ from httpx import ASGITransport, AsyncClient
 from sqlmodel import Session, SQLModel, create_engine
 
 from agent.schemas.pipeline_job import PipelineJob
+from agent.prompts import PromptManager
 from api.schemas.users import build_user_profile_response, serialize_user_profile_sections
 from api.services.gemini_evaluator import GeminiEvaluator
 from api.services.mock_llm_evaluator import MockGeminiEvaluator
@@ -68,11 +69,22 @@ class FailingScraper:
 
 
 class InvalidEvaluator:
-    async def evaluate(self, *, job, prompt, user_context, recent_memory):
+    async def evaluate(
+        self,
+        *,
+        job,
+        prompt,
+        user_context,
+        recent_memory,
+        prompt_metadata=None,
+        evaluation_id=None,
+    ):
         del job
         del prompt
         del user_context
         del recent_memory
+        del prompt_metadata
+        del evaluation_id
         return {
             "fit_score": 999,
             "reasoning": "invalid output",
@@ -350,14 +362,28 @@ def build_runtime(
     notifier: Optional[LoggingSlackNotifier] = None,
     signing_secret: str = "dev-slack-secret",
     tracer: Optional[LangSmithTracer] = None,
+    prompt_manager: Optional[PromptManager] = None,
 ) -> RuntimeServices:
     langsmith_tracer = tracer or LangSmithTracer.disabled()
     return RuntimeServices(
         scraper_registry=ScraperRegistry(scrapers or [StaticScraper()]),
         llm_evaluator=evaluator or MockGeminiEvaluator(),
+        prompt_manager=prompt_manager
+        or PromptManager(
+            client=None,
+            eval_prompt_identifier="",
+            eval_prompt_name="job-evaluation",
+            eval_prompt_version="local-v1",
+            eval_prompt_variant="default",
+            memory_prompt_identifier="",
+            memory_prompt_name="memory-summary",
+            memory_prompt_version="local-v1",
+            memory_prompt_variant="default",
+        ),
         slack_notifier=notifier or LoggingSlackNotifier(),
         slack_signature_service=SlackSignatureService(signing_secret),
         langsmith_tracer=langsmith_tracer,
+        pipeline_version="test-v1",
     )
 
 

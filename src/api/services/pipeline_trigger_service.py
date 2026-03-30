@@ -7,7 +7,6 @@ from agent.nodes.deliver_node import DeliverNode
 from agent.nodes.ingest_node import IngestNode
 from agent.nodes.llm_eval_node import LLMEvalNode
 from agent.nodes.rule_filter_node import RuleFilterNode
-from agent.prompts.memory_summary import summarize_recent_dislikes
 from agent.workflow import build_pipeline_graph
 from api.schemas.pipeline import PipelineRunResult, PipelineTriggerRequest, PipelineTriggerResponse
 from api.services.runtime import RuntimeServices
@@ -47,9 +46,10 @@ class PipelineTriggerService:
 
         for user in users:
             trace_context = start_trace_context()
-            recent_memory = summarize_recent_dislikes(
+            recent_memory_prompt = self.runtime.prompt_manager.render_memory_summary(
                 self.evaluation_store.list_recent_dislikes(user.user_id, limit=10)
             )
+            recent_memory = recent_memory_prompt.text
             user_context = {
                 "user_id": str(user.user_id),
                 "email": user.email,
@@ -73,6 +73,18 @@ class PipelineTriggerService:
                 dry_run=payload.dry_run,
                 app_env=self.runtime.langsmith_tracer.app_env,
             ) as pipeline_trace:
+                pipeline_trace.add_metadata(
+                    {
+                        "pipeline_version": getattr(self.runtime, "pipeline_version", "v1"),
+                        "dataset_candidate": False,
+                        "user_profile_role": user.profile_data.role,
+                        "minimum_fit_score": user.notification_settings.minimum_fit_score,
+                        "delivery_channel": user.notification_settings.delivery_channel,
+                        "memory_prompt_name": recent_memory_prompt.metadata.prompt_name,
+                        "memory_prompt_version": recent_memory_prompt.metadata.prompt_version,
+                        "memory_prompt_variant": recent_memory_prompt.metadata.prompt_variant,
+                    }
+                )
                 graph = build_pipeline_graph(
                     ingest_node=IngestNode(
                         scraper_registry=self.runtime.scraper_registry,
@@ -84,6 +96,8 @@ class PipelineTriggerService:
                     ),
                     llm_eval_node=LLMEvalNode(
                         evaluator=self.runtime.llm_evaluator,
+                        prompt_manager=self.runtime.prompt_manager,
+                        tracer=self.runtime.langsmith_tracer,
                         evaluation_store=self.evaluation_store,
                         system_log_store=self.system_log_store,
                     ),

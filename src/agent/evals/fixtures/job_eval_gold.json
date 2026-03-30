@@ -1,0 +1,212 @@
+[
+  {
+    "id": "f7c5f30e-286e-4f20-b0fa-c767b3f6c101",
+    "inputs": {
+      "user_context": {
+        "user_id": "11111111-1111-1111-1111-111111111111",
+        "profile_data": {
+          "role": "Machine Learning Engineer",
+          "years_of_experience": 6
+        },
+        "guidelines": {
+          "must_haves": ["Python", "SQL", "MLOps"],
+          "deal_breakers": ["contract-only", "onsite-only"]
+        },
+        "notification_settings": {
+          "minimum_fit_score": 80,
+          "delivery_channel": "slack"
+        }
+      },
+      "recent_memory": "Avoid jobs similar to these recent dislikes: weak infra ownership; contract-only roles.",
+      "job": {
+        "job_id": "18f3fb52-d02c-4f2a-b0df-20467365ad27",
+        "platform": "curated",
+        "external_job_id": "gold-001",
+        "title": "Senior Machine Learning Engineer",
+        "company": "Signal Labs",
+        "jd_raw_text": "Build production ML systems with Python, SQL, MLOps, experimentation, and ranking pipelines.",
+        "url": "https://example.com/jobs/gold-001"
+      }
+    },
+    "outputs": {
+      "should_pass": true,
+      "fit_score_range": {"min": 80, "max": 100},
+      "expected_must_have_hits": ["Python", "SQL", "MLOps"],
+      "expected_deal_breakers_found": []
+    },
+    "metadata": {
+      "scenario_type": "strong_match",
+      "platform": "curated",
+      "difficulty": "easy",
+      "source": "curated"
+    }
+  },
+  {
+    "id": "f7c5f30e-286e-4f20-b0fa-c767b3f6c102",
+    "inputs": {
+      "user_context": {
+        "user_id": "11111111-1111-1111-1111-111111111111",
+        "profile_data": {
+          "role": "Machine Learning Engineer",
+          "years_of_experience": 6
+        },
+        "guidelines": {
+          "must_haves": ["Python", "SQL", "MLOps"],
+          "deal_breakers": ["contract-only", "onsite-only"]
+        },
+        "notification_settings": {
+          "minimum_fit_score": 80,
+          "delivery_channel": "slack"
+        }
+      },
+      "recent_memory": "",
+      "job": {
+        "job_id": "18f3fb52-d02c-4f2a-b0df-20467365ad28",
+        "platform": "curated",
+        "external_job_id": "gold-002",
+        "title": "Frontend Engineer",
+        "company": "Noise Portal",
+        "jd_raw_text": "Build marketing landing pages with React and CSS. Contract-only onsite role.",
+        "url": "https://example.com/jobs/gold-002"
+      }
+    },
+    "outputs": {
+      "should_pass": false,
+      "fit_score_range": {"min": 1, "max": 59},
+      "expected_must_have_hits": [],
+      "expected_deal_breakers_found": ["contract-only", "onsite-only"]
+    },
+    "metadata": {
+      "scenario_type": "obvious_reject",
+      "platform": "curated",
+      "difficulty": "easy",
+      "source": "curated"
+    }
+  },
+  {
+    "id": "f7c5f30e-286e-4f20-b0fa-c767b3f6c103",
+    "inputs": {
+      "user_context": {
+        "user_id": "11111111-1111-1111-1111-111111111111",
+        "profile_data": {
+          "role": "Machine Learning Engineer",
+          "years_of_experience": 6
+        },
+        "guidelines": {
+          "must_haves": ["Python", "SQL", "MLOps"],
+          "deal_breakers": ["contract-only", "onsite-only"]
+        },
+        "notification_settings": {
+          "minimum_fit_score": 80,
+          "delivery_channel": "slack"
+        }
+      },
+      "recent_memory": "",
+      "job": {
+        "job_id": "18f3fb52-d02c-4f2a-b0df-20467365ad29",
+        "platform": "curated",
+        "external_job_id": "gold-003",
+        "title": "Applied Scientist",
+        "company": "Model Ridge",
+        "jd_raw_text": "Work on ML ranking systems with Python and experimentation. Limited SQL, unclear MLOps ownership.",
+        "url": "https://example.com/jobs/gold-003"
+      }
+    },
+    "outputs": {
+      "should_pass": false,
+      "fit_score_range": {"min": 55, "max": 79},
+      "expected_must_have_hits": ["Python"],
+      "expected_deal_breakers_found": []
+    },
+    "metadata": {
+      "scenario_type": "borderline_case",
+      "platform": "curated",
+      "difficulty": "medium",
+      "source": "curated"
+    }
+  },
+  {
+    "id": "f7c5f30e-286e-4f20-b0fa-c767b3f6c104",
+    "inputs": {
+      "user_context": {
+        "user_id": "11111111-1111-1111-1111-111111111111",
+        "profile_data": {
+          "role": "Machine Learning Engineer",
+          "years_of_experience": 6
+        },
+        "guidelines": {
+          "must_haves": ["Python", "SQL", "MLOps"],
+          "deal_breakers": ["contract-only", "onsite-only"]
+        },
+        "notification_settings": {
+          "minimum_fit_score": 80,
+          "delivery_channel": "slack"
+        }
+      },
+      "recent_memory": "",
+      "job": {
+        "job_id": "18f3fb52-d02c-4f2a-b0df-20467365ad30",
+        "platform": "curated",
+        "external_job_id": "gold-004",
+        "title": "ML Platform Engineer",
+        "company": "Deploy Ops",
+        "jd_raw_text": "Own Python platform tooling, MLOps, model deployment, but this role is onsite-only in Seoul.",
+        "url": "https://example.com/jobs/gold-004"
+      }
+    },
+    "outputs": {
+      "should_pass": false,
+      "fit_score_range": {"min": 1, "max": 70},
+      "expected_must_have_hits": ["Python", "MLOps"],
+      "expected_deal_breakers_found": ["onsite-only"]
+    },
+    "metadata": {
+      "scenario_type": "deal_breaker_hit",
+      "platform": "curated",
+      "difficulty": "easy",
+      "source": "curated"
+    }
+  },
+  {
+    "id": "f7c5f30e-286e-4f20-b0fa-c767b3f6c105",
+    "inputs": {
+      "user_context": {
+        "user_id": "11111111-1111-1111-1111-111111111111",
+        "profile_data": {
+          "role": "Machine Learning Engineer",
+          "years_of_experience": 6
+        },
+        "guidelines": {
+          "must_haves": ["Python", "SQL", "MLOps"],
+          "deal_breakers": ["contract-only", "onsite-only"]
+        },
+        "notification_settings": {
+          "minimum_fit_score": 80,
+          "delivery_channel": "slack"
+        }
+      },
+      "recent_memory": "",
+      "job": {
+        "job_id": "18f3fb52-d02c-4f2a-b0df-20467365ad31",
+        "platform": "curated",
+        "external_job_id": "gold-005",
+        "title": "Data Engineer for ML Platform",
+        "company": "Warehouse AI",
+        "jd_raw_text": "Heavy SQL and data warehousing, some Python, but no MLOps or model serving ownership.",
+        "url": "https://example.com/jobs/gold-005"
+      }
+    },
+    "outputs": {
+      "should_pass": false,
+      "fit_score_range": {"min": 40, "max": 79},
+      "expected_must_have_hits": ["Python", "SQL"],
+      "expected_deal_breakers_found": []
+    },
+    "metadata": {
+      "scenario_type": "must_have_mismatch",
+      "platform": "curated",
+      "difficulty": "medium",
+      "source": "curated"
+    }
+  }
+]

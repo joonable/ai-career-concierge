@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any
 
+from agent.prompts import PromptManager
 from api.services.gemini_evaluator import GeminiEvaluator
 from api.services.mock_llm_evaluator import MockGeminiEvaluator
 from api.services.slack_notifier import LoggingSlackNotifier
@@ -18,9 +19,11 @@ from scraper.sources.mock_platform import MockPlatformScraper
 class RuntimeServices:
     scraper_registry: ScraperRegistry
     llm_evaluator: Any
+    prompt_manager: PromptManager
     slack_notifier: LoggingSlackNotifier
     slack_signature_service: SlackSignatureService
     langsmith_tracer: LangSmithTracer
+    pipeline_version: str
 
 
 def build_default_runtime(settings: Settings) -> RuntimeServices:
@@ -42,9 +45,10 @@ def build_default_runtime(settings: Settings) -> RuntimeServices:
         llm_evaluator=GeminiEvaluator(
             api_key=settings.gemini_api_key,
             model=settings.gemini_model,
-            tracer=langsmith_tracer,
         ),
+        prompt_manager=PromptManager.from_settings(settings, client=langsmith_tracer.client),
         slack_notifier=LoggingSlackNotifier(),
         slack_signature_service=SlackSignatureService(signing_secret),
         langsmith_tracer=langsmith_tracer,
+        pipeline_version=settings.pipeline_version,
     )

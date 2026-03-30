@@ -40,6 +40,7 @@ packages = [
 
 [tool.poetry.scripts]
 dev = "api.dev:main"
+eval-jobs = "agent.evals.runner:main"
 
 [tool.pytest.ini_options]
 pythonpath = ["src"]
