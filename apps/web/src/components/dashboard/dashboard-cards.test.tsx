@@ -1,5 +1,5 @@
 import React from "react";
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -444,8 +444,13 @@ describe("RecommendationBoard", () => {
     );
 
     await user.click(screen.getByRole("button", { name: "Senior ML Engineer 상세 보기" }));
+    const dialog = screen.getByRole("dialog", { name: "공고 상세 패널" });
+    await user.click(within(dialog).getByRole("button", { name: "나중에 보기" }));
+    expect(
+      screen.getByText("나중에 보기는 관심은 있지만 아직 판단 전인 공고를 분리해두는 용도입니다."),
+    ).toBeInTheDocument();
     await user.type(screen.getByLabelText("피드백 메모"), "next week");
-    await user.click(screen.getByRole("button", { name: "나중에 보기 저장" }));
+    await user.click(within(dialog).getByRole("button", { name: "나중에 보기 저장" }));
 
     expect(recordEvaluationFeedback).toHaveBeenCalledWith("eval-1", {
       feedback: "LATER",
@@ -453,6 +458,42 @@ describe("RecommendationBoard", () => {
     });
     expect(screen.getByText("피드백이 저장되었습니다.")).toBeInTheDocument();
     expect(screen.getByText("피드백 나중에 보기")).toBeInTheDocument();
+  });
+
+  it("updates modal guidance when a different feedback action is selected", async () => {
+    const user = userEvent.setup();
+
+    render(
+      <RecommendationBoard
+        minimumFitScore={85}
+        profile={buildProfile()}
+        recommendations={[buildRecommendation({ userFeedback: null, feedbackLabel: null })]}
+      />,
+    );
+
+    await user.click(screen.getByRole("button", { name: "Senior ML Engineer 상세 보기" }));
+    const dialog = screen.getByRole("dialog", { name: "공고 상세 패널" });
+
+    expect(within(dialog).getByRole("button", { name: "피드백 선택 후 저장" })).toBeDisabled();
+
+    await user.click(within(dialog).getByRole("button", { name: "좋아요" }));
+    expect(
+      screen.getByText("좋아요는 이후 비슷한 공고를 더 자주 추천하는 데 도움이 됩니다."),
+    ).toBeInTheDocument();
+    expect(screen.getByLabelText("피드백 메모")).toHaveAttribute(
+      "placeholder",
+      "어떤 점이 특히 잘 맞는지 남겨보세요",
+    );
+    expect(within(dialog).getByRole("button", { name: "좋아요 저장" })).toBeEnabled();
+
+    await user.click(within(dialog).getByRole("button", { name: "제외" }));
+    expect(
+      screen.getByText("싫어요는 단기 메모리에 반영되어 비슷한 공고를 줄이는 데 사용됩니다."),
+    ).toBeInTheDocument();
+    expect(screen.getByLabelText("피드백 메모")).toHaveAttribute(
+      "placeholder",
+      "왜 제외하려는지 간단히 남겨보세요",
+    );
   });
 
   it("updates the current filtered list immediately after saving feedback", async () => {
@@ -488,10 +529,41 @@ describe("RecommendationBoard", () => {
     expect(screen.getByText("Unsure Role")).toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: "Unsure Role 상세 보기" }));
+    const dialog = screen.getByRole("dialog", { name: "공고 상세 패널" });
+    await user.click(within(dialog).getByRole("button", { name: "나중에 보기" }));
     await user.type(screen.getByLabelText("피드백 메모"), "follow up later");
-    await user.click(screen.getByRole("button", { name: "나중에 보기 저장" }));
+    await user.click(within(dialog).getByRole("button", { name: "나중에 보기 저장" }));
 
     expect(screen.queryByRole("button", { name: "Unsure Role 상세 보기" })).not.toBeInTheDocument();
     expect(screen.getByText("현재 필터와 일치하는 공고가 없습니다")).toBeInTheDocument();
+  });
+
+  it("lets the user save feedback directly from the dashboard card and reflects it immediately", async () => {
+    const user = userEvent.setup();
+    recordEvaluationFeedback.mockResolvedValue({
+      evaluation_id: "eval-1",
+      feedback: "DISLIKE",
+      feedback_reason: "직접 검토 후 제외",
+    });
+
+    render(
+      <RecommendationBoard
+        minimumFitScore={70}
+        profile={buildProfile()}
+        recommendations={[buildRecommendation({ userFeedback: null, feedbackLabel: null })]}
+      />,
+    );
+
+    const card = screen.getByRole("button", { name: "Senior ML Engineer 상세 보기" }).closest("article");
+    expect(card).not.toBeNull();
+
+    await user.click(within(card as HTMLElement).getByRole("button", { name: "싫어요" }));
+
+    expect(recordEvaluationFeedback).toHaveBeenCalledWith("eval-1", {
+      feedback: "DISLIKE",
+      feedback_reason: "직접 검토 후 제외",
+    });
+    expect(screen.getByText("피드백 제외")).toBeInTheDocument();
+    expect(screen.getByText("최근 메모: 직접 검토 후 제외")).toBeInTheDocument();
   });
 });

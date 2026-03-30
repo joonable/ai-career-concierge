@@ -31,6 +31,7 @@ export function RecommendationBoard({
   const [platformFilter, setPlatformFilter] = useState("ALL");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedEvaluationId, setSelectedEvaluationId] = useState<string | null>(null);
+  const [selectedFeedbackAction, setSelectedFeedbackAction] = useState<FeedbackAction | null>(null);
   const [feedbackNote, setFeedbackNote] = useState("");
   const [feedbackStatus, setFeedbackStatus] = useState<string | null>(null);
   const [isSavingFeedback, setIsSavingFeedback] = useState(false);
@@ -71,38 +72,47 @@ export function RecommendationBoard({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [selectedEvaluationId]);
 
-  async function handleFeedbackAction(action: FeedbackAction) {
-    if (!selectedRecommendation) {
-      return;
-    }
-
+  async function saveFeedback(
+    recommendation: DashboardRecommendation,
+    action: FeedbackAction,
+    note: string,
+  ) {
     setIsSavingFeedback(true);
     setFeedbackStatus(null);
 
     try {
-      const result = await recordEvaluationFeedback(selectedRecommendation.evaluationId, {
+      const result = await recordEvaluationFeedback(recommendation.evaluationId, {
         feedback: action,
-        feedback_reason: feedbackNote.trim() || null,
+        feedback_reason: note.trim() || null,
       });
 
       setRecommendationState((current) =>
-        current.map((recommendation) =>
-          recommendation.evaluationId === selectedRecommendation.evaluationId
+        current.map((item) =>
+          item.evaluationId === recommendation.evaluationId
             ? {
-                ...recommendation,
+                ...item,
                 userFeedback: result.feedback,
                 feedbackLabel: formatFeedbackLabel(result.feedback),
                 feedbackReason: result.feedback_reason,
               }
-            : recommendation,
+            : item,
         ),
       );
+      setSelectedFeedbackAction(result.feedback);
+      setFeedbackNote(result.feedback_reason ?? note);
       setFeedbackStatus("피드백이 저장되었습니다.");
     } catch (error) {
       setFeedbackStatus(error instanceof Error ? error.message : "피드백 저장에 실패했습니다.");
     } finally {
       setIsSavingFeedback(false);
     }
+  }
+
+  async function handleModalFeedbackSave() {
+    if (!selectedRecommendation || !selectedFeedbackAction) {
+      return;
+    }
+    await saveFeedback(selectedRecommendation, selectedFeedbackAction, feedbackNote);
   }
 
   return (
@@ -275,6 +285,13 @@ export function RecommendationBoard({
                   className="dashboard-recommendation__button"
                   onClick={() => {
                     setSelectedEvaluationId(recommendation.evaluationId);
+                    setSelectedFeedbackAction(
+                      recommendation.userFeedback === "LIKE" ||
+                        recommendation.userFeedback === "DISLIKE" ||
+                        recommendation.userFeedback === "LATER"
+                        ? recommendation.userFeedback
+                        : null,
+                    );
                     setFeedbackNote(recommendation.feedbackReason ?? "");
                     setFeedbackStatus(null);
                   }}
@@ -326,6 +343,44 @@ export function RecommendationBoard({
                     <span className="dashboard-link dashboard-link--subtle">상세 보기</span>
                   </div>
                 </button>
+                <div className="dashboard-recommendation__actions">
+                  <button
+                    className={buildInlineActionClass(recommendation.userFeedback === "LIKE")}
+                    disabled={isSavingFeedback}
+                    onClick={() => saveFeedback(recommendation, "LIKE", recommendation.feedbackReason ?? "")}
+                    type="button"
+                  >
+                    좋아요
+                  </button>
+                  <button
+                    className={buildInlineActionClass(recommendation.userFeedback === "DISLIKE")}
+                    disabled={isSavingFeedback}
+                    onClick={() =>
+                      saveFeedback(
+                        recommendation,
+                        "DISLIKE",
+                        recommendation.feedbackReason ?? "직접 검토 후 제외",
+                      )
+                    }
+                    type="button"
+                  >
+                    싫어요
+                  </button>
+                  <button
+                    className={buildInlineActionClass(recommendation.userFeedback === "LATER")}
+                    disabled={isSavingFeedback}
+                    onClick={() =>
+                      saveFeedback(
+                        recommendation,
+                        "LATER",
+                        recommendation.feedbackReason ?? "추가 검토 예정",
+                      )
+                    }
+                    type="button"
+                  >
+                    나중에 보기
+                  </button>
+                </div>
               </article>
             );
           })
@@ -457,42 +512,43 @@ export function RecommendationBoard({
               <section className="dashboard-detail-card dashboard-detail-card--full">
                 <span className="dashboard-kicker">Actions</span>
                 <h3 className="dashboard-recommendation__title">피드백 저장</h3>
+                <div className="dashboard-segmented dashboard-segmented--actions">
+                  {(["LIKE", "DISLIKE", "LATER"] as FeedbackAction[]).map((action) => (
+                    <button
+                      className={buildModalActionClass(selectedFeedbackAction === action, action)}
+                      key={action}
+                      onClick={() => setSelectedFeedbackAction(action)}
+                      type="button"
+                    >
+                      {formatFeedbackLabel(action)}
+                    </button>
+                  ))}
+                </div>
+                <p className="dashboard-meta">
+                  {selectedFeedbackAction
+                    ? getFeedbackHelperText(selectedFeedbackAction)
+                    : "먼저 피드백 방향을 선택하면 메모 입력 가이드가 바뀝니다."}
+                </p>
                 <label className="dashboard-search">
                   <span className="dashboard-select__label">피드백 메모</span>
                   <textarea
                     aria-label="피드백 메모"
                     className="dashboard-search__input dashboard-search__input--textarea"
                     onChange={(event) => setFeedbackNote(event.target.value)}
-                    placeholder="왜 좋은지, 왜 별로인지 간단히 남겨보세요"
+                    placeholder={getFeedbackPlaceholder(selectedFeedbackAction)}
                     value={feedbackNote}
                   />
                 </label>
-                <div className="dashboard-chip-filter-list">
-                  <button
-                    className={buildActionClass("LIKE")}
-                    disabled={isSavingFeedback}
-                    onClick={() => handleFeedbackAction("LIKE")}
-                    type="button"
-                  >
-                    좋아요 저장
-                  </button>
-                  <button
-                    className={buildActionClass("DISLIKE")}
-                    disabled={isSavingFeedback}
-                    onClick={() => handleFeedbackAction("DISLIKE")}
-                    type="button"
-                  >
-                    싫어요 저장
-                  </button>
-                  <button
-                    className={buildActionClass("LATER")}
-                    disabled={isSavingFeedback}
-                    onClick={() => handleFeedbackAction("LATER")}
-                    type="button"
-                  >
-                    나중에 보기 저장
-                  </button>
-                </div>
+                <button
+                  className={buildActionClass(selectedFeedbackAction)}
+                  disabled={isSavingFeedback || selectedFeedbackAction === null}
+                  onClick={handleModalFeedbackSave}
+                  type="button"
+                >
+                  {selectedFeedbackAction
+                    ? `${formatFeedbackLabel(selectedFeedbackAction)} 저장`
+                    : "피드백 선택 후 저장"}
+                </button>
                 {feedbackStatus ? <p className="dashboard-meta">{feedbackStatus}</p> : null}
               </section>
             </div>
@@ -799,8 +855,9 @@ function buildChipFilterClass(isActive: boolean) {
   return `dashboard-chip-filter${isActive ? " dashboard-chip-filter--active" : ""}`;
 }
 
-function buildActionClass(action: FeedbackAction) {
-  return `dashboard-action-button dashboard-action-button--${action.toLowerCase()}`;
+function buildActionClass(action: FeedbackAction | null) {
+  const suffix = action ? action.toLowerCase() : "neutral";
+  return `dashboard-action-button dashboard-action-button--${suffix}`;
 }
 
 function formatFeedbackLabel(feedback: FeedbackAction) {
@@ -811,4 +868,35 @@ function formatFeedbackLabel(feedback: FeedbackAction) {
     return "제외";
   }
   return "나중에 보기";
+}
+
+function buildInlineActionClass(isActive: boolean) {
+  return `dashboard-inline-action${isActive ? " dashboard-inline-action--active" : ""}`;
+}
+
+function buildModalActionClass(isActive: boolean, action: FeedbackAction) {
+  return `dashboard-segmented__button dashboard-segmented__button--${action.toLowerCase()}${isActive ? " dashboard-segmented__button--active" : ""}`;
+}
+
+function getFeedbackPlaceholder(action: FeedbackAction | null) {
+  if (action === "LIKE") {
+    return "어떤 점이 특히 잘 맞는지 남겨보세요";
+  }
+  if (action === "DISLIKE") {
+    return "왜 제외하려는지 간단히 남겨보세요";
+  }
+  if (action === "LATER") {
+    return "다시 볼 시점이나 확인할 포인트를 남겨보세요";
+  }
+  return "먼저 피드백 방향을 선택해 주세요";
+}
+
+function getFeedbackHelperText(action: FeedbackAction) {
+  if (action === "LIKE") {
+    return "좋아요는 이후 비슷한 공고를 더 자주 추천하는 데 도움이 됩니다.";
+  }
+  if (action === "DISLIKE") {
+    return "싫어요는 단기 메모리에 반영되어 비슷한 공고를 줄이는 데 사용됩니다.";
+  }
+  return "나중에 보기는 관심은 있지만 아직 판단 전인 공고를 분리해두는 용도입니다.";
 }
