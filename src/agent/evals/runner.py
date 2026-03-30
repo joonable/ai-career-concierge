@@ -112,6 +112,7 @@ async def _run_experiment(*, client, dataset_name: str, model: str, experiment_p
         evaluators=RULE_BASED_EVALUATORS,
         metadata={
             "prompt_name": settings.langsmith_eval_prompt_name,
+            "prompt_identifier": settings.langsmith_eval_prompt_identifier,
             "prompt_version": settings.langsmith_eval_prompt_version,
             "prompt_variant": settings.langsmith_eval_prompt_variant,
             "model": model,

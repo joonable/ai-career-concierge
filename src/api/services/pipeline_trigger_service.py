@@ -83,6 +83,12 @@ class PipelineTriggerService:
                         "memory_prompt_name": recent_memory_prompt.metadata.prompt_name,
                         "memory_prompt_version": recent_memory_prompt.metadata.prompt_version,
                         "memory_prompt_variant": recent_memory_prompt.metadata.prompt_variant,
+                        "memory_prompt_source": recent_memory_prompt.metadata.source,
+                        "memory_prompt_identifier": recent_memory_prompt.metadata.prompt_identifier,
+                        "memory_requested_prompt_identifier": recent_memory_prompt.metadata.requested_prompt_identifier,
+                        "memory_prompt_reference": recent_memory_prompt.metadata.prompt_reference,
+                        "memory_prompt_tag": recent_memory_prompt.metadata.prompt_tag,
+                        "memory_prompt_commit_hash": recent_memory_prompt.metadata.prompt_commit_hash,
                     }
                 )
                 graph = build_pipeline_graph(

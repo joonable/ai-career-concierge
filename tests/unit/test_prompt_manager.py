@@ -12,6 +12,12 @@ from agent.schemas.pipeline_job import PipelineJob
 
 
 class FakePrompt:
+    metadata = {
+        "lc_hub_owner": "personal",
+        "lc_hub_repo": "job-evaluation",
+        "lc_hub_commit_hash": "commit-123",
+    }
+
     def invoke(self, variables):
         class Value:
             def __init__(self, value: str) -> None:
@@ -73,6 +79,12 @@ def test_prompt_manager_loads_langsmith_prompt_metadata():
     assert rendered.metadata.source == "langsmith"
     assert rendered.metadata.prompt_version == "prod"
     assert rendered.metadata.prompt_name == "job-evaluation"
+    assert rendered.metadata.prompt_identifier == "workspace/job-evaluation:prod"
+    assert rendered.metadata.prompt_reference == "prod"
+    assert rendered.metadata.prompt_tag == "prod"
+    assert rendered.metadata.prompt_commit_hash == "commit-123"
+    assert rendered.metadata.prompt_owner == "personal"
+    assert rendered.metadata.prompt_repo == "job-evaluation"
 
 
 def test_prompt_manager_falls_back_to_local_prompt_when_hub_load_fails():
@@ -99,6 +111,9 @@ def test_prompt_manager_falls_back_to_local_prompt_when_hub_load_fails():
     assert "contract-only" in rendered.text
     assert rendered.metadata.source == "local"
     assert rendered.metadata.prompt_version == "local-v1"
+    assert rendered.metadata.prompt_identifier == ""
+    assert rendered.metadata.requested_prompt_identifier == "workspace/job-evaluation:prod"
+    assert rendered.metadata.prompt_reference == "prod"
 
 
 def test_memory_summary_render_returns_metadata():

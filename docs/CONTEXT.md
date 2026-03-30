@@ -209,7 +209,7 @@ PoC는 핵심 루프를 엔드투엔드(end-to-end)로 지원해야 합니다:
 - 스크래퍼 실패, 평가 상태 전환, LLM 호출, Slack 전송, 웹훅 동작은 시크릿이나 불필요한 PII를 노출하지 않고 관찰할 수 있어야 합니다.
 - 현재 구현은 `LANGSMITH_API_KEY`가 설정된 경우 파이프라인 실행 단위 root trace와 Gemini 평가 단위 child trace를 LangSmith에 기록합니다.
 - `LANGSMITH_API_KEY`가 비어 있으면 LangSmith tracing은 비활성화되며, 기존 구조화 로그와 `System_Log` 기록만 유지됩니다.
-- 평가 프롬프트는 `LANGSMITH_EVAL_PROMPT_IDENTIFIER`를 통해 LangSmith Prompt Hub 자산을 읽을 수 있으며, 조회 실패 시 저장소 내 fallback 템플릿을 사용합니다.
+- 평가 프롬프트는 `LANGSMITH_EVAL_PROMPT_IDENTIFIER`, `LANGSMITH_MEMORY_PROMPT_IDENTIFIER`로 Prompt Hub 태그 참조(`job-evaluation:production`, `memory-summary:production`)를 우선 사용하며, trace에는 요청한 태그와 실제 commit hash를 함께 남깁니다. 조회 실패 시 저장소 내 fallback 템플릿을 사용합니다.
 - curated fixture 기반 LangSmith dataset과 offline experiment 러너를 통해 프롬프트 버전, 모델, 점수 기준을 비교할 수 있습니다.
 - production trace는 dataset 승격 후보로 추출할 수 있지만, v1에서는 수동 승인된 경우에만 dataset example로 추가합니다.
 

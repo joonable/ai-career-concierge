@@ -65,8 +65,16 @@ async def evaluate_job(
         "prompt_variant": rendered_prompt.metadata.prompt_variant,
         "schema_version": rendered_prompt.metadata.schema_version,
         "prompt_source": rendered_prompt.metadata.source,
+        "prompt_identifier": rendered_prompt.metadata.prompt_identifier,
+        "requested_prompt_identifier": rendered_prompt.metadata.requested_prompt_identifier,
+        "prompt_reference": rendered_prompt.metadata.prompt_reference,
+        "prompt_tag": rendered_prompt.metadata.prompt_tag,
+        "prompt_commit_hash": rendered_prompt.metadata.prompt_commit_hash,
+        "prompt_owner": rendered_prompt.metadata.prompt_owner,
+        "prompt_repo": rendered_prompt.metadata.prompt_repo,
     }
     evaluator_model = getattr(evaluator, "model", "unknown")
+    prompt_tag = rendered_prompt.metadata.prompt_tag or rendered_prompt.metadata.prompt_version
 
     with tracer.llm_run(
         name="gemini.evaluate",
@@ -78,6 +86,8 @@ async def evaluate_job(
             f"prompt:{rendered_prompt.metadata.prompt_name}",
             f"prompt_version:{rendered_prompt.metadata.prompt_version}",
             f"model:{evaluator_model}",
+            f"prompt_source:{rendered_prompt.metadata.source}",
+            f"prompt_tag:{prompt_tag}",
         ],
     ) as llm_trace:
         try:

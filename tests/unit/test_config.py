@@ -32,6 +32,13 @@ def test_settings_allow_empty_database_url():
     assert settings.database_url == ""
 
 
+def test_langsmith_prompt_identifiers_default_to_tagged_references():
+    settings = Settings(APP_ENV="development", DATABASE_URL="")
+
+    assert settings.langsmith_eval_prompt_identifier == "job-evaluation:production"
+    assert settings.langsmith_memory_prompt_identifier == "memory-summary:production"
+
+
 def test_settings_preserve_placeholder_database_url():
     settings = Settings(
         APP_ENV="development",

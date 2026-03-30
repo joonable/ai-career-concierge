@@ -41,6 +41,12 @@ class PromptMetadata:
     prompt_variant: str
     schema_version: str
     prompt_identifier: str = ""
+    requested_prompt_identifier: str = ""
+    prompt_reference: str = ""
+    prompt_tag: str = ""
+    prompt_commit_hash: str = ""
+    prompt_owner: str = ""
+    prompt_repo: str = ""
     source: str = "local"
 
 
@@ -161,16 +167,30 @@ class PromptManager:
         variables: Dict[str, Any],
         metadata: PromptMetadata,
     ) -> RenderedPrompt:
+        local_metadata = PromptMetadata(
+            prompt_name=metadata.prompt_name,
+            prompt_version=metadata.prompt_version,
+            prompt_variant=metadata.prompt_variant,
+            schema_version=metadata.schema_version,
+            prompt_identifier="",
+            requested_prompt_identifier=identifier,
+            prompt_reference=self._resolve_identifier_reference(identifier),
+            source="local",
+        )
         if self.client is None or not identifier:
             return RenderedPrompt(
                 text=fallback_prompt.invoke(variables).to_string(),
-                metadata=metadata,
+                metadata=local_metadata,
             )
 
         try:
             pulled_prompt = self.client.pull_prompt(identifier)
             rendered = pulled_prompt.invoke(variables).to_string()
-            version = self._resolve_identifier_version(identifier, metadata.prompt_version)
+            hub_metadata = getattr(pulled_prompt, "metadata", {}) or {}
+            commit_hash = str(hub_metadata.get("lc_hub_commit_hash", "") or "")
+            prompt_reference = self._resolve_identifier_reference(identifier)
+            prompt_tag = prompt_reference if prompt_reference and prompt_reference != commit_hash else ""
+            version = prompt_tag or commit_hash or metadata.prompt_version
             return RenderedPrompt(
                 text=rendered,
                 metadata=PromptMetadata(
@@ -179,21 +199,26 @@ class PromptManager:
                     prompt_variant=metadata.prompt_variant,
                     schema_version=metadata.schema_version,
                     prompt_identifier=identifier,
+                    requested_prompt_identifier=identifier,
+                    prompt_reference=prompt_reference or commit_hash,
+                    prompt_tag=prompt_tag,
+                    prompt_commit_hash=commit_hash,
+                    prompt_owner=str(hub_metadata.get("lc_hub_owner", "") or ""),
+                    prompt_repo=str(hub_metadata.get("lc_hub_repo", "") or ""),
                     source="langsmith",
                 ),
             )
         except Exception:
             return RenderedPrompt(
                 text=fallback_prompt.invoke(variables).to_string(),
-                metadata=metadata,
+                metadata=local_metadata,
             )
 
     @staticmethod
-    def _resolve_identifier_version(identifier: str, default_version: str) -> str:
+    def _resolve_identifier_reference(identifier: str) -> str:
         if ":" not in identifier:
-            return default_version
-        version = identifier.split(":", 1)[1].strip()
-        return version or default_version
+            return ""
+        return identifier.split(":", 1)[1].strip()
 
 
 def build_evaluation_prompt(
