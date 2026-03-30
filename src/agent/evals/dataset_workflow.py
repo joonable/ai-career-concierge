@@ -28,6 +28,10 @@ def ensure_dataset(client, *, dataset_name: str, description: str) -> Any:
 
 
 def sync_examples(client, *, dataset_name: str, examples: List[Dict[str, Any]]) -> Any:
+    existing_ids = {
+        str(example.id)
+        for example in client.list_examples(dataset_name=dataset_name, limit=500)
+    }
     serialized = [
         ExampleCreate(
             id=UUID(str(example["id"])),
@@ -37,5 +41,8 @@ def sync_examples(client, *, dataset_name: str, examples: List[Dict[str, Any]]) 
             split=["gold", example.get("metadata", {}).get("scenario_type", "default")],
         )
         for example in examples
+        if str(example["id"]) not in existing_ids
     ]
+    if not serialized:
+        return {"dataset_name": dataset_name, "created": 0, "skipped": len(examples)}
     return client.create_examples(dataset_name=dataset_name, examples=serialized)

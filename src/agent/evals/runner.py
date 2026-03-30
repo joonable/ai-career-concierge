@@ -80,6 +80,10 @@ def main() -> None:
         )
 
 
+if __name__ == "__main__":
+    main()
+
+
 async def _run_experiment(*, client, dataset_name: str, model: str, experiment_prefix: str) -> None:
     settings = get_settings()
     tracer = LangSmithTracer.from_settings(settings)
