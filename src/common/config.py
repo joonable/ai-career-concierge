@@ -53,7 +53,7 @@ class Settings(BaseSettings):
         alias="LANGSMITH_PROJECT",
     )
     langsmith_eval_prompt_identifier: str = Field(
-        default="job-evaluation:production",
+        default="job-evaluation:staging",
         alias="LANGSMITH_EVAL_PROMPT_IDENTIFIER",
     )
     langsmith_eval_prompt_name: str = Field(
@@ -69,7 +69,7 @@ class Settings(BaseSettings):
         alias="LANGSMITH_EVAL_PROMPT_VARIANT",
     )
     langsmith_memory_prompt_identifier: str = Field(
-        default="memory-summary:production",
+        default="memory-summary:staging",
         alias="LANGSMITH_MEMORY_PROMPT_IDENTIFIER",
     )
     langsmith_memory_prompt_name: str = Field(

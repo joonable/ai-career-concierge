@@ -10,27 +10,27 @@ from common.errors import PromptLoadError
 
 PROMPT_SCHEMA_VERSION = "1"
 
-EVALUATION_PROMPT_TEMPLATE = """You are evaluating whether a job is a strong match for one user.
-Be conservative and optimize for precision over recall.
-Target role: {role}
-Years of experience: {years_of_experience}
-Must-haves: {must_haves}
-Deal-breakers: {deal_breakers}
-Recent dislike memory: {recent_memory}
-Job title: {job_title}
-Company: {company}
-Job description: {job_description}
-Return only valid JSON with exactly these keys:
+EVALUATION_PROMPT_TEMPLATE = """당신은 한 명의 사용자를 기준으로 채용 공고 적합도를 평가하는 심사자입니다.
+재현율보다 정밀도를 우선하고, 애매하면 보수적으로 판단하세요.
+목표 직무: {role}
+경력 연차: {years_of_experience}
+필수 조건: {must_haves}
+결격 사유: {deal_breakers}
+최근 싫어요 메모: {recent_memory}
+채용 공고 제목: {job_title}
+회사명: {company}
+채용 공고 설명: {job_description}
+반드시 아래 키만 가진 유효한 JSON 객체만 반환하세요:
 {{
-  "fit_score": integer from 1 to 100,
-  "reasoning": short string within 2-3 concise lines,
-  "must_have_hits": array of strings,
-  "deal_breakers_found": array of strings
+  "fit_score": 1부터 100 사이의 정수,
+  "reasoning": 2~3줄 이내의 짧은 문자열,
+  "must_have_hits": 문자열 배열,
+  "deal_breakers_found": 문자열 배열
 }}
-Do not include markdown fences or extra commentary."""
+마크다운 코드펜스나 추가 설명은 절대 포함하지 마세요."""
 
 MEMORY_SUMMARY_PROMPT_TEMPLATE = (
-    "Avoid jobs similar to these recent dislikes: {joined_reasons}."
+    "최근 싫어요 사유와 유사한 공고는 피하세요: {joined_reasons}."
 )
 
 

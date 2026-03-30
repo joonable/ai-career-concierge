@@ -30,7 +30,7 @@ class FakePrompt:
 
 class FakeClient:
     def pull_prompt(self, identifier: str):
-        assert identifier == "job-evaluation:production"
+        assert identifier == "job-evaluation:staging"
         return FakePrompt()
 
 
@@ -82,11 +82,11 @@ class FakeTracer:
 async def test_evaluate_job_records_prompt_tag_and_commit_hash():
     prompt_manager = PromptManager(
         client=FakeClient(),
-        eval_prompt_identifier="job-evaluation:production",
+        eval_prompt_identifier="job-evaluation:staging",
         eval_prompt_name="job-evaluation",
         eval_prompt_version="local-v1",
         eval_prompt_variant="default",
-        memory_prompt_identifier="memory-summary:production",
+        memory_prompt_identifier="memory-summary:staging",
         memory_prompt_name="memory-summary",
         memory_prompt_version="local-v1",
         memory_prompt_variant="default",
@@ -118,10 +118,10 @@ async def test_evaluate_job_records_prompt_tag_and_commit_hash():
     )
 
     trace_call = tracer.calls[0]
-    assert execution.rendered_prompt.metadata.prompt_tag == "production"
+    assert execution.rendered_prompt.metadata.prompt_tag == "staging"
     assert execution.rendered_prompt.metadata.prompt_commit_hash == "commit-123"
-    assert trace_call["metadata"]["prompt_identifier"] == "job-evaluation:production"
-    assert trace_call["metadata"]["prompt_tag"] == "production"
+    assert trace_call["metadata"]["prompt_identifier"] == "job-evaluation:staging"
+    assert trace_call["metadata"]["prompt_tag"] == "staging"
     assert trace_call["metadata"]["prompt_commit_hash"] == "commit-123"
-    assert "prompt_tag:production" in trace_call["tags"]
+    assert "prompt_tag:staging" in trace_call["tags"]
     assert trace_call["inputs"]["rendered_prompt"] == "Hub prompt for Senior Machine Learning Engineer"
