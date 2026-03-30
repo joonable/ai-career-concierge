@@ -1333,6 +1333,63 @@ main {
   padding-left: 18px;
 }
 
+.onboarding-keyword-input {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+}
+
+.onboarding-inline-button {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+  padding: 12px 16px;
+  font: inherit;
+  font-weight: 600;
+  color: rgba(244, 247, 251, 0.94);
+  background: rgba(255, 255, 255, 0.05);
+  cursor: pointer;
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    background 180ms ease;
+}
+
+.onboarding-inline-button:hover {
+  transform: translateY(-1px);
+  border-color: rgba(171, 214, 255, 0.24);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.onboarding-advanced {
+  display: grid;
+  gap: 14px;
+  padding: 20px;
+  border-radius: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.015)),
+    rgba(5, 14, 28, 0.72);
+}
+
+.onboarding-advanced__summary {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: flex-start;
+  list-style: none;
+  cursor: pointer;
+}
+
+.onboarding-advanced__summary::-webkit-details-marker {
+  display: none;
+}
+
+.onboarding-advanced__content {
+  display: grid;
+  gap: 16px;
+}
+
 .dashboard-card-grid {
   display: grid;
   gap: 16px;
@@ -1845,6 +1902,10 @@ main {
 
   .onboarding-mockup__aside {
     position: static;
+  }
+
+  .onboarding-keyword-input {
+    grid-template-columns: 1fr;
   }
 }
 
