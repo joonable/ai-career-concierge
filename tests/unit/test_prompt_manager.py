@@ -118,6 +118,41 @@ def test_prompt_manager_falls_back_to_local_prompt_when_hub_load_fails():
     assert rendered.metadata.prompt_reference == "prod"
 
 
+def test_local_v3_prompt_contains_score_policy_and_structured_axes():
+    manager = build_prompt_manager(client=FakeClient(should_fail=True))
+
+    rendered = manager.render_evaluation_prompt(
+        user_context={
+            "profile_data": {"role": "Machine Learning Engineer", "years_of_experience": 6},
+            "guidelines": {
+                "must_haves": ["Python", "SQL", "MLOps"],
+                "deal_breakers": ["contract-only", "onsite-only"],
+            },
+        },
+        recent_memory="Avoid weak infra ownership.",
+        job=PipelineJob(
+            job_id="18f3fb52-d02c-4f2a-b0df-20467365ad27",
+            platform="test_source",
+            external_job_id="job-001",
+            title="Backend Engineer, Model Serving",
+            company="Signal Labs",
+            jd_raw_text="Build inference APIs and deployment tooling.",
+            url="https://example.com/jobs/job-001",
+        ),
+    )
+
+    assert rendered.metadata.schema_version == "3"
+    assert "`80~100`" in rendered.text
+    assert "인접 직무 판단 규칙" in rendered.text
+    assert "must-have 판단 규칙" in rendered.text
+    assert "deal-breaker 판단 규칙" in rendered.text
+    assert "transferable skill 판단 규칙" in rendered.text
+    assert '"role_alignment"' in rendered.text
+    assert '"must_have_coverage"' in rendered.text
+    assert '"deal_breaker_severity"' in rendered.text
+    assert '"transferable_skills"' in rendered.text
+
+
 def test_memory_summary_render_returns_metadata():
     manager = build_prompt_manager(client=None)
     rendered = manager.render_memory_summary(["salary too low", "salary too low", "pure frontend"])

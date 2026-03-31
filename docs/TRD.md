@@ -71,7 +71,7 @@ SaaS 확장을 염두에 두고 처음부터 아키텍처를 이원화(Dev/Prod)
 1. **`IngestNode`:** 타겟 채널(예: 인크루트) 비동기 스크래핑 → `Job` DB 적재 및 중복 필터링.
 2. **`RuleFilterNode`:** DB 쿼리(연차, 직무 키워드 등)를 통한 1차 Hard Filtering → `Evaluation` 상태 업데이트.
 3. **`LLMEvalNode`:** (비용 발생 구간) Rule 노드를 통과한 공고들을 Batch로 묶어 Gemini API 호출 → Deal-breaker 분석 및 점수화.
-    - Structured output 기본 계약은 `fit_score`, `summary`, `strengths`, `concerns`, `must_have_matches`, `deal_breaker_flags`, `confidence`를 포함합니다.
+    - Structured output 기본 계약은 `fit_score`, `summary`, `strengths`, `concerns`, `must_have_matches`, `deal_breaker_flags`, `confidence`, `role_alignment`, `must_have_coverage`, `deal_breaker_severity`, `transferable_skills`를 포함합니다.
 4. **`DeliverNode`:** 기준 점수(예: 80점) 이상인 공고들을 포맷팅하여 Slack Interactive Webhook 발송.
 
 ## 6. Non-Functional Requirements (비기능 요구사항)

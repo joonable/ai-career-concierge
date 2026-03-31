@@ -93,6 +93,10 @@ class InvalidEvaluator:
             "must_have_matches": [],
             "deal_breaker_flags": [],
             "confidence": "LOW",
+            "role_alignment": "LOW",
+            "must_have_coverage": "WEAK",
+            "deal_breaker_severity": "NONE",
+            "transferable_skills": "LOW",
         }
 
 
@@ -121,7 +125,9 @@ class ValidGeminiTransport:
                                         '{"fit_score": 91, "summary": "Strong ML systems fit\\n'
                                         'Matches must-have stack", "strengths": ["Python match", "SQL match"], '
                                         '"concerns": [], "must_have_matches": ["Python", "SQL"], '
-                                        '"deal_breaker_flags": [], "confidence": "HIGH"}'
+                                        '"deal_breaker_flags": [], "confidence": "HIGH", '
+                                        '"role_alignment": "HIGH", "must_have_coverage": "PARTIAL", '
+                                        '"deal_breaker_severity": "NONE", "transferable_skills": "HIGH"}'
                                     )
                                 }
                             ]

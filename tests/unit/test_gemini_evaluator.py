@@ -22,7 +22,9 @@ async def test_gemini_evaluator_maps_valid_json_response():
                                         'Matches core stack", "strengths": ["Python match"], '
                                         '"concerns": ["Need infra scope confirmation"], '
                                         '"must_have_matches": ["Python"], '
-                                        '"deal_breaker_flags": [], "confidence": "MEDIUM"}'
+                                        '"deal_breaker_flags": [], "confidence": "MEDIUM", '
+                                        '"role_alignment": "MEDIUM", "must_have_coverage": "PARTIAL", '
+                                        '"deal_breaker_severity": "NONE", "transferable_skills": "HIGH"}'
                                     )
                                 }
                             ]

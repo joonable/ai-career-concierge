@@ -47,6 +47,10 @@ class FakeEvaluator:
             "must_have_matches": ["Python"],
             "deal_breaker_flags": [],
             "confidence": "HIGH",
+            "role_alignment": "HIGH",
+            "must_have_coverage": "PARTIAL",
+            "deal_breaker_severity": "NONE",
+            "transferable_skills": "HIGH",
             "_provider_metadata": {"model": self.model, "latency_ms": 25},
             "_raw_response_text": '{"fit_score": 91}',
         }

@@ -50,6 +50,22 @@ class MockGeminiEvaluator:
         elif fit_score >= 60:
             confidence = "MEDIUM"
 
+        role_alignment = "LOW"
+        if "machine learning" in text or "ml" in text:
+            role_alignment = "HIGH" if "engineer" in text else "MEDIUM"
+
+        must_have_coverage = "WEAK"
+        if len(must_have_hits) >= max(2, len(must_haves)):
+            must_have_coverage = "STRONG"
+        elif must_have_hits:
+            must_have_coverage = "PARTIAL"
+
+        deal_breaker_severity = "HARD" if deal_breakers_found else "NONE"
+
+        transferable_skills = "LOW"
+        if must_have_hits:
+            transferable_skills = "HIGH" if len(must_have_hits) >= 2 else "MEDIUM"
+
         return {
             "fit_score": fit_score,
             "summary": " / ".join(reasoning_bits),
@@ -58,4 +74,8 @@ class MockGeminiEvaluator:
             "must_have_matches": must_have_hits,
             "deal_breaker_flags": deal_breakers_found,
             "confidence": confidence,
+            "role_alignment": role_alignment,
+            "must_have_coverage": must_have_coverage,
+            "deal_breaker_severity": deal_breaker_severity,
+            "transferable_skills": transferable_skills,
         }

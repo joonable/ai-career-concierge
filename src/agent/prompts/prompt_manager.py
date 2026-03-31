@@ -8,7 +8,7 @@ from langchain_core.prompts import PromptTemplate
 from agent.schemas.pipeline_job import PipelineJob
 from common.errors import PromptLoadError
 
-PROMPT_SCHEMA_VERSION = "2"
+PROMPT_SCHEMA_VERSION = "3"
 
 EVALUATION_PROMPT_TEMPLATE = """당신은 한 명의 사용자를 기준으로 채용 공고 적합도를 평가하는 심사자입니다.
 재현율보다 정밀도를 우선하고, 애매하면 보수적으로 판단하세요.
@@ -20,6 +20,34 @@ EVALUATION_PROMPT_TEMPLATE = """당신은 한 명의 사용자를 기준으로 �
 채용 공고 제목: {job_title}
 회사명: {company}
 채용 공고 설명: {job_description}
+평가 원칙:
+- `fit_score`는 단순 호감 점수가 아니라 실제 추천 운영 점수입니다.
+- `80~100`: 강한 추천. 역할 정렬이 높고, 핵심 must-have 대부분이 충족되며, 뚜렷한 deal-breaker가 없어야 합니다.
+- `60~79`: 검토 가능. 관련성은 높지만 일부 must-have 공백, 소유권 불명확성, 역할 경계가 남아 있는 경우입니다.
+- `40~59`: 인접 직무 또는 전환 가능성. 직접적인 타깃 역할은 아니지만 transferable skill이 분명하고 탐색 가치는 있는 경우입니다.
+- `1~39`: 비추천. 핵심 역할 불일치가 크거나, must-have 결손이 심하거나, 추천을 보수적으로 막아야 할 사유가 있는 경우입니다.
+인접 직무 판단 규칙:
+- 직무명이 달라도 실제 책임이 MLE와 충분히 겹치면 자동 저점 처리하지 마세요.
+- backend/model serving, ML platform, experimentation infra, data engineer for ML 같은 역할은 transferable skill이 강하면 `40~59` 또는 `60~79` 후보가 될 수 있습니다.
+- 단, 관련 기술이 일부 겹친다는 이유만으로 `80+`를 주지 마세요. 역할 정렬과 실제 ownership을 함께 보세요.
+must-have 판단 규칙:
+- must-have는 있으면 가산점이 아니라, 없으면 감점 또는 상한 제한을 만드는 핵심 조건입니다.
+- 핵심 must-have 대부분이 충족되면 `80+` 후보가 될 수 있습니다.
+- 일부만 충족하면 보통 `60~79` 또는 `40~59`로 제한하세요.
+- 타깃 역할의 핵심 축이 빠져 있으면 transferable skill이 있어도 `80+`로 올리지 마세요.
+deal-breaker 판단 규칙:
+- 명시적 deal-breaker가 감지되면 추천 여부를 보수적으로 판단하세요.
+- hard deal-breaker가 있으면 높은 기술 적합도가 보여도 강한 추천으로 올리지 마세요.
+- 역할 불일치가 매우 크거나 hard deal-breaker가 있으면 `fit_score`는 `80` 미만이어야 합니다.
+transferable skill 판단 규칙:
+- transferable skill은 역할 불일치를 완전히 상쇄하지는 않지만, 인접 직무를 `1~39`에서 `40~59` 이상으로 끌어올릴 수 있는 근거입니다.
+- 단순 키워드 중복만 보지 말고, Python/SQL/infra 경험이 실제 ML workflow, serving, experimentation, deployment ownership과 이어지는지 보세요.
+출력 규칙:
+- 먼저 역할 정렬, must-have 충족 수준, deal-breaker 심각도, transferable skill 수준을 판단한 뒤 점수를 정하세요.
+- `summary`는 2~3줄 이내로, 왜 이 점수대인지와 핵심 추천 판단을 짧게 요약하세요.
+- `strengths`는 추천 근거가 되는 강점만 짧은 bullet-style 문자열로 쓰세요.
+- `concerns`는 점수를 제한한 이유, 부족한 must-have, ownership 공백, deal-breaker 우려만 쓰세요.
+- `confidence`는 점수 자체와 별개로 판단 근거의 명확성을 나타냅니다. 낮은 점수여도 근거가 명확하면 `HIGH`가 가능하고, 높은 점수여도 정보가 모호하면 `MEDIUM` 또는 `LOW`가 가능합니다.
 반드시 아래 키만 가진 유효한 JSON 객체만 반환하세요:
 {{
   "fit_score": 1부터 100 사이의 정수,
@@ -28,7 +56,11 @@ EVALUATION_PROMPT_TEMPLATE = """당신은 한 명의 사용자를 기준으로 �
   "concerns": 우려 포인트 문자열 배열,
   "must_have_matches": 충족한 필수 조건 문자열 배열,
   "deal_breaker_flags": 감지된 결격 사유 문자열 배열,
-  "confidence": "HIGH", "MEDIUM", "LOW" 중 하나
+  "confidence": "HIGH", "MEDIUM", "LOW" 중 하나,
+  "role_alignment": "HIGH", "MEDIUM", "LOW" 중 하나,
+  "must_have_coverage": "STRONG", "PARTIAL", "WEAK" 중 하나,
+  "deal_breaker_severity": "NONE", "SOFT", "HARD" 중 하나,
+  "transferable_skills": "HIGH", "MEDIUM", "LOW" 중 하나
 }}
 마크다운 코드펜스나 추가 설명은 절대 포함하지 마세요."""
 
@@ -233,7 +265,7 @@ def build_evaluation_prompt(
         client=None,
         eval_prompt_identifier="",
         eval_prompt_name="job-evaluation",
-        eval_prompt_version="local-v1",
+        eval_prompt_version="local-v3",
         eval_prompt_variant="default",
         memory_prompt_identifier="",
         memory_prompt_name="memory-summary",
