@@ -53,6 +53,9 @@ class ProfileData(BaseModel):
 class Guidelines(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
+    # Deprecated compatibility field. `preferences` is the source of truth for
+    # onboarding storage, while `guidelines` remains as a legacy surface for
+    # older evaluators, fixtures, and API consumers during migration.
     must_haves: List[str] = Field(default_factory=list)
     deal_breakers: List[str] = Field(default_factory=list)
 
@@ -166,6 +169,8 @@ class UserProfileBody(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     profile_data: ProfileData = Field(default_factory=ProfileData)
+    # Deprecated compatibility field. New writes should prefer `preferences`,
+    # and this field is derived from `preferences` when structured data exists.
     guidelines: Guidelines = Field(default_factory=Guidelines)
     preferences: Preferences = Field(default_factory=Preferences)
     notification_settings: NotificationSettings = Field(default_factory=NotificationSettings)

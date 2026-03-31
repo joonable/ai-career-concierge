@@ -8,6 +8,8 @@ export type ProfileData = {
 };
 
 export type Guidelines = {
+  // Deprecated compatibility field. Frontend code should read and write
+  // `preferences` as the primary onboarding contract.
   must_haves: string[];
   deal_breakers: string[];
 };
@@ -42,6 +44,7 @@ export type UserProfilePayload = {
     title_keywords?: string[];
   };
   preferences?: Preferences;
+  // Deprecated compatibility field kept only for migration safety.
   guidelines?: Guidelines;
   notification_settings: {
     minimum_fit_score: number;
@@ -54,6 +57,7 @@ export type UserProfileResponse = {
   email: string;
   profile_data: ProfileData;
   preferences: Preferences;
+  // Deprecated compatibility field returned by the backend during migration.
   guidelines: Guidelines;
   notification_settings: NotificationSettings;
 };

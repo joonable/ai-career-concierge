@@ -284,7 +284,8 @@ confidence 정책:
 - `PUT /api/v1/users/me/profile`
   - 프로필 데이터, structured preference, 알림 설정을 업데이트합니다.
   - 온보딩 저장 구조는 `profile_data`, `preferences`, `notification_settings`를 기준으로 하며, `preferences`에는 `work_modes`, `locations`, `team_contexts`, `skills`, `exclusions`, `comparisons`, `note`가 포함됩니다.
-  - 호환성 유지를 위해 백엔드는 기존 `guidelines.must_haves`, `guidelines.deal_breakers`를 계속 응답하지만, 새 `preferences`가 존재하는 경우 스킬/제외 조건 중심으로 파생된 값을 우선 사용합니다.
+  - 호환성 유지를 위해 백엔드는 기존 `guidelines.must_haves`, `guidelines.deal_breakers`를 계속 응답하지만, 이 필드들은 deprecated compatibility surface로 취급합니다.
+  - 새 `preferences`가 존재하는 경우 스킬/제외 조건 중심으로 파생된 값을 우선 사용하며, 새 프론트/consumer는 `guidelines`를 source of truth로 사용하지 않습니다.
   - 역할이 생략된 경우 `role`에서 `profile_data.title_keywords`를 파생시키고, 알림 설정(`notification_settings.delivery_channel`)의 기본값을 `slack`으로 지정합니다.
 - `POST /api/v1/evaluations/{evaluation_id}/feedback`
   - 대시보드 흐름에서 좋아요 또는 싫어요 피드백을 저장합니다.

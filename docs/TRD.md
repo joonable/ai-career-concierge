@@ -45,7 +45,9 @@ SaaS 확장을 염두에 두고 처음부터 아키텍처를 이원화(Dev/Prod)
     - `id` (UUID, PK), `oauth_id`, `email`
     - `profile_data` (JSONB): 사용자 타겟 역할과 경력 정체성을 저장하는 정형 데이터. 현재 PoC 온보딩 기준 필드는 `role`, `roles`, `primary_role`, `years_of_experience`, `seniority`, `title_keywords`.
     - `preferences` (JSONB): 온보딩 선호를 구조적으로 저장하는 필드. 현재 PoC 기준으로 `work_modes`, `locations`, `team_contexts`, `skills`, `exclusions`, `comparisons`, `note`를 포함합니다.
-    - `guidelines` (JSONB): 기존 evaluator 호환을 위한 레거시 제약 조건 필드. 현재는 `must_haves`, `deal_breakers`를 유지하되, `preferences`가 존재하면 스킬/제외 조건 중심으로 파생된 값을 우선 사용합니다.
+    - `guidelines` (JSONB): 기존 evaluator 호환을 위한 레거시 제약 조건 필드. 현재는 `must_haves`, `deal_breakers`를 유지하되, deprecated compatibility field로 간주합니다.
+      - 새 source of truth는 `preferences`입니다.
+      - `preferences`가 존재하면 `guidelines`는 스킬/제외 조건 중심으로 파생된 값을 우선 사용합니다.
     - `notification_settings` (JSONB): `minimum_fit_score`, `delivery_channel` 등 추천 전달 기준. 현재 기본 채널은 `slack`.
 - **`Job` (공고 원본 데이터)**
     - `id` (UUID, PK), `platform`, `external_job_id` (Unique - 중복 수집 방지)
