@@ -130,6 +130,12 @@ It is responsible for:
 
 This is a repository decision, not a permanent architecture lock-in. The boundary for later extraction is the adapter module under `src/promptops/adapters/`.
 
+Official LangSmith references used for Sprint 5 design:
+
+- Annotation queues: `https://docs.langchain.com/langsmith/annotation-queues`
+- Feedback configs and queue SDK: `https://docs.langchain.com/langsmith/annotation-queues-sdk`
+- Attach user feedback: `https://docs.langchain.com/langsmith/attach-user-feedback`
+
 ## Initial Repository Layout
 
 ```text
@@ -169,6 +175,14 @@ Lifecycle stages are:
 
 In Sprint 4, PromptOps experiment orchestration should wrap the existing job-eval workflow instead of replacing it. The PromptOps layer is responsible for dataset sync, experiment execution, compare-link generation, and iteration summaries, while the underlying evaluation pipeline remains in `src/agent/evals`.
 
+In Sprint 5, review workflow contracts should define:
+
+- which runs are routed to LLM judge vs human review
+- which rubric criteria humans score
+- how borderline and failure cases are selected
+- how review feedback is stored and converted into backlog candidates
+- how queue payloads map onto LangSmith annotation queue concepts
+
 ### `src/promptops/adapters`
 
 Holds integration adapters, starting with LangSmith.
@@ -178,6 +192,65 @@ Holds integration adapters, starting with LangSmith.
 Holds this repository's prompt families, normalized context definitions, dataset bindings, evaluator bundles, review rubric, and backlog mapping rules.
 
 In Sprint 3, job evaluation prompts should stop reading raw profile/guideline/job dictionaries directly and instead consume a normalized evaluation context contract from `projects/ai_career_concierge/context.py`.
+
+## Review Workflow Spec
+
+### Review modes
+
+- `llm_judge`
+- `human`
+
+### Review queue
+
+For AI Career Concierge, the initial human review queue is:
+
+- queue name: `job-evaluation-review`
+- backend: LangSmith
+- queue mode: `single`
+- prompt family: `job-evaluation`
+
+### Human rubric
+
+The initial rubric criteria are:
+
+- `role_alignment`
+- `must_have_coverage`
+- `deal_breaker_handling`
+- `transferable_skill_credit`
+- `summary_usefulness`
+
+### Case selection rules
+
+Send a case to human review when either of these is true:
+
+- it is a borderline case
+  - current default: `fit_score` between `40` and `79`, or `role_alignment = MEDIUM`
+- it is a failure case
+  - current default: any tracked evaluator score is below `1.0`
+
+This keeps human review focused on ambiguous or broken cases rather than obvious passes.
+
+### Feedback record
+
+Review feedback should capture:
+
+- review item id
+- reviewer type (`llm_judge` or `human`)
+- reviewer id when available
+- rubric scores
+- freeform notes
+- final decision
+- derived backlog candidates
+
+### Backlog mapping
+
+Review feedback should not stop at "good" or "bad". It should map into candidate work buckets such as:
+
+- prompt wording gaps
+- policy gaps
+- context normalization gaps
+- dataset truth gaps
+- missing product features
 
 ## Definition Of Done For Sprint 1
 

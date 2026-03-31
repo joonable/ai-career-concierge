@@ -8,6 +8,8 @@ from pydantic import BaseModel, Field
 PromptStage = Literal["candidate", "staging", "production"]
 ReviewStatus = Literal["pending", "in_review", "approved", "rejected"]
 FailureCategory = Literal["prompt", "context", "dataset", "policy", "feature"]
+ReviewMode = Literal["llm_judge", "human"]
+ReviewQueueMode = Literal["single", "pairwise"]
 
 
 class PromptMetadata(BaseModel):
@@ -75,8 +77,46 @@ class ReviewItem(BaseModel):
 
     item_id: str = Field(min_length=1)
     prompt_family: str = Field(min_length=1)
+    experiment_id: str = Field(default="")
+    run_id: str = Field(default="")
+    dataset_example_id: str = Field(default="")
+    queue_name: str = Field(default="")
+    mode: ReviewMode = "human"
     status: ReviewStatus = "pending"
+    reasons: List[str] = Field(default_factory=list)
     notes: str = Field(default="")
+
+
+class ReviewRubricCriterion(BaseModel):
+    """Single rubric criterion used by human or LLM review."""
+
+    key: str = Field(min_length=1)
+    label: str = Field(min_length=1)
+    description: str = Field(min_length=1)
+    required: bool = True
+
+
+class ReviewQueueSpec(BaseModel):
+    """Review queue definition that can be mapped to a backend annotation queue."""
+
+    queue_name: str = Field(min_length=1)
+    prompt_family: str = Field(min_length=1)
+    queue_mode: ReviewQueueMode = "single"
+    backend: str = Field(default="langsmith")
+    rubric_keys: List[str] = Field(default_factory=list)
+    description: str = Field(default="")
+
+
+class ReviewFeedbackRecord(BaseModel):
+    """Persistable review feedback shape across human and LLM judges."""
+
+    review_item_id: str = Field(min_length=1)
+    reviewer_type: ReviewMode
+    reviewer_id: str = Field(default="")
+    scores: Dict[str, str] = Field(default_factory=dict)
+    notes: str = Field(default="")
+    decision: str = Field(default="")
+    backlog_candidates: List[str] = Field(default_factory=list)
 
 
 class DatasetSyncSpec(BaseModel):

@@ -19,6 +19,9 @@ from promptops.core.models import (
     DatasetSyncSpec,
     ExperimentRunResult,
     ExperimentSpec,
+    ReviewFeedbackRecord,
+    ReviewItem,
+    ReviewQueueSpec,
 )
 
 
@@ -110,6 +113,38 @@ class LangSmithPromptOpsAdapter:
         if session_params:
             return f"{base}/datasets/{dataset_id}/compare?{session_params}"
         return f"{base}/datasets/{dataset_id}/compare"
+
+    def build_annotation_queue_payload(self, *, queue: ReviewQueueSpec, items: list[ReviewItem]) -> dict[str, Any]:
+        """Build a backend-ready annotation queue payload.
+
+        Sprint 5 defines the contract but does not yet create queues remotely.
+        """
+
+        return {
+            "queue_name": queue.queue_name,
+            "description": queue.description,
+            "prompt_family": queue.prompt_family,
+            "queue_mode": queue.queue_mode,
+            "backend": queue.backend,
+            "rubric_keys": queue.rubric_keys,
+            "items": [
+                {
+                    "item_id": item.item_id,
+                    "experiment_id": item.experiment_id,
+                    "run_id": item.run_id,
+                    "dataset_example_id": item.dataset_example_id,
+                    "status": item.status,
+                    "mode": item.mode,
+                    "reasons": item.reasons,
+                }
+                for item in items
+            ],
+        }
+
+    def build_feedback_payload(self, feedback: ReviewFeedbackRecord) -> dict[str, Any]:
+        """Build a backend-ready feedback payload for run or queue attachment."""
+
+        return feedback.model_dump()
 
 
 async def _run_langsmith_experiment(

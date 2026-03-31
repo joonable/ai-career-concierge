@@ -10,6 +10,10 @@ from promptops.core.models import (
     PromptFamily,
     PromptMetadata,
     PromptRevision,
+    ReviewFeedbackRecord,
+    ReviewItem,
+    ReviewQueueSpec,
+    ReviewRubricCriterion,
 )
 
 __all__ = [
@@ -22,4 +26,8 @@ __all__ = [
     "PromptFamily",
     "PromptMetadata",
     "PromptRevision",
+    "ReviewFeedbackRecord",
+    "ReviewItem",
+    "ReviewQueueSpec",
+    "ReviewRubricCriterion",
 ]
