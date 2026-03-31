@@ -41,8 +41,8 @@ def test_sync_examples_updates_existing_example_when_payload_changes():
                 id="11111111-1111-1111-1111-111111111111",
                 inputs={"job": {"title": "Old title"}},
                 outputs={"fit_score_range": {"min": 40, "max": 59}},
-                metadata={"scenario_type": "borderline_case", "scenario_family": "analytics_infra"},
-                split=["gold", "borderline_case"],
+                metadata={"scenario_type": "경계_사례", "scenario_family": "분석_인프라"},
+                split=["gold", "경계_사례"],
             )
         ]
     )
@@ -52,7 +52,7 @@ def test_sync_examples_updates_existing_example_when_payload_changes():
             "id": "11111111-1111-1111-1111-111111111111",
             "inputs": {"job": {"title": "New title"}},
             "outputs": {"fit_score_range": {"min": 40, "max": 59}, "scoring_note": "updated"},
-            "metadata": {"scenario_type": "borderline_case", "scenario_family": "analytics_infra"},
+            "metadata": {"scenario_type": "경계_사례", "scenario_family": "분석_인프라"},
         }
     ]
 
@@ -70,8 +70,8 @@ def test_sync_examples_updates_existing_example_when_payload_changes():
             "id": "11111111-1111-1111-1111-111111111111",
             "inputs": {"job": {"title": "New title"}},
             "outputs": {"fit_score_range": {"min": 40, "max": 59}, "scoring_note": "updated"},
-            "metadata": {"scenario_type": "borderline_case", "scenario_family": "analytics_infra"},
-            "split": ["gold", "borderline_case"],
+            "metadata": {"scenario_type": "경계_사례", "scenario_family": "분석_인프라"},
+            "split": ["gold", "경계_사례"],
         }
     ]
 
@@ -83,8 +83,8 @@ def test_sync_examples_skips_existing_example_when_payload_matches():
                 id="11111111-1111-1111-1111-111111111111",
                 inputs={"job": {"title": "Same title"}},
                 outputs={"fit_score_range": {"min": 40, "max": 59}, "scoring_note": "same"},
-                metadata={"scenario_type": "borderline_case", "scenario_family": "analytics_infra"},
-                split=["gold", "borderline_case"],
+                metadata={"scenario_type": "경계_사례", "scenario_family": "분석_인프라"},
+                split=["gold", "경계_사례"],
             )
         ]
     )
@@ -94,7 +94,7 @@ def test_sync_examples_skips_existing_example_when_payload_matches():
             "id": "11111111-1111-1111-1111-111111111111",
             "inputs": {"job": {"title": "Same title"}},
             "outputs": {"fit_score_range": {"min": 40, "max": 59}, "scoring_note": "same"},
-            "metadata": {"scenario_type": "borderline_case", "scenario_family": "analytics_infra"},
+            "metadata": {"scenario_type": "경계_사례", "scenario_family": "분석_인프라"},
         }
     ]
 
@@ -118,7 +118,7 @@ def test_sync_examples_creates_missing_examples():
             "id": "22222222-2222-2222-2222-222222222222",
             "inputs": {"job": {"title": "New example"}},
             "outputs": {"fit_score_range": {"min": 60, "max": 79}, "scoring_note": "new"},
-            "metadata": {"scenario_type": "adjacent_role", "scenario_family": "ml_adjacent_data_engineer"},
+            "metadata": {"scenario_type": "인접_직무", "scenario_family": "ml_인접_데이터_엔지니어"},
         }
     ]
 
@@ -136,8 +136,8 @@ def test_sync_examples_creates_missing_examples():
     assert created.inputs == {"job": {"title": "New example"}}
     assert created.outputs == {"fit_score_range": {"min": 60, "max": 79}, "scoring_note": "new"}
     assert created.metadata == {
-        "scenario_type": "adjacent_role",
-        "scenario_family": "ml_adjacent_data_engineer",
+        "scenario_type": "인접_직무",
+        "scenario_family": "ml_인접_데이터_엔지니어",
     }
-    assert created.split == ["gold", "adjacent_role"]
+    assert created.split == ["gold", "인접_직무"]
     assert client.updated_examples == []

@@ -389,8 +389,8 @@ async def test_promptops_status_returns_snapshot_for_allowed_admin(client, monke
     assert body["prompt_family"] == "job-evaluation"
     assert body["production_identifier"] == "job-evaluation:latest"
     assert body["staging_identifier"] == "job-evaluation:staging"
-    assert body["candidate_identifier"] == "job-evaluation · local-v4"
-    assert body["latest_decision"] == "candidate 유지"
+    assert body["candidate_identifier"] == "job-evaluation · local-v4 (직전 후보안)"
+    assert body["latest_decision"] == "최신 staging 프롬프트 1회 검증 완료, 승격 보류"
     assert body["compare_url"].startswith("https://smith.langchain.com/")
     assert body["review_queue_name"] == "job-evaluation-review"
     assert body["review_queue_url"].startswith("https://smith.langchain.com/")

@@ -19,7 +19,7 @@ def test_borderline_fixture_examples_include_score_policy_metadata():
     borderline_examples = [
         example
         for example in examples
-        if example["metadata"]["scenario_type"] == "borderline_case"
+        if example["metadata"]["scenario_type"] == "경계_사례"
     ]
 
     assert len(borderline_examples) >= 8

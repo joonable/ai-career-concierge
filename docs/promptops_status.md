@@ -13,30 +13,33 @@
 - 현재 production tag: `job-evaluation:latest`
 - 현재 staging tag: `job-evaluation:staging`
 - 현재 candidate prompt: `job-evaluation`
-- 현재 candidate 로컬 참조: `local-v4`
-- 최신 결정: `candidate 유지`
+- 현재 candidate 로컬 참조: `local-v4` (직전 후보안)
+- 최신 결정: `최신 staging 프롬프트 1회 검증 완료, 승격 보류`
 
 ### LangSmith / 문서 / Notion 링크
 
 - production prompt: `job-evaluation:latest`
 - staging prompt: `job-evaluation:staging`
 - candidate prompt: `job-evaluation` candidate lineage
-- baseline vs candidate compare: [compare link](https://smith.langchain.com/o/a5f5f699-f384-58ec-9be0-2a39bb96969e/datasets/277c4ae5-c460-4be4-8895-732911768cd7/compare?selectedSessions=54971cd3-fcee-4dc1-bb7c-ca7f9abb6c59&selectedSessions=4906f684-12db-4c1a-88d0-782d25f5bbda)
+- 직전 candidate vs 최신 staging 검증 compare: [compare link](https://smith.langchain.com/o/a5f5f699-f384-58ec-9be0-2a39bb96969e/datasets/277c4ae5-c460-4be4-8895-732911768cd7/compare?selectedSessions=4906f684-12db-4c1a-88d0-782d25f5bbda&selectedSessions=91e3e1bf-e2a1-426c-a155-ce616568eabd)
 - latest iteration report: [`job_evaluation_iteration_001.md`](./promptops_iterations/job_evaluation_iteration_001.md)
 - human review queue: `job-evaluation-review`
 - Notion backlog: [PromptOps Backlog](https://www.notion.so/c5fb7393ece54107b445e90bdabab642)
 
 ### 최신 실험 요약
 
-- `fit_score_band`는 개선됨: `0.6667 -> 0.8000`
-- `classification_match`도 개선됨: `0.8667 -> 0.9333`
-- 하지만 `role_alignment_match`, `must_have_coverage_match`, `transferable_skill_credit`는 하락
+- 최신 `job-evaluation:staging` 1회 검증 run: `promptops-latest-local-v1-b9ea2745`
+- `fit_score_band`: `0.9333`
+- `classification_match`: `1.0`
+- `deal_breaker_severity_match`, `hard_reject_penalty`, `summary_concise`: 모두 `1.0`
+- 약한 축: `concern_keywords_match 0.2667`, `confidence_alignment 0.4`, `strength_keywords_match 0.2`
+- 중간 수준 축: `role_alignment_match 0.6667`, `transferable_skill_credit 0.6667`, `must_have_coverage_match 0.7333`
 
 ### 현재 해석
 
-- 이번 candidate는 score band 보정에는 도움이 있었음
-- 다만 adjacent infra 역할 해석이 다소 과하게 눌리면서 structured sub-judgment 일관성이 낮아짐
-- 따라서 바로 승격하지 않고 human review 확인 후 다음 수정이 필요함
+- 최신 staging 프롬프트는 점수 밴드와 분류 일관성은 충분히 안정적인 편입니다.
+- 다만 설명형 evaluator, 특히 concern/confidence/strength 관련 축은 여전히 흔들립니다.
+- 따라서 바로 승격하기보다 human review와 다음 prompt 보강을 거친 뒤 재판단하는 편이 안전합니다.
 
 ### 다음 backlog top 3
 

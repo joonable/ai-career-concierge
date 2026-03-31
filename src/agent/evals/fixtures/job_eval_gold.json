@@ -9,45 +9,63 @@
           "years_of_experience": 6
         },
         "guidelines": {
-          "must_haves": ["Python", "SQL", "MLOps"],
-          "deal_breakers": ["contract-only", "onsite-only"]
+          "must_haves": [
+            "Python",
+            "SQL",
+            "MLOps"
+          ],
+          "deal_breakers": [
+            "contract-only",
+            "onsite-only"
+          ]
         },
         "notification_settings": {
           "minimum_fit_score": 80,
           "delivery_channel": "slack"
         }
       },
-      "recent_memory": "Avoid jobs similar to these recent dislikes: weak infra ownership; contract-only roles.",
+      "recent_memory": "최근 dislike와 비슷한 공고는 피하세요: 인프라 오너십이 약한 역할, 계약직 전용 역할.",
       "job": {
         "job_id": "18f3fb52-d02c-4f2a-b0df-20467365ad27",
         "platform": "curated",
         "external_job_id": "gold-001",
-        "title": "Senior Machine Learning Engineer",
-        "company": "Signal Labs",
-        "jd_raw_text": "Build production ML systems with Python, SQL, MLOps, experimentation, and ranking pipelines.",
+        "title": "시니어 머신러닝 엔지니어",
+        "company": "시그널 랩스",
+        "jd_raw_text": "Python, SQL, MLOps, 실험, 랭킹 파이프라인을 활용해 프로덕션 ML 시스템을 구축합니다.",
         "url": "https://example.com/jobs/gold-001"
       }
     },
     "outputs": {
       "should_pass": true,
-      "fit_score_range": { "min": 80, "max": 100 },
-      "expected_must_have_matches": ["Python", "SQL", "MLOps"],
+      "fit_score_range": {
+        "min": 80,
+        "max": 100
+      },
+      "expected_must_have_matches": [
+        "Python",
+        "SQL",
+        "MLOps"
+      ],
       "expected_deal_breaker_flags": [],
-      "expected_strength_keywords": ["python", "sql", "mlops"],
+      "expected_strength_keywords": [
+        "python",
+        "sql",
+        "mlops"
+      ],
       "expected_concern_keywords": [],
       "expected_confidence": "HIGH",
       "expected_role_alignment": "HIGH",
       "expected_must_have_coverage": "STRONG",
       "expected_deal_breaker_severity": "NONE",
       "expected_transferable_skill_level": "HIGH",
-      "scoring_note": "Direct role match with strong must-have coverage and no meaningful deal-breaker concern."
+      "scoring_note": "직접적인 역할 일치이며 필수요건 충족도가 높고 의미 있는 딜브레이커 우려가 없습니다."
     },
     "metadata": {
-      "scenario_type": "strong_match",
-      "scenario_family": "direct_mle_match",
+      "scenario_type": "강한_일치",
+      "scenario_family": "직접_mle_일치",
       "platform": "curated",
-      "difficulty": "easy",
-      "source": "curated"
+      "difficulty": "쉬움",
+      "source": "선별"
     }
   },
   {
@@ -60,8 +78,15 @@
           "years_of_experience": 6
         },
         "guidelines": {
-          "must_haves": ["Python", "SQL", "MLOps"],
-          "deal_breakers": ["contract-only", "onsite-only"]
+          "must_haves": [
+            "Python",
+            "SQL",
+            "MLOps"
+          ],
+          "deal_breakers": [
+            "contract-only",
+            "onsite-only"
+          ]
         },
         "notification_settings": {
           "minimum_fit_score": 80,
@@ -73,32 +98,41 @@
         "job_id": "18f3fb52-d02c-4f2a-b0df-20467365ad28",
         "platform": "curated",
         "external_job_id": "gold-002",
-        "title": "Frontend Engineer",
-        "company": "Noise Portal",
-        "jd_raw_text": "Build marketing landing pages with React and CSS. Contract-only onsite role.",
+        "title": "프론트엔드 엔지니어",
+        "company": "노이즈 포털",
+        "jd_raw_text": "React와 CSS로 마케팅 랜딩 페이지를 구축합니다. 계약직 전용이며 오피스 출근 전용 역할입니다.",
         "url": "https://example.com/jobs/gold-002"
       }
     },
     "outputs": {
       "should_pass": false,
-      "fit_score_range": { "min": 1, "max": 39 },
+      "fit_score_range": {
+        "min": 1,
+        "max": 39
+      },
       "expected_must_have_matches": [],
-      "expected_deal_breaker_flags": ["contract-only", "onsite-only"],
+      "expected_deal_breaker_flags": [
+        "contract-only",
+        "onsite-only"
+      ],
       "expected_strength_keywords": [],
-      "expected_concern_keywords": ["contract", "onsite"],
+      "expected_concern_keywords": [
+        "contract",
+        "onsite"
+      ],
       "expected_confidence": "HIGH",
       "expected_role_alignment": "LOW",
       "expected_must_have_coverage": "WEAK",
       "expected_deal_breaker_severity": "HARD",
       "expected_transferable_skill_level": "LOW",
-      "scoring_note": "Clear role mismatch plus explicit hard deal-breakers should keep this in the reject band."
+      "scoring_note": "역할 불일치가 명확하고 하드 딜브레이커가 분명해 거절 구간에 머물러야 합니다."
     },
     "metadata": {
-      "scenario_type": "obvious_reject",
-      "scenario_family": "non_ml_reject",
+      "scenario_type": "명확한_거절",
+      "scenario_family": "비_ml_거절",
       "platform": "curated",
-      "difficulty": "easy",
-      "source": "curated"
+      "difficulty": "쉬움",
+      "source": "선별"
     }
   },
   {
@@ -111,8 +145,15 @@
           "years_of_experience": 6
         },
         "guidelines": {
-          "must_haves": ["Python", "SQL", "MLOps"],
-          "deal_breakers": ["contract-only", "onsite-only"]
+          "must_haves": [
+            "Python",
+            "SQL",
+            "MLOps"
+          ],
+          "deal_breakers": [
+            "contract-only",
+            "onsite-only"
+          ]
         },
         "notification_settings": {
           "minimum_fit_score": 80,
@@ -124,32 +165,43 @@
         "job_id": "18f3fb52-d02c-4f2a-b0df-20467365ad29",
         "platform": "curated",
         "external_job_id": "gold-003",
-        "title": "Applied Scientist",
-        "company": "Model Ridge",
-        "jd_raw_text": "Work on ML ranking systems with Python and experimentation. Limited SQL, unclear MLOps ownership.",
+        "title": "응용 과학자",
+        "company": "모델 리지",
+        "jd_raw_text": "Python과 실험 기반의 ML 랭킹 시스템을 다룹니다. SQL 비중은 낮고 MLOps 오너십은 불명확합니다.",
         "url": "https://example.com/jobs/gold-003"
       }
     },
     "outputs": {
       "should_pass": false,
-      "fit_score_range": { "min": 60, "max": 79 },
-      "expected_must_have_matches": ["Python"],
+      "fit_score_range": {
+        "min": 60,
+        "max": 79
+      },
+      "expected_must_have_matches": [
+        "Python"
+      ],
       "expected_deal_breaker_flags": [],
-      "expected_strength_keywords": ["python", "ranking"],
-      "expected_concern_keywords": ["sql", "mlops"],
+      "expected_strength_keywords": [
+        "python",
+        "ranking"
+      ],
+      "expected_concern_keywords": [
+        "sql",
+        "mlops"
+      ],
       "expected_confidence": "MEDIUM",
       "expected_role_alignment": "MEDIUM",
       "expected_must_have_coverage": "PARTIAL",
       "expected_deal_breaker_severity": "NONE",
       "expected_transferable_skill_level": "MEDIUM",
-      "scoring_note": "High topical relevance keeps it reviewable, but missing SQL depth and unclear MLOps ownership should block 80+."
+      "scoring_note": "주제 적합성은 높아 검토 가치는 있지만, SQL 깊이 부족과 불명확한 MLOps 오너십 때문에 80+는 막아야 합니다."
     },
     "metadata": {
-      "scenario_type": "borderline_case",
-      "scenario_family": "applied_scientist_without_ownership",
+      "scenario_type": "경계_사례",
+      "scenario_family": "소유권_부족_응용과학자",
       "platform": "curated",
-      "difficulty": "medium",
-      "source": "curated"
+      "difficulty": "보통",
+      "source": "선별"
     }
   },
   {
@@ -162,8 +214,15 @@
           "years_of_experience": 6
         },
         "guidelines": {
-          "must_haves": ["Python", "SQL", "MLOps"],
-          "deal_breakers": ["contract-only", "onsite-only"]
+          "must_haves": [
+            "Python",
+            "SQL",
+            "MLOps"
+          ],
+          "deal_breakers": [
+            "contract-only",
+            "onsite-only"
+          ]
         },
         "notification_settings": {
           "minimum_fit_score": 80,
@@ -175,32 +234,46 @@
         "job_id": "18f3fb52-d02c-4f2a-b0df-20467365ad30",
         "platform": "curated",
         "external_job_id": "gold-004",
-        "title": "ML Platform Engineer",
-        "company": "Deploy Ops",
-        "jd_raw_text": "Own Python platform tooling, MLOps, model deployment, but this role is onsite-only in Seoul.",
+        "title": "ML 플랫폼 엔지니어",
+        "company": "디플로이 옵스",
+        "jd_raw_text": "Python 기반 플랫폼 도구, MLOps, 모델 배포를 담당하지만 서울 오피스 출근 전용 역할입니다.",
         "url": "https://example.com/jobs/gold-004"
       }
     },
     "outputs": {
       "should_pass": false,
-      "fit_score_range": { "min": 40, "max": 70 },
-      "expected_must_have_matches": ["Python", "MLOps"],
-      "expected_deal_breaker_flags": ["onsite-only"],
-      "expected_strength_keywords": ["python", "mlops", "deployment"],
-      "expected_concern_keywords": ["onsite"],
+      "fit_score_range": {
+        "min": 40,
+        "max": 70
+      },
+      "expected_must_have_matches": [
+        "Python",
+        "MLOps"
+      ],
+      "expected_deal_breaker_flags": [
+        "onsite-only"
+      ],
+      "expected_strength_keywords": [
+        "python",
+        "mlops",
+        "deployment"
+      ],
+      "expected_concern_keywords": [
+        "onsite"
+      ],
       "expected_confidence": "HIGH",
       "expected_role_alignment": "MEDIUM",
       "expected_must_have_coverage": "PARTIAL",
       "expected_deal_breaker_severity": "HARD",
       "expected_transferable_skill_level": "HIGH",
-      "scoring_note": "Operational overlap is real, but the explicit onsite-only deal-breaker should block recommendation regardless of strong overlap."
+      "scoring_note": "운영 측면의 겹침은 크지만 오피스 출근 전용이라는 명시적 딜브레이커 때문에 강한 겹침과 무관하게 추천을 막아야 합니다."
     },
     "metadata": {
-      "scenario_type": "deal_breaker_hit",
-      "scenario_family": "mlops_heavy_weak_modeling",
+      "scenario_type": "딜브레이커_해당",
+      "scenario_family": "mlops_강점_모델링_약함",
       "platform": "curated",
-      "difficulty": "easy",
-      "source": "curated"
+      "difficulty": "쉬움",
+      "source": "선별"
     }
   },
   {
@@ -213,8 +286,15 @@
           "years_of_experience": 6
         },
         "guidelines": {
-          "must_haves": ["Python", "SQL", "MLOps"],
-          "deal_breakers": ["contract-only", "onsite-only"]
+          "must_haves": [
+            "Python",
+            "SQL",
+            "MLOps"
+          ],
+          "deal_breakers": [
+            "contract-only",
+            "onsite-only"
+          ]
         },
         "notification_settings": {
           "minimum_fit_score": 80,
@@ -226,32 +306,44 @@
         "job_id": "18f3fb52-d02c-4f2a-b0df-20467365ad31",
         "platform": "curated",
         "external_job_id": "gold-005",
-        "title": "Data Engineer for ML Platform",
-        "company": "Warehouse AI",
-        "jd_raw_text": "Heavy SQL and data warehousing, some Python, but no MLOps or model serving ownership.",
+        "title": "ML 플랫폼 데이터 엔지니어",
+        "company": "웨어하우스 AI",
+        "jd_raw_text": "SQL과 데이터 웨어하우징 비중이 높고 일부 Python 경험은 있으나 MLOps나 모델 서빙 오너십은 없습니다.",
         "url": "https://example.com/jobs/gold-005"
       }
     },
     "outputs": {
       "should_pass": false,
-      "fit_score_range": { "min": 40, "max": 59 },
-      "expected_must_have_matches": ["Python", "SQL"],
+      "fit_score_range": {
+        "min": 40,
+        "max": 59
+      },
+      "expected_must_have_matches": [
+        "Python",
+        "SQL"
+      ],
       "expected_deal_breaker_flags": [],
-      "expected_strength_keywords": ["python", "sql"],
-      "expected_concern_keywords": ["mlops", "serving"],
+      "expected_strength_keywords": [
+        "python",
+        "sql"
+      ],
+      "expected_concern_keywords": [
+        "mlops",
+        "serving"
+      ],
       "expected_confidence": "MEDIUM",
       "expected_role_alignment": "MEDIUM",
       "expected_must_have_coverage": "PARTIAL",
       "expected_deal_breaker_severity": "NONE",
       "expected_transferable_skill_level": "HIGH",
-      "scoring_note": "Strong adjacent data skills should earn some credit, but missing MLOps and serving ownership should keep it below the reviewable 60+ band."
+      "scoring_note": "강한 인접 데이터 역량은 일부 점수를 받아야 하지만, MLOps와 서빙 오너십 부재 때문에 검토 가능 구간인 60+ 아래에 머물러야 합니다."
     },
     "metadata": {
-      "scenario_type": "must_have_mismatch",
-      "scenario_family": "ml_adjacent_data_engineer",
+      "scenario_type": "필수요건_불일치",
+      "scenario_family": "ml_인접_데이터_엔지니어",
       "platform": "curated",
-      "difficulty": "medium",
-      "source": "curated"
+      "difficulty": "보통",
+      "source": "선별"
     }
   },
   {
@@ -264,8 +356,15 @@
           "years_of_experience": 6
         },
         "guidelines": {
-          "must_haves": ["Python", "SQL", "MLOps"],
-          "deal_breakers": ["contract-only", "onsite-only"]
+          "must_haves": [
+            "Python",
+            "SQL",
+            "MLOps"
+          ],
+          "deal_breakers": [
+            "contract-only",
+            "onsite-only"
+          ]
         },
         "notification_settings": {
           "minimum_fit_score": 80,
@@ -277,32 +376,46 @@
         "job_id": "18f3fb52-d02c-4f2a-b0df-20467365ad32",
         "platform": "curated",
         "external_job_id": "gold-006",
-        "title": "Senior Data Engineer, Experimentation Platform",
-        "company": "Metric Forge",
-        "jd_raw_text": "Build event pipelines, experiment datasets, and metrics tables with Python and SQL. Little evidence of model deployment ownership.",
+        "title": "시니어 데이터 엔지니어, 실험 플랫폼",
+        "company": "메트릭 포지",
+        "jd_raw_text": "Python과 SQL로 이벤트 파이프라인, 실험 데이터셋, 지표 테이블을 구축합니다. 모델 배포 오너십 증거는 거의 없습니다.",
         "url": "https://example.com/jobs/gold-006"
       }
     },
     "outputs": {
       "should_pass": false,
-      "fit_score_range": { "min": 40, "max": 59 },
-      "expected_must_have_matches": ["Python", "SQL"],
+      "fit_score_range": {
+        "min": 40,
+        "max": 59
+      },
+      "expected_must_have_matches": [
+        "Python",
+        "SQL"
+      ],
       "expected_deal_breaker_flags": [],
-      "expected_strength_keywords": ["python", "sql", "experimentation"],
-      "expected_concern_keywords": ["mlops", "deployment", "serving"],
+      "expected_strength_keywords": [
+        "python",
+        "sql",
+        "experimentation"
+      ],
+      "expected_concern_keywords": [
+        "mlops",
+        "deployment",
+        "serving"
+      ],
       "expected_confidence": "MEDIUM",
       "expected_role_alignment": "MEDIUM",
       "expected_must_have_coverage": "PARTIAL",
       "expected_deal_breaker_severity": "NONE",
       "expected_transferable_skill_level": "HIGH",
-      "scoring_note": "Experiment infrastructure overlap makes it worth tracking, but this is still data-first rather than end-to-end MLE work."
+      "scoring_note": "실험 인프라와의 겹침 덕분에 추적 가치는 있지만, 여전히 종단 간 MLE 역할보다는 데이터 중심 역할입니다."
     },
     "metadata": {
-      "scenario_type": "borderline_case",
-      "scenario_family": "ml_adjacent_data_engineer",
+      "scenario_type": "경계_사례",
+      "scenario_family": "ml_인접_데이터_엔지니어",
       "platform": "curated",
-      "difficulty": "medium",
-      "source": "curated"
+      "difficulty": "보통",
+      "source": "선별"
     }
   },
   {
@@ -315,8 +428,15 @@
           "years_of_experience": 6
         },
         "guidelines": {
-          "must_haves": ["Python", "SQL", "MLOps"],
-          "deal_breakers": ["contract-only", "onsite-only"]
+          "must_haves": [
+            "Python",
+            "SQL",
+            "MLOps"
+          ],
+          "deal_breakers": [
+            "contract-only",
+            "onsite-only"
+          ]
         },
         "notification_settings": {
           "minimum_fit_score": 80,
@@ -328,32 +448,45 @@
         "job_id": "18f3fb52-d02c-4f2a-b0df-20467365ad33",
         "platform": "curated",
         "external_job_id": "gold-007",
-        "title": "Senior Backend Engineer, Model Serving",
-        "company": "Inference Loop",
-        "jd_raw_text": "Own Python inference APIs, deployment workflows, autoscaling, and service reliability for model-backed products.",
+        "title": "시니어 백엔드 엔지니어, 모델 서빙",
+        "company": "인퍼런스 루프",
+        "jd_raw_text": "모델 기반 제품을 위한 Python 추론 API, 배포 워크플로, 오토스케일링, 서비스 안정성을 담당합니다.",
         "url": "https://example.com/jobs/gold-007"
       }
     },
     "outputs": {
       "should_pass": false,
-      "fit_score_range": { "min": 60, "max": 79 },
-      "expected_must_have_matches": ["Python", "MLOps"],
+      "fit_score_range": {
+        "min": 60,
+        "max": 79
+      },
+      "expected_must_have_matches": [
+        "Python",
+        "MLOps"
+      ],
       "expected_deal_breaker_flags": [],
-      "expected_strength_keywords": ["python", "serving", "deployment"],
-      "expected_concern_keywords": ["modeling", "training"],
+      "expected_strength_keywords": [
+        "python",
+        "serving",
+        "deployment"
+      ],
+      "expected_concern_keywords": [
+        "modeling",
+        "training"
+      ],
       "expected_confidence": "MEDIUM",
       "expected_role_alignment": "MEDIUM",
       "expected_must_have_coverage": "PARTIAL",
       "expected_deal_breaker_severity": "NONE",
       "expected_transferable_skill_level": "HIGH",
-      "scoring_note": "Production serving ownership is highly relevant to MLE, but limited modeling scope should keep it below strong-recommendation territory."
+      "scoring_note": "프로덕션 서빙 오너십은 MLE와 매우 관련 있지만 모델링 범위가 제한적이어서 강한 추천 구간 아래에 머물러야 합니다."
     },
     "metadata": {
-      "scenario_type": "borderline_case",
-      "scenario_family": "backend_model_serving",
+      "scenario_type": "경계_사례",
+      "scenario_family": "백엔드_모델_서빙",
       "platform": "curated",
-      "difficulty": "medium",
-      "source": "curated"
+      "difficulty": "보통",
+      "source": "선별"
     }
   },
   {
@@ -366,8 +499,15 @@
           "years_of_experience": 6
         },
         "guidelines": {
-          "must_haves": ["Python", "SQL", "MLOps"],
-          "deal_breakers": ["contract-only", "onsite-only"]
+          "must_haves": [
+            "Python",
+            "SQL",
+            "MLOps"
+          ],
+          "deal_breakers": [
+            "contract-only",
+            "onsite-only"
+          ]
         },
         "notification_settings": {
           "minimum_fit_score": 80,
@@ -379,32 +519,45 @@
         "job_id": "18f3fb52-d02c-4f2a-b0df-20467365ad34",
         "platform": "curated",
         "external_job_id": "gold-008",
-        "title": "Backend Platform Engineer, AI Runtime",
-        "company": "Runtime Harbor",
-        "jd_raw_text": "Build Python services, rollout tooling, and observability for AI runtime infrastructure. SQL appears occasionally but is not central.",
+        "title": "백엔드 플랫폼 엔지니어, AI 런타임",
+        "company": "런타임 하버",
+        "jd_raw_text": "AI 런타임 인프라를 위해 Python 서비스, 롤아웃 도구, 관측성을 구축합니다. SQL은 가끔 등장하지만 핵심은 아닙니다.",
         "url": "https://example.com/jobs/gold-008"
       }
     },
     "outputs": {
       "should_pass": false,
-      "fit_score_range": { "min": 60, "max": 79 },
-      "expected_must_have_matches": ["Python"],
+      "fit_score_range": {
+        "min": 60,
+        "max": 79
+      },
+      "expected_must_have_matches": [
+        "Python"
+      ],
       "expected_deal_breaker_flags": [],
-      "expected_strength_keywords": ["python", "platform", "inference"],
-      "expected_concern_keywords": ["sql", "modeling", "scope"],
+      "expected_strength_keywords": [
+        "python",
+        "platform",
+        "inference"
+      ],
+      "expected_concern_keywords": [
+        "sql",
+        "modeling",
+        "scope"
+      ],
       "expected_confidence": "MEDIUM",
       "expected_role_alignment": "MEDIUM",
       "expected_must_have_coverage": "PARTIAL",
       "expected_deal_breaker_severity": "NONE",
       "expected_transferable_skill_level": "HIGH",
-      "scoring_note": "The production infra overlap is meaningful enough for human review, but must-have coverage remains incomplete for a stronger score."
+      "scoring_note": "프로덕션 인프라와의 겹침은 사람 검토를 보낼 만큼 의미 있지만, 더 강한 점수를 주기에는 필수요건 충족이 불완전합니다."
     },
     "metadata": {
-      "scenario_type": "borderline_case",
-      "scenario_family": "backend_model_serving",
+      "scenario_type": "경계_사례",
+      "scenario_family": "백엔드_모델_서빙",
       "platform": "curated",
-      "difficulty": "medium",
-      "source": "curated"
+      "difficulty": "보통",
+      "source": "선별"
     }
   },
   {
@@ -417,8 +570,15 @@
           "years_of_experience": 6
         },
         "guidelines": {
-          "must_haves": ["Python", "SQL", "MLOps"],
-          "deal_breakers": ["contract-only", "onsite-only"]
+          "must_haves": [
+            "Python",
+            "SQL",
+            "MLOps"
+          ],
+          "deal_breakers": [
+            "contract-only",
+            "onsite-only"
+          ]
         },
         "notification_settings": {
           "minimum_fit_score": 80,
@@ -430,32 +590,45 @@
         "job_id": "18f3fb52-d02c-4f2a-b0df-20467365ad35",
         "platform": "curated",
         "external_job_id": "gold-009",
-        "title": "Applied Scientist, Ranking",
-        "company": "Relevance Works",
-        "jd_raw_text": "Own offline experiments and model iteration for ranking systems with Python. Production deployment and MLOps responsibility are shared elsewhere.",
+        "title": "응용 연구 과학자, 추천",
+        "company": "추천 웨이브",
+        "jd_raw_text": "오프라인 모델링과 실험을 이끌지만, 프로덕션 서빙과 MLOps는 별도 플랫폼 팀이 담당합니다.",
         "url": "https://example.com/jobs/gold-009"
       }
     },
     "outputs": {
       "should_pass": false,
-      "fit_score_range": { "min": 60, "max": 79 },
-      "expected_must_have_matches": ["Python"],
+      "fit_score_range": {
+        "min": 60,
+        "max": 79
+      },
+      "expected_must_have_matches": [
+        "Python"
+      ],
       "expected_deal_breaker_flags": [],
-      "expected_strength_keywords": ["python", "ranking", "experimentation"],
-      "expected_concern_keywords": ["sql", "mlops", "ownership"],
+      "expected_strength_keywords": [
+        "python",
+        "ranking",
+        "experimentation"
+      ],
+      "expected_concern_keywords": [
+        "sql",
+        "mlops",
+        "ownership"
+      ],
       "expected_confidence": "MEDIUM",
       "expected_role_alignment": "MEDIUM",
       "expected_must_have_coverage": "PARTIAL",
       "expected_deal_breaker_severity": "NONE",
       "expected_transferable_skill_level": "MEDIUM",
-      "scoring_note": "This should remain above exploratory adjacent roles because the ML problem space is highly relevant, even though shipping ownership is incomplete."
+      "scoring_note": "모델링 적합성은 높지만 프로덕션 오너십 공백이 커서 중간 점수대 검토 구간에 머물러야 합니다."
     },
     "metadata": {
-      "scenario_type": "borderline_case",
-      "scenario_family": "applied_scientist_without_ownership",
+      "scenario_type": "경계_사례",
+      "scenario_family": "소유권_부족_응용과학자",
       "platform": "curated",
-      "difficulty": "medium",
-      "source": "curated"
+      "difficulty": "보통",
+      "source": "선별"
     }
   },
   {
@@ -468,8 +641,15 @@
           "years_of_experience": 6
         },
         "guidelines": {
-          "must_haves": ["Python", "SQL", "MLOps"],
-          "deal_breakers": ["contract-only", "onsite-only"]
+          "must_haves": [
+            "Python",
+            "SQL",
+            "MLOps"
+          ],
+          "deal_breakers": [
+            "contract-only",
+            "onsite-only"
+          ]
         },
         "notification_settings": {
           "minimum_fit_score": 80,
@@ -481,32 +661,45 @@
         "job_id": "18f3fb52-d02c-4f2a-b0df-20467365ad36",
         "platform": "curated",
         "external_job_id": "gold-010",
-        "title": "Research Scientist, Personalization",
-        "company": "Theory Signal",
-        "jd_raw_text": "Focus on model prototyping, papers, and offline evaluation for personalization. Limited evidence of production system ownership or MLOps work.",
+        "title": "리서치 사이언티스트, 랭킹",
+        "company": "탑라인 AI",
+        "jd_raw_text": "랭킹 모델을 연구하고 실험 분석을 수행합니다. SQL 사용은 가볍고 프로덕션 시스템 책임은 거의 없습니다.",
         "url": "https://example.com/jobs/gold-010"
       }
     },
     "outputs": {
       "should_pass": false,
-      "fit_score_range": { "min": 40, "max": 59 },
-      "expected_must_have_matches": ["Python"],
+      "fit_score_range": {
+        "min": 40,
+        "max": 59
+      },
+      "expected_must_have_matches": [
+        "Python"
+      ],
       "expected_deal_breaker_flags": [],
-      "expected_strength_keywords": ["python", "personalization", "modeling"],
-      "expected_concern_keywords": ["production", "mlops", "ownership"],
+      "expected_strength_keywords": [
+        "python",
+        "personalization",
+        "modeling"
+      ],
+      "expected_concern_keywords": [
+        "production",
+        "mlops",
+        "ownership"
+      ],
       "expected_confidence": "MEDIUM",
       "expected_role_alignment": "MEDIUM",
       "expected_must_have_coverage": "WEAK",
       "expected_deal_breaker_severity": "NONE",
       "expected_transferable_skill_level": "MEDIUM",
-      "scoring_note": "The ML overlap is real, but the role is too research-leaning and too light on operational ownership to treat as clearly reviewable."
+      "scoring_note": "핵심 문제 영역은 가깝지만 운영 책임과 필수요건 충족이 약해 보수적인 검토 구간에 머물러야 합니다."
     },
     "metadata": {
-      "scenario_type": "borderline_case",
-      "scenario_family": "applied_scientist_without_ownership",
+      "scenario_type": "경계_사례",
+      "scenario_family": "소유권_부족_응용과학자",
       "platform": "curated",
-      "difficulty": "medium",
-      "source": "curated"
+      "difficulty": "보통",
+      "source": "선별"
     }
   },
   {
@@ -519,8 +712,15 @@
           "years_of_experience": 6
         },
         "guidelines": {
-          "must_haves": ["Python", "SQL", "MLOps"],
-          "deal_breakers": ["contract-only", "onsite-only"]
+          "must_haves": [
+            "Python",
+            "SQL",
+            "MLOps"
+          ],
+          "deal_breakers": [
+            "contract-only",
+            "onsite-only"
+          ]
         },
         "notification_settings": {
           "minimum_fit_score": 80,
@@ -532,32 +732,46 @@
         "job_id": "18f3fb52-d02c-4f2a-b0df-20467365ad37",
         "platform": "curated",
         "external_job_id": "gold-011",
-        "title": "Software Engineer, Experimentation Infrastructure",
-        "company": "Growth Matrix",
-        "jd_raw_text": "Build experimentation tooling, metrics services, and offline analysis workflows using Python and SQL. No direct model lifecycle ownership.",
+        "title": "소프트웨어 엔지니어, 실험 인프라",
+        "company": "익스페리먼트 스택",
+        "jd_raw_text": "A/B 테스트 플랫폼, 지표 계산, Python 서비스와 SQL 파이프라인을 구축합니다. 모델 서빙 책임은 없습니다.",
         "url": "https://example.com/jobs/gold-011"
       }
     },
     "outputs": {
       "should_pass": false,
-      "fit_score_range": { "min": 40, "max": 59 },
-      "expected_must_have_matches": ["Python", "SQL"],
+      "fit_score_range": {
+        "min": 40,
+        "max": 59
+      },
+      "expected_must_have_matches": [
+        "Python",
+        "SQL"
+      ],
       "expected_deal_breaker_flags": [],
-      "expected_strength_keywords": ["python", "sql", "experimentation"],
-      "expected_concern_keywords": ["mlops", "serving", "lifecycle"],
+      "expected_strength_keywords": [
+        "python",
+        "sql",
+        "experimentation"
+      ],
+      "expected_concern_keywords": [
+        "mlops",
+        "serving",
+        "lifecycle"
+      ],
       "expected_confidence": "MEDIUM",
       "expected_role_alignment": "MEDIUM",
       "expected_must_have_coverage": "PARTIAL",
       "expected_deal_breaker_severity": "NONE",
       "expected_transferable_skill_level": "MEDIUM",
-      "scoring_note": "The systems overlap is practical, but the role still sits one layer away from end-to-end ML engineering ownership."
+      "scoring_note": "실험 플랫폼 경험은 충분히 인접하지만 직접적인 ML 시스템 오너십이 부족해 중간 이하 점수 구간이 적절합니다."
     },
     "metadata": {
-      "scenario_type": "borderline_case",
-      "scenario_family": "analytics_infra",
+      "scenario_type": "경계_사례",
+      "scenario_family": "분석_인프라",
       "platform": "curated",
-      "difficulty": "medium",
-      "source": "curated"
+      "difficulty": "보통",
+      "source": "선별"
     }
   },
   {
@@ -570,8 +784,15 @@
           "years_of_experience": 6
         },
         "guidelines": {
-          "must_haves": ["Python", "SQL", "MLOps"],
-          "deal_breakers": ["contract-only", "onsite-only"]
+          "must_haves": [
+            "Python",
+            "SQL",
+            "MLOps"
+          ],
+          "deal_breakers": [
+            "contract-only",
+            "onsite-only"
+          ]
         },
         "notification_settings": {
           "minimum_fit_score": 80,
@@ -583,32 +804,45 @@
         "job_id": "18f3fb52-d02c-4f2a-b0df-20467365ad38",
         "platform": "curated",
         "external_job_id": "gold-012",
-        "title": "MLOps Engineer",
-        "company": "Delivery Mesh",
-        "jd_raw_text": "Own training pipelines, deployment automation, model registry, CI/CD, and monitoring with Python. Modeling depth is limited and SQL is secondary.",
+        "title": "MLOps 엔지니어",
+        "company": "배포 브리지",
+        "jd_raw_text": "Python 기반 CI/CD, 모델 배포, 피처 스토어 운영, 모니터링을 담당합니다. 모델 개발 자체는 제한적입니다.",
         "url": "https://example.com/jobs/gold-012"
       }
     },
     "outputs": {
       "should_pass": false,
-      "fit_score_range": { "min": 60, "max": 79 },
-      "expected_must_have_matches": ["Python", "MLOps"],
+      "fit_score_range": {
+        "min": 60,
+        "max": 79
+      },
+      "expected_must_have_matches": [
+        "Python",
+        "MLOps"
+      ],
       "expected_deal_breaker_flags": [],
-      "expected_strength_keywords": ["python", "mlops", "deployment"],
-      "expected_concern_keywords": ["modeling", "sql"],
+      "expected_strength_keywords": [
+        "python",
+        "mlops",
+        "deployment"
+      ],
+      "expected_concern_keywords": [
+        "modeling",
+        "sql"
+      ],
       "expected_confidence": "MEDIUM",
       "expected_role_alignment": "MEDIUM",
       "expected_must_have_coverage": "PARTIAL",
       "expected_deal_breaker_severity": "NONE",
       "expected_transferable_skill_level": "HIGH",
-      "scoring_note": "Real production ownership and strong MLOps overlap make this clearly reviewable, but narrower modeling breadth should keep it below 80+."
+      "scoring_note": "MLOps 오너십이 강해 검토 가치는 높지만 모델링 범위가 약해 추천 상단 구간까지는 어렵습니다."
     },
     "metadata": {
-      "scenario_type": "borderline_case",
-      "scenario_family": "mlops_heavy_weak_modeling",
+      "scenario_type": "경계_사례",
+      "scenario_family": "mlops_강점_모델링_약함",
       "platform": "curated",
-      "difficulty": "medium",
-      "source": "curated"
+      "difficulty": "보통",
+      "source": "선별"
     }
   },
   {
@@ -621,8 +855,15 @@
           "years_of_experience": 6
         },
         "guidelines": {
-          "must_haves": ["Python", "SQL", "MLOps"],
-          "deal_breakers": ["contract-only", "onsite-only"]
+          "must_haves": [
+            "Python",
+            "SQL",
+            "MLOps"
+          ],
+          "deal_breakers": [
+            "contract-only",
+            "onsite-only"
+          ]
         },
         "notification_settings": {
           "minimum_fit_score": 80,
@@ -634,32 +875,46 @@
         "job_id": "18f3fb52-d02c-4f2a-b0df-20467365ad39",
         "platform": "curated",
         "external_job_id": "gold-013",
-        "title": "AI Platform Engineer",
-        "company": "Warehouse Brain",
-        "jd_raw_text": "The title is AI-facing, but the day-to-day work is batch ETL, internal data tooling, and warehouse performance tuning with Python and SQL.",
+        "title": "분석 엔지니어, ML 의사결정 지원",
+        "company": "인사이트 파운드리",
+        "jd_raw_text": "Python과 SQL로 분석 데이터셋, 실험 리포팅, 특성 품질 점검을 수행합니다. 배포 책임은 없습니다.",
         "url": "https://example.com/jobs/gold-013"
       }
     },
     "outputs": {
       "should_pass": false,
-      "fit_score_range": { "min": 40, "max": 59 },
-      "expected_must_have_matches": ["Python", "SQL"],
+      "fit_score_range": {
+        "min": 40,
+        "max": 59
+      },
+      "expected_must_have_matches": [
+        "Python",
+        "SQL"
+      ],
       "expected_deal_breaker_flags": [],
-      "expected_strength_keywords": ["python", "sql", "platform"],
-      "expected_concern_keywords": ["mlops", "serving", "title"],
+      "expected_strength_keywords": [
+        "python",
+        "sql",
+        "platform"
+      ],
+      "expected_concern_keywords": [
+        "mlops",
+        "serving",
+        "title"
+      ],
       "expected_confidence": "HIGH",
       "expected_role_alignment": "LOW",
       "expected_must_have_coverage": "PARTIAL",
       "expected_deal_breaker_severity": "NONE",
       "expected_transferable_skill_level": "MEDIUM",
-      "scoring_note": "The AI-flavored title should not inflate the score when the actual responsibilities are mostly data platform work."
+      "scoring_note": "분석 및 실험 신호는 관련성이 있지만 MLOps와 서빙 오너십이 약해 인접 직무 점수대에 머물러야 합니다."
     },
     "metadata": {
-      "scenario_type": "borderline_case",
-      "scenario_family": "title_mismatch_skill_overlap",
+      "scenario_type": "경계_사례",
+      "scenario_family": "직함_불일치_스킬_중첩",
       "platform": "curated",
-      "difficulty": "medium",
-      "source": "curated"
+      "difficulty": "보통",
+      "source": "선별"
     }
   },
   {
@@ -672,8 +927,15 @@
           "years_of_experience": 6
         },
         "guidelines": {
-          "must_haves": ["Python", "SQL", "MLOps"],
-          "deal_breakers": ["contract-only", "onsite-only"]
+          "must_haves": [
+            "Python",
+            "SQL",
+            "MLOps"
+          ],
+          "deal_breakers": [
+            "contract-only",
+            "onsite-only"
+          ]
         },
         "notification_settings": {
           "minimum_fit_score": 80,
@@ -685,32 +947,45 @@
         "job_id": "18f3fb52-d02c-4f2a-b0df-20467365ad40",
         "platform": "curated",
         "external_job_id": "gold-014",
-        "title": "Software Engineer, AI Developer Experience",
-        "company": "Prompt Foundry",
-        "jd_raw_text": "Build Python SDKs, eval workflows, prompt tooling, and internal services for ML teams. SQL is limited and direct deployment ownership is partial.",
+        "title": "AI 제품 백엔드 엔지니어",
+        "company": "프로덕트 오빗",
+        "jd_raw_text": "Python 서비스, 추론 API, 배포 파이프라인을 운영하며 모델 학습 자체는 리서치 팀이 맡습니다.",
         "url": "https://example.com/jobs/gold-014"
       }
     },
     "outputs": {
       "should_pass": false,
-      "fit_score_range": { "min": 60, "max": 79 },
-      "expected_must_have_matches": ["Python"],
+      "fit_score_range": {
+        "min": 60,
+        "max": 79
+      },
+      "expected_must_have_matches": [
+        "Python"
+      ],
       "expected_deal_breaker_flags": [],
-      "expected_strength_keywords": ["python", "tooling", "workflow"],
-      "expected_concern_keywords": ["sql", "deployment", "scope"],
+      "expected_strength_keywords": [
+        "python",
+        "tooling",
+        "workflow"
+      ],
+      "expected_concern_keywords": [
+        "sql",
+        "deployment",
+        "scope"
+      ],
       "expected_confidence": "MEDIUM",
       "expected_role_alignment": "MEDIUM",
       "expected_must_have_coverage": "WEAK",
       "expected_deal_breaker_severity": "NONE",
       "expected_transferable_skill_level": "HIGH",
-      "scoring_note": "The title is not classic MLE, but overlap with ML tooling and production workflows is high enough to justify human review."
+      "scoring_note": "실제 제품 운영 면에서는 높은 연관성이 있으나 모델링 범위가 좁아 검토 가능 상단 정도가 적절합니다."
     },
     "metadata": {
-      "scenario_type": "borderline_case",
-      "scenario_family": "title_mismatch_skill_overlap",
+      "scenario_type": "경계_사례",
+      "scenario_family": "직함_불일치_스킬_중첩",
       "platform": "curated",
-      "difficulty": "medium",
-      "source": "curated"
+      "difficulty": "보통",
+      "source": "선별"
     }
   },
   {
@@ -723,8 +998,15 @@
           "years_of_experience": 6
         },
         "guidelines": {
-          "must_haves": ["Python", "SQL", "MLOps"],
-          "deal_breakers": ["contract-only", "onsite-only"]
+          "must_haves": [
+            "Python",
+            "SQL",
+            "MLOps"
+          ],
+          "deal_breakers": [
+            "contract-only",
+            "onsite-only"
+          ]
         },
         "notification_settings": {
           "minimum_fit_score": 80,
@@ -736,32 +1018,43 @@
         "job_id": "18f3fb52-d02c-4f2a-b0df-20467365ad41",
         "platform": "curated",
         "external_job_id": "gold-015",
-        "title": "Machine Learning Infra Engineer",
-        "company": "Scale Engine",
-        "jd_raw_text": "Own feature pipelines, training orchestration, deployment tooling, and reliability for production ML systems using Python, SQL, and MLOps practices.",
+        "title": "머신러닝 플랫폼 소프트웨어 엔지니어",
+        "company": "플랫폼 포지",
+        "jd_raw_text": "Python, SQL, MLOps를 바탕으로 학습 및 배포 플랫폼을 구축하며 모델링 팀과 긴밀히 협업합니다.",
         "url": "https://example.com/jobs/gold-015"
       }
     },
     "outputs": {
       "should_pass": true,
-      "fit_score_range": { "min": 80, "max": 95 },
-      "expected_must_have_matches": ["Python", "SQL", "MLOps"],
+      "fit_score_range": {
+        "min": 80,
+        "max": 95
+      },
+      "expected_must_have_matches": [
+        "Python",
+        "SQL",
+        "MLOps"
+      ],
       "expected_deal_breaker_flags": [],
-      "expected_strength_keywords": ["python", "sql", "deployment"],
+      "expected_strength_keywords": [
+        "python",
+        "sql",
+        "deployment"
+      ],
       "expected_concern_keywords": [],
       "expected_confidence": "HIGH",
       "expected_role_alignment": "HIGH",
       "expected_must_have_coverage": "STRONG",
       "expected_deal_breaker_severity": "NONE",
       "expected_transferable_skill_level": "HIGH",
-      "scoring_note": "Although the title leans infra, the responsibilities still align tightly with practical MLE ownership and should clear the recommendation threshold."
+      "scoring_note": "직함은 다소 다르지만 핵심 기술 겹침과 플랫폼 오너십이 높아 강한 일치로 볼 수 있습니다."
     },
     "metadata": {
-      "scenario_type": "strong_match",
-      "scenario_family": "title_mismatch_skill_overlap",
+      "scenario_type": "강한_일치",
+      "scenario_family": "직함_불일치_스킬_중첩",
       "platform": "curated",
-      "difficulty": "medium",
-      "source": "curated"
+      "difficulty": "보통",
+      "source": "선별"
     }
   }
 ]
