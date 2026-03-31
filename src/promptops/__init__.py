@@ -1,6 +1,12 @@
 """PromptOps scaffold for prompt iteration workflows."""
 
 from promptops.core.models import (
+    BacklogItem,
+    DatasetSyncResult,
+    DatasetSyncSpec,
+    ExperimentRunResult,
+    ExperimentSpec,
+    FailureRecord,
     DatasetSyncResult,
     DatasetSyncSpec,
     ExperimentRunResult,
@@ -17,10 +23,12 @@ from promptops.core.models import (
 )
 
 __all__ = [
+    "BacklogItem",
     "DatasetSyncResult",
     "DatasetSyncSpec",
     "ExperimentRunResult",
     "ExperimentSpec",
+    "FailureRecord",
     "IterationRecord",
     "IterationSummary",
     "PromptFamily",

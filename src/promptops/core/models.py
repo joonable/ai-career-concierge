@@ -10,6 +10,19 @@ ReviewStatus = Literal["pending", "in_review", "approved", "rejected"]
 FailureCategory = Literal["prompt", "context", "dataset", "policy", "feature"]
 ReviewMode = Literal["llm_judge", "human"]
 ReviewQueueMode = Literal["single", "pairwise"]
+BacklogPriority = Literal["P0", "P1", "P2", "P3"]
+FailureTaxonomyKey = Literal[
+    "prompt.role_alignment",
+    "prompt.must_have_coverage",
+    "prompt.transferable_skill_credit",
+    "prompt.summary_usefulness",
+    "dataset.gold_expectation_gap",
+    "dataset.borderline_coverage_gap",
+    "context.normalization_gap",
+    "policy.deal_breaker_handling",
+    "policy.score_band_definition",
+    "feature.onboarding_signal_missing",
+]
 
 
 class PromptMetadata(BaseModel):
@@ -117,6 +130,28 @@ class ReviewFeedbackRecord(BaseModel):
     notes: str = Field(default="")
     decision: str = Field(default="")
     backlog_candidates: List[str] = Field(default_factory=list)
+
+
+class FailureRecord(BaseModel):
+    """Structured failure record produced from review or evaluator results."""
+
+    taxonomy_key: FailureTaxonomyKey
+    category: FailureCategory
+    summary: str = Field(min_length=1)
+    evidence: List[str] = Field(default_factory=list)
+    source_review_item_id: str = Field(default="")
+
+
+class BacklogItem(BaseModel):
+    """Actionable backlog item derived from PromptOps review and failure analysis."""
+
+    item_key: str = Field(min_length=1)
+    category: FailureCategory
+    priority: BacklogPriority
+    title: str = Field(min_length=1)
+    action: str = Field(min_length=1)
+    linked_taxonomy_keys: List[FailureTaxonomyKey] = Field(default_factory=list)
+    evidence: List[str] = Field(default_factory=list)
 
 
 class DatasetSyncSpec(BaseModel):

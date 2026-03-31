@@ -252,6 +252,81 @@ Review feedback should not stop at "good" or "bad". It should map into candidate
 - dataset truth gaps
 - missing product features
 
+## Failure Taxonomy And Backlog Rules
+
+### Failure taxonomy
+
+The initial taxonomy keys are:
+
+- `prompt.role_alignment`
+- `prompt.must_have_coverage`
+- `prompt.transferable_skill_credit`
+- `prompt.summary_usefulness`
+- `dataset.gold_expectation_gap`
+- `dataset.borderline_coverage_gap`
+- `context.normalization_gap`
+- `policy.deal_breaker_handling`
+- `policy.score_band_definition`
+- `feature.onboarding_signal_missing`
+
+### Category split
+
+PromptOps should separate failures into:
+
+- prompt issue
+- dataset issue
+- context issue
+- policy issue
+- feature issue
+
+This matters because the correct next action is different:
+
+- prompt issue: change prompt wording or structure
+- dataset issue: add or fix gold truth
+- context issue: add or normalize an input signal
+- policy issue: clarify product scoring rules first
+- feature issue: collect a new signal in the product
+
+### Backlog item format
+
+Each backlog item should capture:
+
+- stable item key
+- category
+- priority
+- title
+- next action
+- linked taxonomy keys
+- evidence from review or experiment
+
+### Priority defaults
+
+Default priority by category:
+
+- `policy` -> `P0`
+- `feature` -> `P1`
+- `prompt` -> `P1`
+- `context` -> `P1`
+- `dataset` -> `P2`
+
+### Operating rule
+
+Review should produce actionable backlog items, not just observations.
+
+If a reviewer says a case is wrong, PromptOps should answer:
+
+- what kind of failure it is,
+- what should change next,
+- and how urgent that change is.
+
+### Example failure backlog items
+
+- `prompt:role-alignment`
+- `prompt:must-have-coverage`
+- `policy:deal-breaker-handling`
+- `dataset:borderline-coverage-gap`
+- `feature:onboarding-signal-missing`
+
 ## Definition Of Done For Sprint 1
 
 Sprint 1 is complete when:
