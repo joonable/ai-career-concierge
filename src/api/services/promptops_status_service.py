@@ -22,7 +22,7 @@ PROMPTOPS_COMPARE_URL = (
     "?selectedSessions=54971cd3-fcee-4dc1-bb7c-ca7f9abb6c59"
     "&selectedSessions=4906f684-12db-4c1a-88d0-782d25f5bbda"
 )
-PROMPTOPS_LATEST_ITERATION_TITLE = "Job Evaluation Iteration 001"
+PROMPTOPS_LATEST_ITERATION_TITLE = "Job Evaluation 반복 개선 기록 001"
 PROMPTOPS_LATEST_ITERATION_URL = "/internal/promptops/iterations/job-evaluation-001"
 
 PROMPTOPS_LATEST_SUMMARY = [
@@ -33,15 +33,15 @@ PROMPTOPS_LATEST_SUMMARY = [
 
 PROMPTOPS_BACKLOG_ITEMS = [
     PromptOpsBacklogItem(
-        title="Refine role alignment wording for adjacent infra roles",
+        title="인접 infra 역할의 role alignment 문구 다듬기",
         url="https://www.notion.so/3347099bf2cc81debc98c6eb6d1f925d",
     ),
     PromptOpsBacklogItem(
-        title="Tighten must-have coverage handling for borderline roles",
+        title="borderline 역할의 must-have coverage 처리 보강",
         url="https://www.notion.so/3347099bf2cc81ddbd70d5e97b4e10e0",
     ),
     PromptOpsBacklogItem(
-        title="Clarify transferable skill credit for adjacent roles",
+        title="인접 역할의 transferable skill credit 명확화",
         url="https://www.notion.so/3347099bf2cc8102b0efeae13925b3ff",
     ),
 ]

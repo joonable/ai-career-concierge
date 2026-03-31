@@ -265,100 +265,85 @@ main {
 
 .promptops-shell {
   display: grid;
-  gap: 20px;
-  padding-top: 40px;
+  gap: 16px;
+  padding-top: 32px;
 }
 
-.promptops-hero {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 20px;
-  padding: 28px;
-}
-
-.promptops-hero__copy {
-  display: grid;
-  gap: 10px;
-  max-width: 42rem;
+.promptops-overview-grid {
+  align-items: stretch;
 }
 
 .promptops-grid {
   display: grid;
-  gap: 20px;
+  gap: 16px;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
 }
 
 .promptops-card {
   display: grid;
   gap: 18px;
-  padding: 24px;
 }
 
-.promptops-card__header {
+.promptops-lineage-grid,
+.promptops-action-grid {
   display: grid;
-  gap: 8px;
+  gap: 12px;
 }
 
-.promptops-card__header h2 {
-  margin: 0;
-  font-size: 1.35rem;
+.promptops-lineage-grid {
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
 }
 
-.promptops-kv {
-  display: grid;
-  gap: 14px;
-  margin: 0;
-}
-
-.promptops-kv div {
+.promptops-lineage-item,
+.promptops-action-card {
   display: grid;
   gap: 6px;
-  padding: 14px 16px;
-  border: 1px solid var(--panel-border);
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.45);
+  min-height: 110px;
+  padding: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.03);
 }
 
-.promptops-kv dt {
-  color: var(--muted);
-  font-size: 0.85rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-}
-
-.promptops-kv dd {
-  margin: 0;
+.promptops-lineage-item strong,
+.promptops-action-card strong {
+  color: #f8fbff;
   font-size: 1rem;
-  font-weight: 600;
+  line-height: 1.4;
   word-break: break-word;
 }
 
-.promptops-decision {
-  display: grid;
-  gap: 8px;
-  min-width: 220px;
-  padding: 18px 20px;
-  border: 1px solid rgba(15, 118, 110, 0.18);
-  border-radius: 22px;
-  background: rgba(15, 118, 110, 0.1);
-}
-
-.promptops-decision__label {
-  color: var(--accent-strong);
-  font-size: 0.82rem;
+.promptops-lineage-item__label,
+.promptops-action-card__eyebrow {
+  color: rgba(189, 201, 221, 0.66);
+  font-size: 0.78rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
-.promptops-decision strong,
-.promptops-decision-detail {
-  font-size: 1.2rem;
-  line-height: 1.5;
+.promptops-action-grid {
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
 }
 
-.promptops-link-list,
+.promptops-action-card {
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    background 180ms ease;
+}
+
+.promptops-action-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(171, 214, 255, 0.22);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.promptops-action-card p {
+  margin: 0;
+  color: rgba(215, 224, 238, 0.72);
+  line-height: 1.6;
+}
+
 .promptops-list {
   display: grid;
   gap: 12px;
@@ -366,24 +351,43 @@ main {
   padding-left: 18px;
 }
 
-.promptops-link-list {
-  padding-left: 0;
-}
-
-.promptops-link-list a,
 .promptops-inline-link,
 .promptops-list--links a {
   display: inline-flex;
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  color: var(--accent-strong);
+  color: #dbeafe;
   font-weight: 600;
+}
+
+.promptops-action-stack {
+  display: grid;
+  gap: 12px;
+}
+
+.promptops-back-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(234, 240, 248, 0.9);
+  font-size: 0.88rem;
+  white-space: nowrap;
 }
 
 .promptops-empty {
   margin: 0;
-  color: var(--muted);
+  color: rgba(215, 224, 238, 0.72);
+}
+
+.promptops-decision-detail {
+  margin: 0;
+  font-size: 1.2rem;
+  line-height: 1.6;
+  color: #f8fbff;
 }
 
 .login-hero__copy {

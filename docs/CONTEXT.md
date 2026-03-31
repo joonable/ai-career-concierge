@@ -324,7 +324,7 @@ confidence 정책:
 - 평가 프롬프트는 `LANGSMITH_EVAL_PROMPT_IDENTIFIER`, `LANGSMITH_MEMORY_PROMPT_IDENTIFIER`로 Prompt Hub 태그 참조(`job-evaluation:staging`, `memory-summary:staging`)를 우선 사용하며, trace에는 요청한 태그와 실제 commit hash를 함께 남깁니다. 조회 실패 시 저장소 내 fallback 템플릿을 사용합니다.
 - fallback evaluation prompt는 현재 v3 score-policy schema를 기준으로 유지해야 하며, LangSmith Prompt Hub의 `job-evaluation` lineage도 같은 JSON 계약과 점수 정책 문구로 동기화되어야 합니다. 로컬 fallback을 먼저 갱신한 뒤 Prompt Hub 최신 commit을 반영하고, 이후 `staging` 태그를 그 commit으로 이동해 offline experiment와 staged runtime이 같은 기준을 보도록 맞춥니다.
 - curated fixture 기반 LangSmith dataset과 offline experiment 러너를 통해 프롬프트 버전, 모델, 점수 기준을 비교할 수 있습니다.
-- 현재 gold fixture는 단순 점수/통과 여부 외에 `expected_strength_keywords`, `expected_concern_keywords`, `expected_must_have_matches`, `expected_deal_breaker_flags`, `expected_confidence`까지 포함하며, fixture 로딩 시 계약 검증을 통과해야 합니다.
+- 현재 골드 픽스처(gold fixture)는 단순 점수/통과 여부 외에 `expected_strength_keywords`, `expected_concern_keywords`, `expected_must_have_matches`, `expected_deal_breaker_flags`, `expected_confidence`까지 포함하며, fixture 로딩 시 계약 검증을 통과해야 합니다.
 - production trace는 dataset 승격 후보로 추출할 수 있지만, v1에서는 수동 승인된 경우에만 dataset example로 추가합니다.
 
 ## 프롬프트 관리 가드레일 (Prompt Management Guardrails)

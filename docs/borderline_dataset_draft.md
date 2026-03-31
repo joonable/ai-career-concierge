@@ -4,7 +4,7 @@ Date: 2026-03-31 (Asia/Seoul)
 
 ## Purpose
 
-이 문서는 `fit_score` calibration을 위한 borderline gold dataset 초안입니다. 아직 fixture에 반영하기 전의 정책 설계 단계이며, 각 예시는 이후 [`src/agent/evals/fixtures/job_eval_gold.json`](/Users/joon/PycharmProjects/ai-career-concierge/src/agent/evals/fixtures/job_eval_gold.json)로 옮기기 쉬운 형태로 정리합니다.
+이 문서는 `fit_score` calibration을 위한 borderline 골드 데이터셋(gold dataset) 초안입니다. 아직 fixture에 반영하기 전의 정책 설계 단계이며, 각 예시는 이후 [`src/agent/evals/fixtures/job_eval_gold.json`](/Users/joon/PycharmProjects/ai-career-concierge/src/agent/evals/fixtures/job_eval_gold.json)로 옮기기 쉬운 형태로 정리합니다.
 
 기본 사용자 기준:
 

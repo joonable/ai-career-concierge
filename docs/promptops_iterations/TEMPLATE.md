@@ -1,16 +1,16 @@
-# <Prompt Family> Iteration <NNN>
+# <Prompt Family> 반복 개선 기록 <NNN>
 
 날짜: YYYY-MM-DD (Asia/Seoul)
 
-## 1. Iteration 개요
+## 1. 반복 개선 개요
 
 - prompt family:
 - baseline tag 또는 baseline reference:
 - candidate tag 또는 candidate reference:
 - 작성자:
-- iteration goal:
+- 반복 개선 목표:
 
-## 2. Baseline
+## 2. 기준선(Baseline)
 
 - dataset:
 - baseline experiment:
@@ -18,13 +18,13 @@
 - baseline compare link:
 - baseline 요약:
 
-## 3. Candidate 변경
+## 3. 후보안(Candidate) 변경
 
 - 변경 유형: `prompt` / `context` / `policy wording` / `other`
 - 변경 요약:
 - 변경 이유:
 
-## 4. Candidate 실험
+## 4. 후보안(Candidate) 실험
 
 - candidate experiment:
 - candidate session id:
@@ -34,7 +34,7 @@
 
 ## 5. 핵심 결과
 
-| Metric | Baseline | Candidate | Change |
+| 지표 | 기준선 | 후보안 | 변화량 |
 | --- | ---: | ---: | ---: |
 | `example_metric` | 0.0000 | 0.0000 | +0.0000 |
 
@@ -57,7 +57,7 @@
 - 유형 2:
 - 유형 3:
 
-## 7. Decision
+## 7. 결정(Decision)
 
 - decision: `candidate 유지` / `staging 승격` / `production 승격` / `보류` / `폐기`
 - 이유:
@@ -68,23 +68,23 @@
 ### 1.
 
 - item key:
-- priority:
-- why:
-- next action:
+- 우선순위:
+- 이유:
+- 다음 액션:
 
 ### 2.
 
 - item key:
-- priority:
-- why:
-- next action:
+- 우선순위:
+- 이유:
+- 다음 액션:
 
 ### 3.
 
 - item key:
-- priority:
-- why:
-- next action:
+- 우선순위:
+- 이유:
+- 다음 액션:
 
 ## 9. 참고 링크
 

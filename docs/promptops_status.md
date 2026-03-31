@@ -1,4 +1,4 @@
-# PromptOps Current Status
+# PromptOps 현재 상태
 
 날짜: 2026-03-31 (Asia/Seoul)
 
@@ -8,13 +8,13 @@
 
 ## `job-evaluation`
 
-### Current stage snapshot
+### 현재 상태 스냅샷
 
-- current production tag: `job-evaluation:latest`
-- current staging tag: `job-evaluation:staging`
-- current candidate prompt: `job-evaluation`
-- current candidate local reference: `local-v4`
-- latest decision: `candidate 유지`
+- 현재 production tag: `job-evaluation:latest`
+- 현재 staging tag: `job-evaluation:staging`
+- 현재 candidate prompt: `job-evaluation`
+- 현재 candidate 로컬 참조: `local-v4`
+- 최신 결정: `candidate 유지`
 
 ### LangSmith / 문서 / Notion 링크
 
@@ -26,19 +26,19 @@
 - human review queue: `job-evaluation-review`
 - Notion backlog: [PromptOps Backlog](https://www.notion.so/c5fb7393ece54107b445e90bdabab642)
 
-### Latest experiment summary
+### 최신 실험 요약
 
 - `fit_score_band`는 개선됨: `0.6667 -> 0.8000`
 - `classification_match`도 개선됨: `0.8667 -> 0.9333`
 - 하지만 `role_alignment_match`, `must_have_coverage_match`, `transferable_skill_credit`는 하락
 
-### Current interpretation
+### 현재 해석
 
 - 이번 candidate는 score band 보정에는 도움이 있었음
 - 다만 adjacent infra 역할 해석이 다소 과하게 눌리면서 structured sub-judgment 일관성이 낮아짐
 - 따라서 바로 승격하지 않고 human review 확인 후 다음 수정이 필요함
 
-### Next backlog top 3
+### 다음 backlog top 3
 
 - `prompt:role-alignment`
 - `prompt:must-have-coverage`
@@ -50,14 +50,14 @@
 
 1. current stage snapshot을 확인한다.
 2. compare 링크를 열어 baseline/candidate 차이를 본다.
-3. iteration report에서 해석과 blocker를 읽는다.
+3. iteration 기록에서 해석과 blocker를 읽는다.
 4. review queue와 Notion backlog를 확인한다.
 
 ### PM / 운영자
 
-1. latest decision과 current interpretation을 확인한다.
+1. 최신 결정과 현재 해석을 확인한다.
 2. compare 링크와 review queue를 필요 시 연다.
-3. iteration report에서 왜 보류/유지되었는지 읽는다.
+3. iteration 기록에서 왜 보류/유지되었는지 읽는다.
 4. Notion backlog에서 다음 작업 상태를 확인한다.
 
 ## 참고 문서

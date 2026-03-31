@@ -85,8 +85,8 @@ SaaS 확장을 염두에 두고 처음부터 아키텍처를 이원화(Dev/Prod)
     - 파이프라인 trace에는 `run_id`, `user_id`, `dry_run`, `app_env`, `pipeline_version`, `user_profile_role`, `minimum_fit_score`, `delivery_channel`과 memory-summary prompt의 `prompt_tag`, `prompt_commit_hash`를 metadata로 남기고, Gemini trace에는 `evaluation_id`, `job_id`, `external_job_id`, `platform`, `title`, `job_company`, `prompt_name`, `prompt_version`, `prompt_variant`, `schema_version`, `prompt_identifier`, `prompt_reference`, `prompt_tag`, `prompt_commit_hash`, `model`, `latency_ms`를 남깁니다.
     - `LANGSMITH_API_KEY`가 없으면 tracing은 비활성화되고 기존 애플리케이션 로그와 `System_Log` 기반 관측만 유지됩니다.
     - Prompt Hub 자산은 `LANGSMITH_EVAL_PROMPT_IDENTIFIER`, `LANGSMITH_MEMORY_PROMPT_IDENTIFIER`를 통해 태그 기준(`:staging`, 필요 시 `:production`)으로 선택하고, 조회 실패 시 로컬 fallback prompt를 사용합니다.
-    - 실험 비교는 curated gold dataset과 LangSmith experiment workflow를 통해 수행하고, production trace는 수동 승인 흐름으로 dataset candidate에 승격합니다.
-    - curated gold dataset은 pass/fail과 점수대만 아니라 구조화 설명 품질까지 평가할 수 있도록 strength/concern keyword, must-have/deal-breaker expectation, confidence expectation을 포함해야 합니다.
+    - 실험 비교는 선별된 골드 데이터셋(curated gold dataset)과 LangSmith experiment workflow를 통해 수행하고, production trace는 수동 승인 흐름으로 dataset candidate에 승격합니다.
+    - 선별된 골드 데이터셋은 pass/fail과 점수대만 아니라 구조화 설명 품질까지 평가할 수 있도록 strength/concern keyword, must-have/deal-breaker expectation, confidence expectation을 포함해야 합니다.
     - **Application Logging:** FastAPI의 내장 Structured Logging을 사용하여 API 호출 및 일반 시스템 에러를 기록합니다.
 - **6.2 Resilience & Fallback Policy (복원력 및 장애 대응)**
     - **Graceful Degradation (우아한 기능 저하):** 채용 사이트(예: 인크루트)의 DOM 구조 변경 등으로 Playwright 스크래핑이 실패하더라도 전체 파이프라인은 중단되지 않습니다.
