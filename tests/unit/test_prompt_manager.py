@@ -5,6 +5,7 @@ from agent.evals.rule_based_evaluators import (
     evaluate_fit_score_band,
     evaluate_job_match,
     evaluate_reasoning_quality,
+    evaluate_score_policy_alignment,
     evaluate_signal_alignment,
     evaluate_structured_explanations,
 )
@@ -147,6 +148,10 @@ def test_curated_dataset_fixture_and_rule_based_evaluators():
             "must_have_matches": ["Python", "SQL", "MLOps"],
             "deal_breaker_flags": [],
             "confidence": "HIGH",
+            "role_alignment": "HIGH",
+            "must_have_coverage": "STRONG",
+            "deal_breaker_severity": "NONE",
+            "transferable_skill_level": "HIGH",
         }
 
     class Example:
@@ -155,6 +160,12 @@ def test_curated_dataset_fixture_and_rule_based_evaluators():
     assert evaluate_job_match(Run(), Example()).score == 1
     assert evaluate_fit_score_band(Run(), Example()).score == 1
     assert evaluate_reasoning_quality(Run(), Example()).score == 1
+    score_policy_alignment = evaluate_score_policy_alignment(Run(), Example())
+    assert score_policy_alignment["results"][0].score == 1
+    assert score_policy_alignment["results"][1].score == 1
+    assert score_policy_alignment["results"][2].score == 1
+    assert score_policy_alignment["results"][3].score == 1
+    assert score_policy_alignment["results"][4].score == 1
     signal_alignment = evaluate_signal_alignment(Run(), Example())
     assert signal_alignment["results"][0].score == 1
     assert signal_alignment["results"][1].score == 1
@@ -162,3 +173,33 @@ def test_curated_dataset_fixture_and_rule_based_evaluators():
     assert structured_alignment["results"][0].score == 1
     assert structured_alignment["results"][1].score == 1
     assert structured_alignment["results"][2].score == 1
+
+
+def test_score_policy_alignment_flags_hard_reject_penalty_failures():
+    examples = load_curated_examples(
+        Path("src/agent/evals/fixtures/job_eval_gold.json")
+    )
+
+    hard_reject_example = next(
+        example for example in examples if example["outputs"]["expected_deal_breaker_severity"] == "HARD"
+    )
+
+    class Run:
+        outputs = {
+            "fit_score": 91,
+            "role_alignment": hard_reject_example["outputs"]["expected_role_alignment"],
+            "must_have_coverage": hard_reject_example["outputs"]["expected_must_have_coverage"],
+            "deal_breaker_severity": hard_reject_example["outputs"]["expected_deal_breaker_severity"],
+            "transferable_skill_level": hard_reject_example["outputs"]["expected_transferable_skill_level"],
+        }
+
+    class Example:
+        outputs = hard_reject_example["outputs"]
+
+    score_policy_alignment = evaluate_score_policy_alignment(Run(), Example())
+
+    assert score_policy_alignment["results"][0].score == 1
+    assert score_policy_alignment["results"][1].score == 1
+    assert score_policy_alignment["results"][2].score == 1
+    assert score_policy_alignment["results"][3].score == 1
+    assert score_policy_alignment["results"][4].score == 0

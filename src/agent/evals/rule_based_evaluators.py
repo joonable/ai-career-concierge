@@ -5,6 +5,10 @@ from typing import Any, Dict, List
 from langsmith.evaluation.evaluator import EvaluationResult, EvaluationResults
 
 
+def _normalized_output(outputs: Dict[str, Any], key: str) -> str:
+    return str(outputs.get(key) or "").strip().upper()
+
+
 def evaluate_job_match(run, example=None):
     outputs = (run.outputs or {}) if run else {}
     reference = (example.outputs or {}) if example else {}
@@ -29,6 +33,63 @@ def evaluate_fit_score_band(run, example=None):
         key="fit_score_band",
         score=1 if minimum <= fit_score <= maximum else 0,
         comment=f"fit_score={fit_score}, expected_range=({minimum}, {maximum})",
+    )
+
+
+def evaluate_score_policy_alignment(run, example=None):
+    outputs = (run.outputs or {}) if run else {}
+    reference = (example.outputs or {}) if example else {}
+
+    actual_role_alignment = _normalized_output(outputs, "role_alignment")
+    expected_role_alignment = _normalized_output(reference, "expected_role_alignment")
+
+    actual_must_have_coverage = _normalized_output(outputs, "must_have_coverage")
+    expected_must_have_coverage = _normalized_output(reference, "expected_must_have_coverage")
+
+    actual_deal_breaker_severity = _normalized_output(outputs, "deal_breaker_severity")
+    expected_deal_breaker_severity = _normalized_output(reference, "expected_deal_breaker_severity")
+
+    actual_transferable_skill_level = _normalized_output(outputs, "transferable_skill_level")
+    if not actual_transferable_skill_level:
+        actual_transferable_skill_level = _normalized_output(outputs, "transferable_skills")
+    expected_transferable_skill_level = _normalized_output(reference, "expected_transferable_skill_level")
+
+    fit_score = int(outputs.get("fit_score") or 0)
+    hard_reject_expected = expected_deal_breaker_severity == "HARD" or expected_role_alignment == "LOW"
+    hard_reject_penalty_applied = fit_score < 80 if hard_reject_expected else True
+
+    return EvaluationResults(
+        results=[
+            EvaluationResult(
+                key="role_alignment_match",
+                score=1 if expected_role_alignment and actual_role_alignment == expected_role_alignment else 0,
+                comment=f"expected={expected_role_alignment}, actual={actual_role_alignment}",
+            ),
+            EvaluationResult(
+                key="must_have_coverage_match",
+                score=1 if expected_must_have_coverage and actual_must_have_coverage == expected_must_have_coverage else 0,
+                comment=f"expected={expected_must_have_coverage}, actual={actual_must_have_coverage}",
+            ),
+            EvaluationResult(
+                key="deal_breaker_severity_match",
+                score=1 if expected_deal_breaker_severity and actual_deal_breaker_severity == expected_deal_breaker_severity else 0,
+                comment=f"expected={expected_deal_breaker_severity}, actual={actual_deal_breaker_severity}",
+            ),
+            EvaluationResult(
+                key="transferable_skill_credit",
+                score=1 if expected_transferable_skill_level and actual_transferable_skill_level == expected_transferable_skill_level else 0,
+                comment=f"expected={expected_transferable_skill_level}, actual={actual_transferable_skill_level}",
+            ),
+            EvaluationResult(
+                key="hard_reject_penalty",
+                score=1 if hard_reject_penalty_applied else 0,
+                comment=(
+                    f"fit_score={fit_score}, expected_role_alignment={expected_role_alignment}, "
+                    f"expected_deal_breaker_severity={expected_deal_breaker_severity}, "
+                    f"hard_reject_expected={hard_reject_expected}"
+                ),
+            ),
+        ]
     )
 
 
@@ -105,6 +166,7 @@ def evaluate_structured_explanations(run, example=None):
 RULE_BASED_EVALUATORS = [
     evaluate_job_match,
     evaluate_fit_score_band,
+    evaluate_score_policy_alignment,
     evaluate_reasoning_quality,
     evaluate_signal_alignment,
     evaluate_structured_explanations,
