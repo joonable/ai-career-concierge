@@ -20,6 +20,10 @@ def test_slack_payload_contains_required_job_fields():
                 "must_have_matches": [],
                 "deal_breaker_flags": [],
                 "confidence": "HIGH",
+                "role_alignment": "HIGH",
+                "must_have_coverage": "STRONG",
+                "deal_breaker_severity": "NONE",
+                "transferable_skills": "HIGH",
             }
         ),
     )
