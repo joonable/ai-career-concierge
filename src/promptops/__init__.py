@@ -1,21 +1,15 @@
 """PromptOps scaffold for prompt iteration workflows."""
 
 from promptops.core.models import (
-    BacklogItem,
     DatasetSyncResult,
     DatasetSyncSpec,
     ExperimentRunResult,
     ExperimentSpec,
     FailureRecord,
-    DatasetSyncResult,
-    DatasetSyncSpec,
-    ExperimentRunResult,
-    ExperimentSpec,
     IterationRecord,
     IterationSummary,
     PromptFamily,
     PromptMetadata,
-    PromptRevision,
     ReviewFeedbackRecord,
     ReviewItem,
     ReviewQueueSpec,
@@ -23,7 +17,6 @@ from promptops.core.models import (
 )
 
 __all__ = [
-    "BacklogItem",
     "DatasetSyncResult",
     "DatasetSyncSpec",
     "ExperimentRunResult",
@@ -33,7 +26,6 @@ __all__ = [
     "IterationSummary",
     "PromptFamily",
     "PromptMetadata",
-    "PromptRevision",
     "ReviewFeedbackRecord",
     "ReviewItem",
     "ReviewQueueSpec",

@@ -17,9 +17,3 @@ def get_prompt_family(key: str) -> PromptFamily:
         if family.key == key:
             return family
     raise KeyError(f"Unknown prompt family: {key}")
-
-
-def list_prompt_families_by_stage(stage: str) -> list[PromptFamily]:
-    """Return prompt families currently assigned to a lifecycle stage."""
-
-    return [family for family in list_prompt_families() if family.active_stage == stage]

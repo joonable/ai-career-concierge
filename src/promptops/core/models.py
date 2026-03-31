@@ -26,35 +26,22 @@ FailureTaxonomyKey = Literal[
 
 
 class PromptMetadata(BaseModel):
-    """Metadata describing how a prompt family is managed."""
+    """Runtime metadata for resolving a prompt family."""
 
     owner: str = Field(min_length=1)
     backend: str = Field(default="langsmith")
     identifier: str = Field(min_length=1)
-    local_version: str = Field(min_length=1)
     schema_version: int = Field(ge=1)
     tags: Dict[PromptStage, str] = Field(default_factory=dict)
 
 
-class PromptRevision(BaseModel):
-    """Recorded prompt revision shape for PromptOps iteration tracking."""
-
-    family_key: str = Field(min_length=1)
-    revision_id: str = Field(min_length=1)
-    stage: PromptStage
-    summary: str = Field(default="")
-    change_reason: str = Field(default="")
-
-
 class PromptFamily(BaseModel):
-    """Logical prompt family managed by PromptOps."""
+    """Logical prompt family used for runtime prompt binding."""
 
     key: str = Field(min_length=1)
     description: str = Field(default="")
     project_key: str = Field(min_length=1)
-    active_stage: PromptStage = "candidate"
     metadata: PromptMetadata
-    revisions: List[PromptRevision] = Field(default_factory=list)
 
 
 class ExperimentSpec(BaseModel):
@@ -140,18 +127,6 @@ class FailureRecord(BaseModel):
     summary: str = Field(min_length=1)
     evidence: List[str] = Field(default_factory=list)
     source_review_item_id: str = Field(default="")
-
-
-class BacklogItem(BaseModel):
-    """Actionable backlog item derived from PromptOps review and failure analysis."""
-
-    item_key: str = Field(min_length=1)
-    category: FailureCategory
-    priority: BacklogPriority
-    title: str = Field(min_length=1)
-    action: str = Field(min_length=1)
-    linked_taxonomy_keys: List[FailureTaxonomyKey] = Field(default_factory=list)
-    evidence: List[str] = Field(default_factory=list)
 
 
 class DatasetSyncSpec(BaseModel):

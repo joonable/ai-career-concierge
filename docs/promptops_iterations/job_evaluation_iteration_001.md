@@ -2,18 +2,20 @@
 
 Date: 2026-03-31 (Asia/Seoul)
 
-## Goal
+## 1. Iteration 개요
 
 Run the first end-to-end PromptOps iteration for the `job-evaluation` prompt family with one small prompt change, a curated experiment rerun, LLM-judge comparison, and a human review queue handoff.
 
-## Prompt Family
+### Prompt Family
 
 - family: `job-evaluation`
-- baseline revision: `local-v3`
-- candidate revision: `local-v4`
+- baseline prompt tag: `job-evaluation:staging`
+- candidate prompt tag: `job-evaluation`
+- local baseline reference: `local-v3`
+- local candidate reference: `local-v4`
 - lifecycle stage under test: `candidate`
 
-## Baseline Snapshot
+## 2. Baseline
 
 - dataset: `job-eval-gold-dev`
 - fixture: `src/agent/evals/fixtures/job_eval_gold.json`
@@ -22,7 +24,7 @@ Run the first end-to-end PromptOps iteration for the `job-evaluation` prompt fam
 - baseline compare link: [baseline compare](https://smith.langchain.com/o/a5f5f699-f384-58ec-9be0-2a39bb96969e/datasets/277c4ae5-c460-4be4-8895-732911768cd7/compare?selectedSessions=54971cd3-fcee-4dc1-bb7c-ca7f9abb6c59)
 - dataset sync result: `created=0`, `updated=15`, `skipped=0`
 
-## Prompt Diff
+## 3. Candidate 변경
 
 Candidate revision `local-v4` added one narrower instruction to the adjacent-role scoring section:
 
@@ -31,7 +33,7 @@ Candidate revision `local-v4` added one narrower instruction to the adjacent-rol
 
 This was intentionally a single-line policy change rather than a broad prompt rewrite.
 
-## Candidate Experiment
+## 4. Candidate 실험
 
 - candidate experiment: `promptops-candidate-local-v4-bcba8f4f`
 - candidate session id: `4906f684-12db-4c1a-88d0-782d25f5bbda`
@@ -39,7 +41,7 @@ This was intentionally a single-line policy change rather than a broad prompt re
 - combined compare link: [baseline vs candidate](https://smith.langchain.com/o/a5f5f699-f384-58ec-9be0-2a39bb96969e/datasets/277c4ae5-c460-4be4-8895-732911768cd7/compare?selectedSessions=54971cd3-fcee-4dc1-bb7c-ca7f9abb6c59&selectedSessions=4906f684-12db-4c1a-88d0-782d25f5bbda)
 - dataset sync result: `created=0`, `updated=15`, `skipped=0`
 
-## LLM Judge Result
+## 5. 핵심 결과
 
 | Metric | Baseline (`local-v3`) | Candidate (`local-v4`) | Change |
 | --- | ---: | ---: | ---: |
@@ -61,7 +63,7 @@ This was intentionally a single-line policy change rather than a broad prompt re
 - The main regressions were in `role_alignment_match`, `must_have_coverage_match`, `must_have_expectation`, and `transferable_skill_credit`.
 - This means the new wording helped score-band selection but may have over-compressed some adjacent-role reasoning and made structured sub-judgment labels less consistent.
 
-## Human Review Queue
+## 6. Human Review
 
 - queue name: `job-evaluation-review`
 - queue id: `a1438ae9-2449-4798-94f1-0243ab9b1e18`
@@ -92,7 +94,7 @@ The queue contains borderline cases and failed candidate runs selected with this
 - `7b082634-6f18-4c84-a88d-3c17ea1a5f29` `Software Engineer, AI Developer Experience`
 - `147e32f5-0264-4413-83fb-8374a3ce36d8` `Machine Learning Infra Engineer`
 
-## Next Backlog Items
+## 8. Next Backlog
 
 These items should be treated as the immediate follow-up candidates for the next PromptOps iteration.
 
@@ -120,7 +122,7 @@ These items should be treated as the immediate follow-up candidates for the next
 - why: several candidate runs still missed `strength_keywords_match` or `concern_keywords_match`
 - action: improve explanation wording only after role-alignment and must-have behavior are restabilized
 
-## Decision
+## 7. Decision
 
 Iteration 001 is a successful PromptOps cycle because it completed the full loop:
 
