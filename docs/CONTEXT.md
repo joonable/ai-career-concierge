@@ -66,7 +66,7 @@ PoC는 핵심 루프를 엔드투엔드(end-to-end)로 지원해야 합니다:
 - `docs`
   - 제품/기술 문서와 함께 `/internal` 운영 허브가 읽는 canonical 운영 문서를 포함
   - 최상위에는 핵심 제품 문서만 두고, 운영 문서는 `docs/internal/`, PromptOps 문서는 `docs/promptops/`, 구현 메모는 `docs/implementation/`에 정리
-  - 최소 운영 문서는 `docs/internal/status.md`, `docs/internal/operations_panel.md`, `docs/internal/agent_workboard.md`를 유지
+  - 최소 운영 문서는 `docs/internal/status.md`, `docs/internal/operations_panel.md`를 유지
 
 ## 핵심 비즈니스 로직 (Core Business Logic)
 
@@ -226,11 +226,11 @@ confidence 정책:
   - `docs/TRD.md`
   - `docs/PRD.md`
   - `docs/internal/operations_panel.md`
-  - `docs/internal/agent_workboard.md`
+  - `docs/internal/status.md`
 - 운영 패널은 문서 링크 나열에 그치지 않고, 어떤 문서가 source of truth인지와 마지막 업데이트 맥락을 함께 보여줘야 합니다.
-- 운영 패널이 문서 편집 기능을 제공하는 경우, 최소한 운영 문서와 작업 보드 업데이트가 UI에서 가능해야 합니다.
-- `docs/internal/agent_workboard.md`는 최근 완료 작업, 현재 작업 상태, 다음 action, backlog, UI 확인 경로를 담는 canonical workboard로 유지합니다.
-- 에이전트가 의미 있는 작업을 마쳤다면 가능할 때마다 `docs/internal/agent_workboard.md`를 갱신해 운영 패널에서 바로 확인할 수 있게 해야 합니다.
+- 운영 패널이 문서 편집 기능을 제공하는 경우, 최소한 운영 문서 업데이트가 UI에서 가능해야 합니다.
+- `docs/internal/status.md`는 최근 완료 작업, 현재 작업 상태, 다음 action, backlog, UI 확인 경로를 담는 canonical workboard로 유지합니다.
+- 에이전트가 의미 있는 작업을 마쳤다면 가능할 때마다 `docs/internal/status.md`를 갱신해 운영 패널에서 바로 확인할 수 있게 해야 합니다.
 
 ## PromptOps 운영 초안
 

@@ -4,6 +4,8 @@ import React from "react";
 import { DashboardErrorState } from "@/components/dashboard/dashboard-error-state";
 import { ensurePromptOpsAdminAccess } from "@/lib/promptops_access";
 import { loadInternalPageData } from "@/lib/internal_loader";
+import { WorkboardCard } from "@/components/internal/WorkboardCard";
+import { CoreDocsCard } from "@/components/internal/CoreDocsCard";
 
 const FALLBACK_VALUE = "아직 정리되지 않음";
 
@@ -26,6 +28,8 @@ export default async function InternalHomePage() {
   return (
     <main className="dashboard-page promptops-page">
       <div className="dashboard-shell promptops-shell">
+        
+        {/* Top Hero Section */}
         <section className="dashboard-grid promptops-overview-grid">
           <article className="dashboard-card dashboard-card--active dashboard-card--span-2">
             <div className="dashboard-hero">
@@ -34,8 +38,7 @@ export default async function InternalHomePage() {
                   <span className="dashboard-kicker">Internal</span>
                   <h1 className="dashboard-title">운영 허브</h1>
                   <p className="dashboard-subcopy">
-                    현재 작업, milestone, 다음 액션, backlog를 한 화면에서 정리하고 Prompt 운영 패널로 바로 이어지는
-                    내부 상황판입니다.
+                    제품의 진행 상황과 파이프라인 운영 상태를 모니터링하고 핵심 문서를 바로 읽어볼 수 있는 통합 상황판입니다.
                   </p>
                 </div>
                 <span className="dashboard-pill dashboard-pill--accent">
@@ -44,16 +47,16 @@ export default async function InternalHomePage() {
               </div>
               <div className="dashboard-stat-grid">
                 <div className="dashboard-stat">
-                  <span className="dashboard-stat__label">Current focus</span>
-                  <strong>{internalStatus.currentFocus.length || 0}</strong>
+                  <span className="dashboard-stat__label">시스템 운영 과제</span>
+                  <strong>{internalStatus.operationsAgent.length || 0}</strong>
+                </div>
+                <div className="dashboard-stat">
+                  <span className="dashboard-stat__label">제품/유저 과제</span>
+                  <strong>{internalStatus.userProductUX.length || 0}</strong>
                 </div>
                 <div className="dashboard-stat">
                   <span className="dashboard-stat__label">Open actions</span>
                   <strong>{internalStatus.actions.length || 0}</strong>
-                </div>
-                <div className="dashboard-stat">
-                  <span className="dashboard-stat__label">Backlog items</span>
-                  <strong>{internalStatus.backlog.length || 0}</strong>
                 </div>
               </div>
             </div>
@@ -67,8 +70,8 @@ export default async function InternalHomePage() {
               </div>
               <span className="dashboard-pill">{promptSummary.snapshot.prompt_family}</span>
             </div>
-            <p className="dashboard-meta">
-              최신 결정 {promptSummary.snapshot.latest_decision || FALLBACK_VALUE}
+            <p className="dashboard-meta" style={{ marginBottom: "12px", marginTop: "4px" }}>
+              최신 결정: {promptSummary.snapshot.latest_decision || FALLBACK_VALUE}
             </p>
             <ul className="promptops-list promptops-list--compact">
               {(promptSummary.docs.interpretation.length > 0
@@ -80,8 +83,8 @@ export default async function InternalHomePage() {
                   <li key={item}>{item}</li>
                 ))}
             </ul>
-            <div className="dashboard-summary-card__footer">
-              <span className="dashboard-summary-card__cta">PromptOps 작업대로 이동</span>
+            <div className="dashboard-summary-card__footer" style={{ marginTop: "auto" }}>
+              <span className="dashboard-summary-card__cta">PromptOps 뷰어로 이동</span>
               <span className="dashboard-summary-card__arrow" aria-hidden="true">
                 →
               </span>
@@ -89,123 +92,36 @@ export default async function InternalHomePage() {
           </Link>
         </section>
 
-        <section className="promptops-grid">
-          <article className="dashboard-card promptops-card">
-            <div className="dashboard-section__header">
-              <div>
-                <span className="dashboard-kicker">Current work</span>
-                <h2 className="dashboard-section__title">현재 작업 중</h2>
+        {/* Asymmetric Dashboard Body */}
+        <div className="dashboard-grid promptops-overview-grid" style={{ alignItems: "start", marginTop: "16px" }}>
+          
+          {/* Main Column (Workboard) */}
+          <div className="dashboard-card--span-2" style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+            <WorkboardCard kicker="Operations & Agent" title="시스템 및 에이전트 관점" type="current" items={internalStatus.operationsAgent} />
+            <WorkboardCard kicker="User & Product UX" title="유저 및 제품 관점" type="next" items={internalStatus.userProductUX} />
+            
+            <details className="dashboard-accordion" style={{ outline: "none", cursor: "pointer", marginTop: "8px" }}>
+              <summary style={{ padding: "0 8px 12px", fontSize: "0.95rem", color: "#9ca3af", userSelect: "none" }}>
+                최근 완료 작업 ({internalStatus.recentCompletions.length}건) 펼쳐보기
+              </summary>
+              <div style={{ paddingBottom: "8px" }}>
+                <WorkboardCard kicker="Done" title="최근 완료 작업" type="done" items={internalStatus.recentCompletions} />
               </div>
-            </div>
-            {internalStatus.currentFocus.length > 0 ? (
-              <ul className="promptops-list">
-                {internalStatus.currentFocus.map((item) => (
-                  <li key={item}>{item}</li>
-                ))}
-              </ul>
-            ) : (
-              <p className="promptops-empty">{FALLBACK_VALUE}</p>
-            )}
-          </article>
+            </details>
+          </div>
 
-          <article className="dashboard-card promptops-card">
-            <div className="dashboard-section__header">
-              <div>
-                <span className="dashboard-kicker">Milestone</span>
-                <h2 className="dashboard-section__title">프로젝트 milestone 및 진행상황</h2>
-              </div>
-            </div>
-            {internalStatus.milestones.length > 0 ? (
-              <ul className="promptops-list">
-                {internalStatus.milestones.map((item) => (
-                  <li key={item}>{item}</li>
-                ))}
-              </ul>
-            ) : (
-              <p className="promptops-empty">{FALLBACK_VALUE}</p>
-            )}
-          </article>
-        </section>
+          {/* Sidebar Column (Docs, Milestones, Backlogs) */}
+          <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+            <CoreDocsCard kicker="Core Docs" title="핵심 문서 레지스트리" items={internalStatus.coreDocuments} />
+            <CoreDocsCard kicker="References" title="참고 링크" items={internalStatus.references} />
+            
+            <WorkboardCard kicker="Milestones" title="프로젝트 진행 상황" type="milestone" items={internalStatus.milestones} />
+            <WorkboardCard kicker="Next Action" title="다음 해야 할 action" type="next" items={internalStatus.actions} />
+            <WorkboardCard kicker="Backlog" title="앞으로의 backlog" type="backlog" items={internalStatus.backlog} />
+            <WorkboardCard kicker="Notes" title="운영 메모" type="note" items={internalStatus.notes} />
+          </div>
 
-        <section className="promptops-grid">
-          <article className="dashboard-card promptops-card">
-            <div className="dashboard-section__header">
-              <div>
-                <span className="dashboard-kicker">Action</span>
-                <h2 className="dashboard-section__title">지금 해야 할 action</h2>
-              </div>
-            </div>
-            {internalStatus.actions.length > 0 ? (
-              <ul className="promptops-list">
-                {internalStatus.actions.map((item) => (
-                  <li key={item}>{item}</li>
-                ))}
-              </ul>
-            ) : (
-              <p className="promptops-empty">{FALLBACK_VALUE}</p>
-            )}
-          </article>
-
-          <article className="dashboard-card promptops-card">
-            <div className="dashboard-section__header">
-              <div>
-                <span className="dashboard-kicker">Backlog</span>
-                <h2 className="dashboard-section__title">앞으로의 backlog</h2>
-              </div>
-            </div>
-            {internalStatus.backlog.length > 0 ? (
-              <ul className="promptops-list">
-                {internalStatus.backlog.map((item) => (
-                  <li key={item}>{item}</li>
-                ))}
-              </ul>
-            ) : (
-              <p className="promptops-empty">{FALLBACK_VALUE}</p>
-            )}
-          </article>
-        </section>
-
-        <section className="promptops-grid">
-          <article className="dashboard-card promptops-card">
-            <div className="dashboard-section__header">
-              <div>
-                <span className="dashboard-kicker">Notes</span>
-                <h2 className="dashboard-section__title">운영 메모</h2>
-              </div>
-            </div>
-            {internalStatus.notes.length > 0 ? (
-              <ul className="promptops-list">
-                {internalStatus.notes.map((item) => (
-                  <li key={item}>{item}</li>
-                ))}
-              </ul>
-            ) : (
-              <p className="promptops-empty">{FALLBACK_VALUE}</p>
-            )}
-          </article>
-
-          <article className="dashboard-card promptops-card">
-            <div className="dashboard-section__header">
-              <div>
-                <span className="dashboard-kicker">References</span>
-                <h2 className="dashboard-section__title">참고 링크</h2>
-              </div>
-            </div>
-            {internalStatus.references.length > 0 ? (
-              <ul className="promptops-list promptops-list--links">
-                {internalStatus.references.map((item) => (
-                  <li key={item.url}>
-                    <Link href={item.url} rel="noreferrer" target="_blank">
-                      {item.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p className="promptops-empty">{FALLBACK_VALUE}</p>
-            )}
-          </article>
-        </section>
+        </div>
       </div>
     </main>
   );

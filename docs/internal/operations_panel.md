@@ -17,7 +17,6 @@
 - `docs/TRD.md`
 - `docs/PRD.md`
 - `docs/internal/status.md`
-- `docs/internal/agent_workboard.md`
 - `docs/promptops/README.md`
 - `docs/promptops/status.md`
 
@@ -36,14 +35,13 @@
 
 - 운영 패널은 장기적으로 다음 문서의 수정 동선을 제공하는 것을 목표로 합니다:
   - `docs/internal/status.md`
-  - `docs/internal/agent_workboard.md`
   - 운영자가 자주 갱신하는 상태성 문서
 - 핵심 제품/아키텍처 문서(`AGENTS.md`, `docs/CONTEXT.md`, `docs/TRD.md`, `docs/PRD.md`)는 보기와 수정 진입점을 지원하되, 변경 시 계약 변경임을 명확히 보여줘야 합니다.
 - 편집 기능이 아직 준비되지 않은 경우에도, 운영 패널은 최소한 열람과 원문 이동 경로를 제공해야 합니다.
 
-## `docs/internal/agent_workboard.md` 계약
+## `docs/internal/status.md` 계약
 
-- 이 문서는 운영 패널이 우선적으로 읽는 현재 상태판입니다.
+- 이 문서는 운영 패널이 우선적으로 읽는 상태판(workboard + status) 문서입니다.
 - 의미 있는 작업이 끝나면 에이전트는 가능할 때마다 이 문서를 갱신합니다.
 - 최소 섹션:
   - `최근 완료 작업`

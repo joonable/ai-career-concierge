@@ -13,7 +13,7 @@ PROMPT_SCHEMA_VERSION = "3"
 
 EVALUATION_PROMPT_TEMPLATE = """당신은 한 명의 사용자를 기준으로 채용 공고 적합도를 평가하는 심사자입니다.
 재현율보다 정밀도를 우선하고, 애매하면 보수적으로 판단하세요.
-목표 직무: {role}
+목표 직무들: {role}
 경력 연차: {years_of_experience}
 필수 조건: {must_haves}
 결격 사유: {deal_breakers}

@@ -70,6 +70,7 @@ class NormalizedEvaluationContext(BaseModel):
     """
 
     target_role: str = "unknown"
+    role_targets: list[str] = Field(default_factory=list)
     years_of_experience: int | None = None
     hard_preferences: NormalizedHardPreferences = Field(default_factory=NormalizedHardPreferences)
     soft_preferences: NormalizedSoftPreferences = Field(default_factory=NormalizedSoftPreferences)
@@ -78,7 +79,7 @@ class NormalizedEvaluationContext(BaseModel):
 
     def to_prompt_variables(self) -> dict[str, Any]:
         return {
-            "role": self.target_role,
+            "role": _join_items(self.role_targets, fallback=self.target_role),
             "years_of_experience": (
                 str(self.years_of_experience) if self.years_of_experience is not None else "unknown"
             ),
@@ -189,6 +190,7 @@ def build_normalized_evaluation_context(
 
     return NormalizedEvaluationContext(
         target_role=role,
+        role_targets=normalized_preferences.role_targets,
         years_of_experience=years,
         hard_preferences=NormalizedHardPreferences(
             must_haves=must_haves,

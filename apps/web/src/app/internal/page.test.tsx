@@ -42,9 +42,11 @@ describe("InternalHomePage", () => {
         currentFocus: ["운영 허브 정보 구조 정리"],
         milestones: ["internal 운영 허브: 진행 중"],
         actions: ["docs 기반 상태 카드 보강"],
+        recentCompletions: ["운영 패널 문서 계약 정리"],
         backlog: ["Prompt family 확장 준비"],
         notes: ["운영 상태는 docs를 canonical source로 유지"],
         references: [{ label: "PromptOps 기준서", url: "https://example.com/promptops" }],
+        coreDocuments: [{ label: "AGENTS.md", url: "/docs/AGENTS.md" }],
       },
       promptSummary: {
         docs: {
@@ -77,7 +79,9 @@ describe("InternalHomePage", () => {
 
     expect(screen.getByText("운영 허브")).toBeInTheDocument();
     expect(screen.getByText("운영 허브 정보 구조 정리")).toBeInTheDocument();
+    expect(screen.getByText("운영 패널 문서 계약 정리")).toBeInTheDocument();
     expect(screen.getByText("internal 운영 허브: 진행 중")).toBeInTheDocument();
+    expect(screen.getByText("AGENTS.md")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /프롬프트 운영 패널/i })).toHaveAttribute(
       "href",
       "/internal/prompts",

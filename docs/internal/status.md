@@ -1,50 +1,68 @@
-# Internal 운영 상태
+# 내부 대시보드 상태판
 
-날짜: 2026-03-31 (Asia/Seoul)
+이 문서는 개발팀과 운영팀이 실시간으로 공유하는 상황판(Single Source of Truth)입니다.
+웹 대시보드의 `/internal` 패널에서 이 파일을 파싱하여 렌더링하므로 형식을 준수해야 합니다.
 
-이 문서는 `/internal` 운영 허브에서 보여주는 canonical 상태 요약입니다.
+## 날짜: 2026-03-31 (Asia/Seoul)
 
-## 현재 작업 중
+## 핵심 문서 및 참고 링크
 
-- `/internal` 운영 허브와 `/internal/prompts` 전용 작업대 분리
-- docs 기반 상태판 구조 정리와 카드형 정보 계층 고정
+- [AGENTS.md](../AGENTS.md)
+- [프로젝트 컨텍스트](./CONTEXT.md)
+- [초기 제품 요구사항 (PRD)](./PRD.md)
+- [기술 요구사항 결정 (TRD)](./TRD.md)
+- [운영 패널 컴포넌트 정리](./operations_panel.md)
+
+## 시스템 및 에이전트 관점 (Operations & Agent)
+
 - PromptOps lineage / compare / review / iteration 동선 정리
 - 운영 패널에서 핵심 문서와 작업 보드를 직접 활용하는 방향으로 문서 계약 확장
+- LangGraph 워크플로우를 Agentic 구조로 모듈화 리팩터링 진행
+- 채용 플랫폼 사이트별 Scraper 로깅 한계 파악 및 에러 복구 제어 연구
+
+## 유저 및 제품 관점 (User & Product UX)
+
+- 로그인, 인증 콜백, 프로필 정보, 대시보드 구조에 대한 `apps/web` 수직 슬라이스 완성도 높이기
+- 유저 모델의 구직 요건(희망 직무, 지역, 기타) 입력 플로우 구체화
+- UI/UX Asymmetric Dashboard 뷰 리디자인에 맞춘 세부 카드 스타일 개선
+
+## 최근 완료 작업 (Done)
+
+- `/internal` 대시보드를 비대칭형 레이아웃으로 전면 리디자인 완료
+- 문서 뷰어 라우트 신설 및 404 오류 제거
+- 로컬 웹서버 Next.js 캐싱 깨짐 이슈 안내 및 복구 완료
+- 로그인 / 온보딩 / 대시보드 기초 공사 완료
+- PromptOps 운영 패널 초안 구축 및 문서 단일화 정리 완료
+
+## 다음 action
+
+- docs 기반의 상태판 구조를 파싱하여 예쁘게 렌더링하는 Markdown 뷰어와 `react-markdown` 컴포넌트 작업 완료하기
+- Supabase Service Role 정책 적용을 백엔드 통합과 어떻게 분리할지 결정
+- LangSmith 추적 (Tracing) 구조 및 ID 설정
+
+## backlog
+
+- **시스템/운영**: `/internal` 대시보드 내 시스템 로그(API 응답/오류 로그, 채용 공고 수집 실패 등) 및 Playwright 기반 Scraper 상태를 모니터링할 전용 인디케이터 시각화 추가
+- **개선**: 피드백 수집 및 단기 기억(short-term memory) 로직을 Next.js API와 엮어보기
+- **기술 부채**: UI 레벨에서 `error.tsx`, `loading.tsx` 스켈레톤 로딩 보강
 
 ## 프로젝트 milestone 및 진행상황
 
-- 로그인 / 온보딩 / 대시보드 수직 슬라이스: 완료
-- PromptOps 운영 패널 초안: 완료
-- Internal 운영 허브 정보 구조 정리: 진행 중
-- docs 기반 운영 기록 정착: 진행 중
-- 운영 패널 문서 레지스트리 및 작업 보드 계약 정리: 완료
-
-## 지금 해야 할 action
-
-- 운영 허브에서 지금 해야 할 action이 먼저 보이도록 섹션 우선순위 유지
-- milestone과 backlog를 문서 기준으로 계속 갱신
-- Prompt workspace에서 최신 iteration과 review queue 동선을 바로 열 수 있게 유지
-- 운영 패널이 `AGENTS.md`, `CONTEXT`, `TRD`, `PRD`, workboard를 자연스럽게 노출하도록 문서/로더/UI를 잇는 작업 진행
-
-## 앞으로의 backlog
-
-- prompt family가 늘어나도 `/internal/prompts` 카드 구조를 그대로 재사용할 수 있게 확장
-- internal 운영 허브에 more systems view가 필요해지면 scraper / pipeline / delivery 상태도 합류
-- docs 항목별 owner / due / 상태 표현이 필요해지면 additive한 문서 계약으로 확장
-- 문서 보기뿐 아니라 inline editing 또는 저장 동선을 운영 패널에 추가
-- recent changes, current status, next action, backlog, verification path를 카드로 분리해 가시성 강화
+- `Phase 1`: 단일 유저 수직 횡단(Vertical Slice) 아키텍처 및 Supabase 인증 PoC (진행 중)
+- `Phase 2`: 핵심 LangGraph 평가 파이프라인 연동 확인
+- `Phase 3`: Slack 알림 봇 딜리버리 및 긍정/부정(Like/Dislike) 피드백 루프 구축
 
 ## 운영 메모
 
-- 운영 상태의 canonical source는 docs 문서로 유지
-- runtime truth가 필요한 lineage / compare / review 링크는 API 스냅샷을 사용
-- Prompt 관련 상세 내용은 `/internal/prompts`에 모아서 관리
-- 일반 운영 허브는 docs 레지스트리 + workboard + verification links를 먼저 보여주는 방향을 유지
+- Next.js 로컬 구동 중 빌드 커맨드가 돌어갈 경우 `.next` 캐시가 날아가 스타일이 꺠질 수 있으니 재시작을 권장함.
+- 현재 영속성은 `SUPABASE_SERVICE_ROLE_KEY`를 주로 사용하고 있으며 추후 RLS 정책 반영을 미룸.
 
-## 참고 링크
+## UI 확인 위치
 
-- [PromptOps 기준서](../promptops/README.md)
-- [PromptOps 현재 상태](../promptops/status.md)
-- [Iteration 001 기록](../promptops/iterations/job_evaluation_iteration_001.md)
-- [운영 패널 문서 계약](./operations_panel.md)
-- [에이전트 작업 보드](./agent_workboard.md)
+- `/internal`
+  - 운영 허브 대시보드 (리디자인 됨)
+  - 프롬프트 운영 패널 (`/internal/prompts`)
+  - [NEW] 마크다운 문서 뷰어 서브라우트 (`/internal/docs`)
+- 문서 원문
+  - `docs/internal/status.md`
+  - `docs/internal/operations_panel.md`

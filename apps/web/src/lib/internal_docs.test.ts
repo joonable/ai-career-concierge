@@ -6,19 +6,16 @@ describe("internal docs parsing", () => {
   it("parses the repository internal status document into dashboard sections", async () => {
     const result = await loadInternalStatusDocument();
 
-    expect(result.updatedAt).toBe("2026-03-31 (Asia/Seoul)");
-    expect(result.currentFocus).toContain("/internal 운영 허브와 /internal/prompts 전용 작업대 분리");
-    expect(result.milestones).toContain("Internal 운영 허브 정보 구조 정리: 진행 중");
-    expect(result.actions).toContain("milestone과 backlog를 문서 기준으로 계속 갱신");
-    expect(result.backlog).toContain("prompt family가 늘어나도 /internal/prompts 카드 구조를 그대로 재사용할 수 있게 확장");
-    expect(result.notes).toContain("운영 상태의 canonical source는 docs 문서로 유지");
-    expect(result.references).toEqual([
-      { label: "PromptOps 기준서", url: "../promptops/README.md" },
-      { label: "PromptOps 현재 상태", url: "../promptops/status.md" },
-      { label: "Iteration 001 기록", url: "../promptops/iterations/job_evaluation_iteration_001.md" },
-      { label: "운영 패널 문서 계약", url: "./operations_panel.md" },
-      { label: "에이전트 작업 보드", url: "./agent_workboard.md" },
-    ]);
+    expect(result.operationsAgent[0]).toContain("PromptOps lineage");
+    expect(result.userProductUX[0]).toContain("수직 슬라이스");
+    expect(result.recentCompletions[0]).toContain("리디자인");
+    expect(result.actions[0]).toContain("Markdown 뷰어");
+    expect(result.backlog[0]).toContain("Scraper 상태를 모니터링");
+    expect(result.notes[0]).toContain("캐시");
+    expect(result.references).toEqual(expect.arrayContaining([
+      { label: "AGENTS.md", url: "/internal/docs/AGENTS.md" },
+      { label: "프로젝트 컨텍스트", url: "/internal/docs/CONTEXT.md" },
+    ]));
   });
 
   it("parses the repository promptops status document into prompt workspace sections", async () => {
@@ -36,7 +33,7 @@ describe("internal docs parsing", () => {
       },
       {
         label: "latest iteration report: job_evaluation_iteration_001.md",
-        url: "./iterations/job_evaluation_iteration_001.md",
+        url: "/internal/docs/iterations/job_evaluation_iteration_001.md",
       },
       {
         label: "Notion backlog: PromptOps Backlog",

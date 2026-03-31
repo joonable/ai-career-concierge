@@ -8,12 +8,15 @@ export type InternalLinkItem = {
 
 export type InternalStatusDocument = {
   updatedAt: string | null;
-  currentFocus: string[];
+  operationsAgent: string[];
+  userProductUX: string[];
   milestones: string[];
   actions: string[];
+  recentCompletions: string[];
   backlog: string[];
   notes: string[];
   references: InternalLinkItem[];
+  coreDocuments: InternalLinkItem[];
 };
 
 export type PromptOpsDocumentSummary = {
@@ -26,16 +29,19 @@ export type PromptOpsDocumentSummary = {
 };
 
 export async function loadInternalStatusDocument(): Promise<InternalStatusDocument> {
-  const markdown = await readDocsMarkdown("internal/status.md");
+  const statusMarkdown = await readDocsMarkdown("internal/status.md");
 
   return {
-    updatedAt: extractDocumentDate(markdown),
-    currentFocus: extractBulletItems(extractSection(markdown, "현재 작업 중")),
-    milestones: extractBulletItems(extractSection(markdown, "프로젝트 milestone 및 진행상황")),
-    actions: extractBulletItems(extractSection(markdown, "지금 해야 할 action")),
-    backlog: extractBulletItems(extractSection(markdown, "앞으로의 backlog")),
-    notes: extractBulletItems(extractSection(markdown, "운영 메모")),
-    references: extractLinkItems(extractSection(markdown, "참고 링크")),
+    updatedAt: extractDocumentDate(statusMarkdown),
+    operationsAgent: extractBulletItems(extractSection(statusMarkdown, "시스템 및 에이전트 관점 (Operations & Agent)")),
+    userProductUX: extractBulletItems(extractSection(statusMarkdown, "유저 및 제품 관점 (User & Product UX)")),
+    milestones: extractBulletItems(extractSection(statusMarkdown, "프로젝트 milestone 및 진행상황")),
+    actions: extractBulletItems(extractSection(statusMarkdown, "다음 action")),
+    recentCompletions: extractBulletItems(extractSection(statusMarkdown, "최근 완료 작업 (Done)")),
+    backlog: extractBulletItems(extractSection(statusMarkdown, "backlog")),
+    notes: extractBulletItems(extractSection(statusMarkdown, "운영 메모")),
+    references: extractLinkItems(extractSection(statusMarkdown, "핵심 문서 및 참고 링크")),
+    coreDocuments: extractLinkItems(extractSection(statusMarkdown, "핵심 문서 및 참고 링크")),
   };
 }
 
@@ -160,10 +166,17 @@ function extractLinkItems(section: string): InternalLinkItem[] {
     }
 
     const [, linkLabel, url] = linkMatch;
+    
+    let processedUrl = url.trim();
+    if (processedUrl.endsWith('.md') && !processedUrl.startsWith('http')) {
+      const cleanPath = processedUrl.replace(/^(\.\.\/|\.\/)+/, '');
+      processedUrl = `/internal/docs/${cleanPath}`;
+    }
+
     const label = stripInlineMarkdown(line).replace(/\s+/g, " ").trim();
     items.push({
       label: label.length > 0 ? label : linkLabel.trim(),
-      url: url.trim(),
+      url: processedUrl,
     });
   }
 
