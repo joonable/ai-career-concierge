@@ -43,8 +43,9 @@ SaaS 확장을 염두에 두고 처음부터 아키텍처를 이원화(Dev/Prod)
 
 - **`User` (사용자)**
     - `id` (UUID, PK), `oauth_id`, `email`
-    - `profile_data` (JSONB): 직무, 연차, 기술 스택 등 정형 데이터. 현재 PoC 온보딩 기준 필드는 `role`, `years_of_experience`, `title_keywords`.
-    - `guidelines` (JSONB): `must_haves`, `deal_breakers` 등 LLM 주입용 제약 조건.
+    - `profile_data` (JSONB): 사용자 타겟 역할과 경력 정체성을 저장하는 정형 데이터. 현재 PoC 온보딩 기준 필드는 `role`, `roles`, `primary_role`, `years_of_experience`, `seniority`, `title_keywords`.
+    - `preferences` (JSONB): 온보딩 선호를 구조적으로 저장하는 필드. 현재 PoC 기준으로 `work_modes`, `locations`, `team_contexts`, `skills`, `exclusions`, `comparisons`, `note`를 포함합니다.
+    - `guidelines` (JSONB): 기존 evaluator 호환을 위한 레거시 제약 조건 필드. 현재는 `must_haves`, `deal_breakers`를 유지하되, `preferences`가 존재하면 스킬/제외 조건 중심으로 파생된 값을 우선 사용합니다.
     - `notification_settings` (JSONB): `minimum_fit_score`, `delivery_channel` 등 추천 전달 기준. 현재 기본 채널은 `slack`.
 - **`Job` (공고 원본 데이터)**
     - `id` (UUID, PK), `platform`, `external_job_id` (Unique - 중복 수집 방지)
@@ -73,8 +74,10 @@ SaaS 확장을 염두에 두고 처음부터 아키텍처를 이원화(Dev/Prod)
 
 1. **`IngestNode`:** 타겟 채널(예: 인크루트) 비동기 스크래핑 → `Job` DB 적재 및 중복 필터링.
 2. **`RuleFilterNode`:** DB 쿼리(연차, 직무 키워드 등)를 통한 1차 Hard Filtering → `Evaluation` 상태 업데이트.
+    - 현재는 구조화된 `profile_data`와 `preferences`를 공용 normalization 레이어로 해석하고, title/experience 외에 `locations`, `work_modes`를 metadata가 명확할 때 추가 hard filter로 사용할 수 있습니다.
 3. **`LLMEvalNode`:** (비용 발생 구간) Rule 노드를 통과한 공고들을 Batch로 묶어 Gemini API 호출 → Deal-breaker 분석 및 점수화.
     - Structured output 기본 계약은 `fit_score`, `summary`, `strengths`, `concerns`, `must_have_matches`, `deal_breaker_flags`, `confidence`, `role_alignment`, `must_have_coverage`, `deal_breaker_severity`, `transferable_skills`를 포함합니다.
+    - Prompt 입력은 raw 저장 스키마를 직접 읽지 않고, 공용 normalized evaluation context builder를 통해 `preferred_skills`, `excluded_signals`, `work_modes`, `locations`, `team_contexts`, `comparison_tones`, `note` 등을 prompt-friendly variables로 변환해 사용합니다.
 4. **`DeliverNode`:** 기준 점수(예: 80점) 이상인 공고들을 포맷팅하여 Slack Interactive Webhook 발송.
 
 ## 6. Non-Functional Requirements (비기능 요구사항)
@@ -105,7 +108,7 @@ SaaS 확장을 염두에 두고 처음부터 아키텍처를 이원화(Dev/Prod)
 - **`GET /api/v1/users/me/dashboard`**
     - Next.js 프론트엔드에서 칸반 보드를 렌더링하기 위한 개인화된 추천 공고 목록을 반환합니다.
     - 각 추천 항목은 기본 평가 필드 외에도 상세 패널용 구조화 필드(`decision_summary`, `match_highlights`, `risk_highlights`, `confidence_level`, `rule_match_reasons`, `rule_rejection_details`, `responsibilities`, `requirements`, `preferred_requirements`, `location`, `employment_type`)를 포함합니다.
-    - 위 구조화 필드는 현재 PoC 단계에서 DB에 별도 컬럼으로 저장하지 않고, 공고 원문/메타데이터와 사용자 프로필, 평가 결과를 바탕으로 백엔드에서 파생하여 응답합니다.
+    - 위 구조화 필드는 현재 PoC 단계에서 DB에 별도 컬럼으로 저장하지 않고, 공고 원문/메타데이터, 구조화된 사용자 profile/preferences, 평가 결과를 바탕으로 backend presenter에서 파생하여 응답합니다.
 - **`GET /api/v1/users/me/promptops-status`**
     - 내부 PromptOps 운영 패널용 read-only 스냅샷 응답을 반환합니다.
     - 응답은 production/staging/candidate prompt 식별자, latest decision, LangSmith compare / annotation queue 링크, Notion backlog 링크, 최신 iteration 링크, 최신 요약과 backlog top 3를 포함합니다.

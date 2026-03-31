@@ -128,6 +128,15 @@ def test_local_v3_prompt_contains_score_policy_and_structured_axes():
                 "must_haves": ["Python", "SQL", "MLOps"],
                 "deal_breakers": ["contract-only", "onsite-only"],
             },
+            "preferences": {
+                "work_modes": ["hybrid"],
+                "locations": ["seoul"],
+                "team_contexts": ["ai-first"],
+                "skills": {"preset": ["python", "sql"], "custom": ["Feature Store"]},
+                "exclusions": {"preset": ["contract"], "custom": []},
+                "comparisons": {"delivery-vs-research": 1},
+                "note": "B2B SaaS 경험 선호",
+            },
         },
         recent_memory="Avoid weak infra ownership.",
         job=PipelineJob(
@@ -144,6 +153,11 @@ def test_local_v3_prompt_contains_score_policy_and_structured_axes():
     assert rendered.metadata.schema_version == "3"
     assert "`80~100`" in rendered.text
     assert "선호 title keywords" in rendered.text
+    assert "선호 근무 형태" in rendered.text
+    assert "선호 지역" in rendered.text
+    assert "선호 팀 맥락" in rendered.text
+    assert "비교 선택 톤" in rendered.text
+    assert "추가 메모" in rendered.text
     assert "알림 최소 적합도 기준" in rendered.text
     assert "구조화된 JD 책임 근거" in rendered.text
     assert "누락/불명확한 컨텍스트" in rendered.text
@@ -173,6 +187,15 @@ def test_prompt_manager_uses_normalized_context_values_in_rendered_prompt():
                 "deal_breakers": ["contract-only"],
             },
             "notification_settings": {"minimum_fit_score": 80},
+            "preferences": {
+                "work_modes": ["hybrid"],
+                "locations": ["seoul"],
+                "team_contexts": ["product-team"],
+                "skills": {"preset": ["python"], "custom": ["Feature Store"]},
+                "exclusions": {"preset": ["contract"], "custom": ["박사 학위 필수"]},
+                "comparisons": {"delivery-vs-research": 1},
+                "note": "B2B SaaS 선호",
+            },
         },
         recent_memory="weak infra ownership; contract-only roles",
         job=PipelineJob(
@@ -193,6 +216,11 @@ def test_prompt_manager_uses_normalized_context_values_in_rendered_prompt():
     )
 
     assert "MLE, Platform" in rendered.text
+    assert "하이브리드" in rendered.text
+    assert "서울" in rendered.text
+    assert "프로덕트와 가까운 역할" in rendered.text
+    assert "약하게 오른쪽: 모델 개발 중심 / 서비스 적용 중심" in rendered.text
+    assert "B2B SaaS 선호" in rendered.text
     assert "알림 최소 적합도 기준: 80" in rendered.text
     assert "Build inference APIs" in rendered.text
     assert "Seoul" in rendered.text

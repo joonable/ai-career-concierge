@@ -280,13 +280,25 @@ confidence 정책:
 ### PoC 루프를 위해 추가된 스캐폴드 엔드포인트 (Scaffold Endpoints Added For The PoC Loop)
 
 - `GET /api/v1/users/me/profile`
-  - 정규화된 중첩 형태의 현재 사용자 프로필 및 알림 설정을 반환합니다.
+  - 정규화된 중첩 형태의 현재 사용자 프로필, structured preference, 호환용 guideline, 알림 설정을 반환합니다.
 - `PUT /api/v1/users/me/profile`
-  - 프로필 데이터, 가이드라인 및 알림 설정을 업데이트합니다.
-  - 역할, 연차, 필수 조건, 결격 사유, 최소 적합도 점수 등의 온보딩 필드를 허용합니다.
+  - 프로필 데이터, structured preference, 알림 설정을 업데이트합니다.
+  - 온보딩 저장 구조는 `profile_data`, `preferences`, `notification_settings`를 기준으로 하며, `preferences`에는 `work_modes`, `locations`, `team_contexts`, `skills`, `exclusions`, `comparisons`, `note`가 포함됩니다.
+  - 호환성 유지를 위해 백엔드는 기존 `guidelines.must_haves`, `guidelines.deal_breakers`를 계속 응답하지만, 새 `preferences`가 존재하는 경우 스킬/제외 조건 중심으로 파생된 값을 우선 사용합니다.
   - 역할이 생략된 경우 `role`에서 `profile_data.title_keywords`를 파생시키고, 알림 설정(`notification_settings.delivery_channel`)의 기본값을 `slack`으로 지정합니다.
 - `POST /api/v1/evaluations/{evaluation_id}/feedback`
   - 대시보드 흐름에서 좋아요 또는 싫어요 피드백을 저장합니다.
+
+## 온보딩 저장 구조와 소비자 해석
+
+- 저장 스키마는 UI가 수집한 의미를 보존하는 것을 우선합니다.
+  - `profile_data`: 대표 직무, 전체 직무 선택, 경력 연차, seniority, title keywords
+  - `preferences`: 근무 형태, 지역, 팀 맥락, preset/custom 스킬, preset/custom 제외 조건, 비교 선택, 보조 메모
+  - `notification_settings`: 최소 적합도, 전달 채널
+- evaluator, rule filter, dashboard는 저장 스키마를 직접 해석하지 않고 공용 normalization/presenter 레이어를 거쳐 값을 읽습니다.
+- evaluator는 정규화된 선호 컨텍스트를 사용해 스킬, 제외 조건, 근무 형태, 지역, 팀 맥락, 비교 선택 톤을 prompt 변수로 전달합니다.
+- rule filter는 최소한 `role`, `title_keywords`, `years_of_experience` 외에도 구조화된 `locations`, `work_modes`를 읽어 추가 hard filtering에 활용할 수 있습니다.
+- dashboard는 raw `guidelines.must_haves`, `deal_breakers`를 그대로 노출하지 않고, structured `preferences`를 사용자 친화적인 요약 모델로 변환해 표시합니다.
 
 ### 현재 인증 계약 (Current Auth Contract)
 
