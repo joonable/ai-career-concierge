@@ -42,7 +42,7 @@ PoC는 핵심 루프를 엔드투엔드(end-to-end)로 지원해야 합니다:
 
 - `apps/web`
   - Next.js App Router 프론트엔드
-  - `src/app`은 `/login`, `/auth/callback`, `/onboarding`, `/dashboard`, `/internal/promptops`와 같은 라우트 진입점을 포함
+  - `src/app`은 `/login`, `/auth/callback`, `/onboarding`, `/dashboard`, `/internal`, `/internal/prompts`와 같은 라우트 진입점을 포함
   - `src/components`는 인증, 온보딩, 대시보드 컴포넌트와 같은 페이지 관련 UI를 포함
   - `src/lib`은 Supabase 인증 헬퍼, API 클라이언트 코드, 프론트엔드 런타임 어댑터를 포함
 - `src/api`
@@ -219,7 +219,7 @@ confidence 정책:
 - 1차 목표는 prompt family registry, experiment orchestration, evaluator/review 연결, iteration 기록의 경계를 코드와 문서로 고정하는 것입니다.
 - LangSmith는 초기 PromptOps backend로 사용하되, 구현은 `src/promptops/adapters` 경계 뒤에 둡니다.
 - 이 저장소의 job-matching 정책과 dataset/evaluator 의미는 `src/promptops/projects/ai_career_concierge`에 둬서, 향후 공통 PromptOps core 분리가 가능하도록 설계합니다.
-- 내부 운영 가시성을 위해 `/internal/promptops` 페이지는 LangSmith/Notion을 실시간 조회하지 않고, 백엔드가 제공하는 PromptOps 상태 스냅샷을 렌더링합니다.
+- 내부 운영 가시성을 위해 `/internal` 운영 허브는 docs 기반 상태 요약과 PromptOps 스냅샷을 함께 보여주고, `/internal/prompts` 페이지는 LangSmith/Notion을 실시간 조회하지 않고 백엔드가 제공하는 PromptOps 상태 스냅샷을 렌더링합니다.
 
 ## 대시보드 상세 데이터 책임 분리
 

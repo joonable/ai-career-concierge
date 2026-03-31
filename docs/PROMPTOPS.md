@@ -256,7 +256,7 @@ iteration 운영 히스토리는 코드가 아니라 `docs/promptops_iterations/
 4. LangSmith review queue
 5. Notion backlog
 
-웹에서는 `/internal/promptops` 라우트가 같은 상태를 내부 운영 패널 형태로 보여줍니다.
+웹에서는 `/internal/prompts` 라우트가 같은 상태를 프롬프트 운영 패널 형태로 보여줍니다.
 
 역할별 차이는 해석의 깊이이지, 출발 문서는 다르지 않습니다.
 

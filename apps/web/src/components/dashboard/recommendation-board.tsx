@@ -161,6 +161,13 @@ export function RecommendationBoard({
           <span className="dashboard-select__label">저장 뷰</span>
           <div className="dashboard-segmented">
             <button
+              className={buildSegmentClass(savedView === "all")}
+              onClick={() => setSavedView("all")}
+              type="button"
+            >
+              전체
+            </button>
+            <button
               className={buildSegmentClass(savedView === "recommended")}
               onClick={() => setSavedView("recommended")}
               type="button"
@@ -172,21 +179,14 @@ export function RecommendationBoard({
               onClick={() => setSavedView("review")}
               type="button"
             >
-              검토 필요
-            </button>
-            <button
-              className={buildSegmentClass(savedView === "all")}
-              onClick={() => setSavedView("all")}
-              type="button"
-            >
-              전체
+              검토필요
             </button>
           </div>
           <p className="dashboard-meta">
             {savedView === "recommended"
               ? "추천만은 최소 적합도 기준을 자동 적용합니다."
               : savedView === "review"
-                ? "검토 필요는 보류, 낮은 점수, 미응답 공고를 우선 보여줍니다."
+                ? "검토필요는 보류, 낮은 점수, 미응답 공고를 우선 보여줍니다."
                 : "전체에서만 빠른 조건이 추가로 목록을 좁힙니다."}
           </p>
         </div>

@@ -395,7 +395,7 @@ async def test_promptops_status_returns_snapshot_for_allowed_admin(client, monke
     assert body["review_queue_name"] == "job-evaluation-review"
     assert body["review_queue_url"].startswith("https://smith.langchain.com/")
     assert body["notion_backlog_url"] == "https://www.notion.so/c5fb7393ece54107b445e90bdabab642"
-    assert body["latest_iteration_url"] == "/internal/promptops/iterations/job-evaluation-001"
+    assert body["latest_iteration_url"] == "/internal/prompts/iterations/job-evaluation-001"
     assert len(body["latest_summary"]) == 3
     assert len(body["next_backlog_items"]) == 3
 

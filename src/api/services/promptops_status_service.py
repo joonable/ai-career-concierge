@@ -23,7 +23,7 @@ PROMPTOPS_COMPARE_URL = (
     "&selectedSessions=91e3e1bf-e2a1-426c-a155-ce616568eabd"
 )
 PROMPTOPS_LATEST_ITERATION_TITLE = "Job Evaluation 반복 개선 기록 001"
-PROMPTOPS_LATEST_ITERATION_URL = "/internal/promptops/iterations/job-evaluation-001"
+PROMPTOPS_LATEST_ITERATION_URL = "/internal/prompts/iterations/job-evaluation-001"
 
 PROMPTOPS_LATEST_SUMMARY = [
     "최신 `job-evaluation:staging` 프롬프트 1회 검증에서 fit_score_band는 0.9333, classification_match는 1.0을 기록했습니다.",

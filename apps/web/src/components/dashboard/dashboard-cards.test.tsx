@@ -222,7 +222,9 @@ describe("RecommendationBoard", () => {
     );
 
     expect(screen.getByPlaceholderText("회사명이나 직무명으로 찾기")).toBeInTheDocument();
+    expect(screen.getAllByRole("button", { name: "전체" }).length).toBeGreaterThan(0);
     expect(screen.getByRole("button", { name: "추천만" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "검토필요" })).toBeInTheDocument();
     expect(screen.getByText("추천 기준 85점 이상만 보기")).toBeInTheDocument();
     expect(screen.getByText("규칙에서 제외된 공고도 포함")).toBeInTheDocument();
     expect(screen.getByText("기준 충족")).toBeInTheDocument();
@@ -255,7 +257,7 @@ describe("RecommendationBoard", () => {
 
     expect(screen.getByText("현재 필터와 일치하는 공고가 없습니다")).toBeInTheDocument();
 
-    await user.click(screen.getByRole("button", { name: "검토 필요" }));
+    await user.click(screen.getByRole("button", { name: "검토필요" }));
 
     expect(screen.getByText("Platform Engineer")).toBeInTheDocument();
     expect(screen.getAllByText("대기")).toHaveLength(2);
@@ -289,7 +291,7 @@ describe("RecommendationBoard", () => {
 
     expect(screen.queryByText("Junior Analyst")).not.toBeInTheDocument();
 
-    await user.click(screen.getByRole("button", { name: "검토 필요" }));
+    await user.click(screen.getByRole("button", { name: "검토필요" }));
     await user.click(screen.getByLabelText("규칙에서 제외된 공고도 포함"));
 
     expect(screen.getByText("Junior Analyst")).toBeInTheDocument();
@@ -388,7 +390,7 @@ describe("RecommendationBoard", () => {
       />,
     );
 
-    await user.click(screen.getByRole("button", { name: "검토 필요" }));
+    await user.click(screen.getByRole("button", { name: "검토필요" }));
 
     expect(screen.getByText("Needs Review Role")).toBeInTheDocument();
     expect(screen.queryByText("Recommended Role")).not.toBeInTheDocument();

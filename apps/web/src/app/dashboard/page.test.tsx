@@ -5,6 +5,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import DashboardPage from "@/app/dashboard/page";
 
 const loadDashboardPageData = vi.fn();
+const isPromptOpsAdminEmail = vi.fn();
 
 vi.mock("next/link", () => ({
   default: ({
@@ -22,9 +23,15 @@ vi.mock("@/lib/dashboard_loader", () => ({
   loadDashboardPageData: (...args: unknown[]) => loadDashboardPageData(...args),
 }));
 
+vi.mock("@/lib/promptops_access", () => ({
+  isPromptOpsAdminEmail: (...args: unknown[]) => isPromptOpsAdminEmail(...args),
+}));
+
 describe("DashboardPage", () => {
   beforeEach(() => {
     loadDashboardPageData.mockReset();
+    isPromptOpsAdminEmail.mockReset();
+    isPromptOpsAdminEmail.mockReturnValue(false);
   });
 
   it("uses the stricter onboarding completion rule in the hero copy and stats", async () => {
@@ -93,6 +100,42 @@ describe("DashboardPage", () => {
 
     expect(screen.getByText("아직 비어 있습니다")).toBeInTheDocument();
     expect(screen.getByText("파이프라인 실행 후 여기에 표시됩니다.")).toBeInTheDocument();
+  });
+
+  it("renders an admin bar when the signed-in user is an admin", async () => {
+    isPromptOpsAdminEmail.mockReturnValue(true);
+    loadDashboardPageData.mockResolvedValue({
+      status: "ready",
+      dashboard: {
+        user_id: "user-1",
+        minimum_fit_score: 80,
+        recommendations: [],
+      },
+      profile: {
+        user_id: "user-1",
+        email: "admin@example.com",
+        profile_data: {
+          role: "Machine Learning Engineer",
+          years_of_experience: 6,
+          title_keywords: ["machine learning"],
+        },
+        guidelines: {
+          must_haves: ["Python"],
+          deal_breakers: ["contract-only"],
+        },
+        notification_settings: {
+          minimum_fit_score: 80,
+          delivery_channel: "slack",
+        },
+      },
+    });
+
+    render(await DashboardPage());
+
+    expect(screen.getByRole("link", { name: /운영 허브로 이동/i })).toHaveAttribute(
+      "href",
+      "/internal",
+    );
   });
 
   it("renders an in-page error state when dashboard data loading fails", async () => {

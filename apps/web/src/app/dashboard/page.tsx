@@ -1,3 +1,4 @@
+import Link from "next/link";
 import React from "react";
 
 import { DashboardErrorState } from "@/components/dashboard/dashboard-error-state";
@@ -6,6 +7,7 @@ import { RecommendationBoard } from "@/components/dashboard/recommendation-board
 import { loadDashboardPageData } from "@/lib/dashboard_loader";
 import { mapDashboardRecommendations } from "@/lib/dashboard_mapper";
 import { deriveDashboardOnboardingState } from "@/lib/dashboard_onboarding";
+import { isPromptOpsAdminEmail } from "@/lib/promptops_access";
 
 export default async function DashboardPage() {
   const dashboardPageData = await loadDashboardPageData();
@@ -23,10 +25,18 @@ export default async function DashboardPage() {
   const { dashboard, profile } = dashboardPageData;
   const recommendations = mapDashboardRecommendations(dashboard);
   const onboardingState = deriveDashboardOnboardingState(profile);
+  const canAccessAdminPage = isPromptOpsAdminEmail(profile.email);
 
   return (
     <main className="dashboard-page">
       <div className="dashboard-shell">
+        {canAccessAdminPage ? (
+          <Link className="dashboard-admin-bar" href="/internal">
+            <span className="dashboard-admin-bar__eyebrow">Admin</span>
+            <strong>운영 허브로 이동</strong>
+            <span className="dashboard-admin-bar__meta">milestone, action, PromptOps 작업대를 한 번에 확인합니다.</span>
+          </Link>
+        ) : null}
         <section className="dashboard-grid">
           <article className="dashboard-card dashboard-card--active dashboard-card--span-2">
             <div className="dashboard-hero">
