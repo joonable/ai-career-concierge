@@ -51,6 +51,9 @@ PoC는 핵심 루프를 엔드투엔드(end-to-end)로 지원해야 합니다:
   - 기본 파이프라인 런타임은 Gemini structured-output evaluator를 사용하고, 테스트는 mock evaluator를 주입
 - `src/agent`
   - LangGraph 워크플로우, 노드 구현, 프롬프트, 타입이 지정된 파이프라인 상태
+- `src/promptops`
+  - 프롬프트 실험, 리뷰, iteration 기록을 위한 PromptOps 스캐폴드
+  - 현재는 이 저장소 내부 모듈로 시작하지만, core/adapters/project bindings 경계를 유지해 향후 분리를 염두에 둠
 - `src/scraper`
   - 기본 스크래퍼 인터페이스, 노멀라이저(normalizer), 소스 레지스트리, 소스별 스크래퍼
   - 기본 런타임은 인크루트(Incruit) 실스크래퍼를 사용하고, 테스트는 fixture/mock scraper를 병행
@@ -205,6 +208,13 @@ confidence 정책:
   - 대시보드를 위한 개인화된 추천 데이터를 반환합니다.
   - 각 추천 항목에는 대시보드 필터/정렬을 지원하기 위한 `created_at`, `updated_at`, 제외 사유 표시를 위한 `rule_rejection_reason`, 상세 패널 구성을 위한 `jd_raw_text`, 경력 범위, `source_metadata`가 포함되어야 합니다.
   - 상세 패널은 추가로 `decision_summary`, `match_highlights`, `risk_highlights`, `confidence_level`, `rule_match_reasons`, `rule_rejection_details`, `responsibilities`, `requirements`, `preferred_requirements`, `location`, `employment_type`를 내려주며, 이 필드들은 현재 DB 저장값과 사용자 프로필을 바탕으로 백엔드에서 구조화해 응답합니다.
+
+## PromptOps 운영 초안
+
+- PromptOps는 prompt 변경을 텍스트 수정이 아니라 실험 가능한 운영 루프로 다루기 위한 내부 모듈입니다.
+- 1차 목표는 prompt family registry, experiment orchestration, evaluator/review 연결, iteration 기록의 경계를 코드와 문서로 고정하는 것입니다.
+- LangSmith는 초기 PromptOps backend로 사용하되, 구현은 `src/promptops/adapters` 경계 뒤에 둡니다.
+- 이 저장소의 job-matching 정책과 dataset/evaluator 의미는 `src/promptops/projects/ai_career_concierge`에 둬서, 향후 공통 PromptOps core 분리가 가능하도록 설계합니다.
 
 ## 대시보드 상세 데이터 책임 분리
 

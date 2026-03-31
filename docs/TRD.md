@@ -7,6 +7,7 @@
 - **Presentation Layer (Web UI & Chat Ops):** Next.js 기반의 사용자 대시보드 및 Slack 양방향 메시지(Block Kit).
 - **Application Layer (API & Orchestration):** Python FastAPI 기반의 백엔드 서버. 에이전트 워크플로우(LangGraph)의 실행 컨텍스트를 제공하고 외부 요청을 라우팅.
 - **Agentic Data Pipeline (Ingestion & Evaluation):** Playwright 기반의 데이터 수집 모듈과 Gemini 모델을 활용한 다단(Multi-stage) 평가 엔진.
+- **PromptOps Layer (Experimentation & Review):** Prompt family, experiment, evaluator, review workflow를 관리하는 내부 운영 계층. 현재는 저장소 내부 모듈로 시작하되 향후 분리 가능한 경계를 유지.
 - **Storage Layer (Database & Auth):** Supabase (PostgreSQL) 기반의 영속성(Persistence) 데이터 및 사용자 인증 관리.
 
 ## 2. Infrastructure & Environment Isolation
@@ -103,3 +104,11 @@ SaaS 확장을 염두에 두고 처음부터 아키텍처를 이원화(Dev/Prod)
     - Next.js 프론트엔드에서 칸반 보드를 렌더링하기 위한 개인화된 추천 공고 목록을 반환합니다.
     - 각 추천 항목은 기본 평가 필드 외에도 상세 패널용 구조화 필드(`decision_summary`, `match_highlights`, `risk_highlights`, `confidence_level`, `rule_match_reasons`, `rule_rejection_details`, `responsibilities`, `requirements`, `preferred_requirements`, `location`, `employment_type`)를 포함합니다.
     - 위 구조화 필드는 현재 PoC 단계에서 DB에 별도 컬럼으로 저장하지 않고, 공고 원문/메타데이터와 사용자 프로필, 평가 결과를 바탕으로 백엔드에서 파생하여 응답합니다.
+
+## 8. PromptOps Architecture Boundary
+
+- PromptOps는 이 저장소 안에서 시작하는 내부 운영 모듈이며 경로는 `src/promptops`입니다.
+- 공통 운영 개념(prompt family metadata, experiment spec, review item, failure taxonomy, iteration record)은 `src/promptops/core`에 둡니다.
+- 외부 backend 연동은 `src/promptops/adapters` 아래에 두고, LangSmith는 첫 번째 adapter로 사용합니다.
+- AI Career Concierge 특화 로직(평가 policy 의미, dataset bindings, review rubric, normalized context)은 `src/promptops/projects/ai_career_concierge`에 둡니다.
+- 이 경계는 향후 PromptOps core를 별도 패키지나 프로젝트로 분리할 수 있게 하기 위한 설계 규칙입니다.
