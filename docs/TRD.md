@@ -6,6 +6,7 @@
 
 - **Presentation Layer (Web UI & Chat Ops):** Next.js 기반의 사용자 대시보드 및 Slack 양방향 메시지(Block Kit).
     - 내부 운영 가시성을 위해 `/internal` 운영 허브와 `/internal/prompts` 프롬프트 운영 패널을 둡니다.
+    - `/internal` 운영 허브는 docs 기반 운영 문서 레지스트리, 최근 작업 보드, 다음 action/backlog, 검증 링크를 우선적으로 노출해야 합니다.
 - **Application Layer (API & Orchestration):** Python FastAPI 기반의 백엔드 서버. 에이전트 워크플로우(LangGraph)의 실행 컨텍스트를 제공하고 외부 요청을 라우팅.
 - **Agentic Data Pipeline (Ingestion & Evaluation):** Playwright 기반의 데이터 수집 모듈과 Gemini 모델을 활용한 다단(Multi-stage) 평가 엔진.
 - **PromptOps Layer (Experimentation & Review):** Prompt family, experiment, evaluator, review workflow를 관리하는 내부 운영 계층. 현재는 저장소 내부 모듈로 시작하되 향후 분리 가능한 경계를 유지.
@@ -110,11 +111,27 @@ SaaS 확장을 염두에 두고 처음부터 아키텍처를 이원화(Dev/Prod)
     - 응답은 production/staging/candidate prompt 식별자, latest decision, LangSmith compare / annotation queue 링크, Notion backlog 링크, 최신 iteration 링크, 최신 요약과 backlog top 3를 포함합니다.
     - 접근 제어는 Supabase 세션 기반 bearer 인증 위에 `PROMPTOPS_ADMIN_EMAILS` allowlist를 추가로 적용합니다.
 
-## 8. PromptOps Architecture Boundary
+## 8. Internal Operations Panel Contract
+
+- `/internal` 운영 허브는 문서 기반 운영 패널로 정의합니다.
+- 운영 패널은 최소한 다음 기능을 지원하는 방향으로 설계합니다:
+    - 핵심 문서 레지스트리 노출: `AGENTS.md`, `docs/CONTEXT.md`, `docs/TRD.md`, `docs/PRD.md`, 운영 패널 관련 `.md`
+    - 문서 편집 진입점 또는 수정 동선 제공
+    - 최근 완료 작업, 현재 작업 상태, 다음 action, backlog 노출
+    - 각 작업에 대한 UI 확인 경로 또는 검증 링크 노출
+    - PromptOps, scraper, pipeline, delivery 같은 운영 모듈 상태를 additive하게 합류시킬 수 있는 카드형 구조
+- 운영 패널의 docs canonical source는 우선 다음 문서 집합입니다:
+    - `docs/internal_status.md`
+    - `docs/operations_panel.md`
+    - `docs/agent_workboard.md`
+- `docs/agent_workboard.md`는 에이전트가 작업 완료 시 갱신하는 운영용 현재 상태 문서이며, 운영 패널은 이를 1차 요약 source로 사용할 수 있어야 합니다.
+- 문서 편집 기능이 아직 구현되지 않았더라도, TRD 기준으로 운영 패널은 적어도 문서 보기/링크/업데이트 책임을 구조적으로 수용해야 합니다.
+
+## 9. PromptOps Architecture Boundary
 
 - PromptOps는 이 저장소 안에서 시작하는 내부 운영 모듈이며 경로는 `src/promptops`입니다.
 - 공통 운영 개념(prompt family metadata, experiment spec, review item, failure taxonomy, iteration record)은 `src/promptops/core`에 둡니다.
 - 외부 backend 연동은 `src/promptops/adapters` 아래에 두고, LangSmith는 첫 번째 adapter로 사용합니다.
 - AI Career Concierge 특화 로직(평가 policy 의미, dataset bindings, review rubric, normalized context)은 `src/promptops/projects/ai_career_concierge`에 둡니다.
 - 이 경계는 향후 PromptOps core를 별도 패키지나 프로젝트로 분리할 수 있게 하기 위한 설계 규칙입니다.
-- 내부 운영 허브는 docs 기반 운영 요약과 PromptOps 상태 스냅샷을 함께 보여주고, `/internal/prompts`는 LangSmith/Notion의 live backend를 직접 호출하지 않고 백엔드가 제공하는 수동 PromptOps 상태 스냅샷을 렌더링합니다.
+- 내부 운영 허브는 docs 기반 운영 요약, 작업 보드, 핵심 문서 레지스트리와 PromptOps 상태 스냅샷을 함께 보여주고, `/internal/prompts`는 LangSmith/Notion의 live backend를 직접 호출하지 않고 백엔드가 제공하는 수동 PromptOps 상태 스냅샷을 렌더링합니다.

@@ -63,6 +63,9 @@ PoC는 핵심 루프를 엔드투엔드(end-to-end)로 지원해야 합니다:
   - 타입이 지정된 구성(config), 로깅, 원격 측정(telemetry), id 및 공유 오류
 - `tests`
   - 단위(unit), 통합(integration), 계약(contract) 및 복원력(resilience) 테스트
+- `docs`
+  - 제품/기술 문서와 함께 `/internal` 운영 허브가 읽는 canonical 운영 문서를 포함
+  - 최소 운영 문서는 `internal_status.md`, `operations_panel.md`, `agent_workboard.md`를 유지
 
 ## 핵심 비즈니스 로직 (Core Business Logic)
 
@@ -213,13 +216,28 @@ confidence 정책:
   - 응답에는 production/staging/candidate prompt 식별자, latest decision, LangSmith compare / review queue 링크, Notion backlog 링크, 최신 iteration 요약이 포함됩니다.
   - 접근은 `PROMPTOPS_ADMIN_EMAILS` allowlist에 들어 있는 사용자 이메일로 제한됩니다.
 
+## 운영 패널 문서 계약 (Operations Panel Document Contract)
+
+- `/internal` 운영 허브는 runtime snapshot만이 아니라 docs 기반 운영 문서를 적극적으로 읽는 내부 패널이어야 합니다.
+- 운영 패널은 최소한 다음 문서를 노출 대상으로 다뤄야 합니다:
+  - `AGENTS.md`
+  - `docs/CONTEXT.md`
+  - `docs/TRD.md`
+  - `docs/PRD.md`
+  - `docs/operations_panel.md`
+  - `docs/agent_workboard.md`
+- 운영 패널은 문서 링크 나열에 그치지 않고, 어떤 문서가 source of truth인지와 마지막 업데이트 맥락을 함께 보여줘야 합니다.
+- 운영 패널이 문서 편집 기능을 제공하는 경우, 최소한 운영 문서와 작업 보드 업데이트가 UI에서 가능해야 합니다.
+- `docs/agent_workboard.md`는 최근 완료 작업, 현재 작업 상태, 다음 action, backlog, UI 확인 경로를 담는 canonical workboard로 유지합니다.
+- 에이전트가 의미 있는 작업을 마쳤다면 가능할 때마다 `docs/agent_workboard.md`를 갱신해 운영 패널에서 바로 확인할 수 있게 해야 합니다.
+
 ## PromptOps 운영 초안
 
 - PromptOps는 prompt 변경을 텍스트 수정이 아니라 실험 가능한 운영 루프로 다루기 위한 내부 모듈입니다.
 - 1차 목표는 prompt family registry, experiment orchestration, evaluator/review 연결, iteration 기록의 경계를 코드와 문서로 고정하는 것입니다.
 - LangSmith는 초기 PromptOps backend로 사용하되, 구현은 `src/promptops/adapters` 경계 뒤에 둡니다.
 - 이 저장소의 job-matching 정책과 dataset/evaluator 의미는 `src/promptops/projects/ai_career_concierge`에 둬서, 향후 공통 PromptOps core 분리가 가능하도록 설계합니다.
-- 내부 운영 가시성을 위해 `/internal` 운영 허브는 docs 기반 상태 요약과 PromptOps 스냅샷을 함께 보여주고, `/internal/prompts` 페이지는 LangSmith/Notion을 실시간 조회하지 않고 백엔드가 제공하는 PromptOps 상태 스냅샷을 렌더링합니다.
+- 내부 운영 가시성을 위해 `/internal` 운영 허브는 docs 기반 상태 요약, 작업 보드, 핵심 문서 레지스트리, PromptOps 스냅샷을 함께 보여주고, `/internal/prompts` 페이지는 LangSmith/Notion을 실시간 조회하지 않고 백엔드가 제공하는 PromptOps 상태 스냅샷을 렌더링합니다.
 
 ## 대시보드 상세 데이터 책임 분리
 
