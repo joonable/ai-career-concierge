@@ -113,12 +113,12 @@ export function OnboardingStatusCard({ state }: OnboardingStatusCardProps) {
         {state.yearsOfExperience}년 경력 · 최소 적합도 {state.minimumFitScore}+
       </p>
       <div className="dashboard-detail">
-        <span className="dashboard-detail__label">Must-haves</span>
-        <div className="dashboard-chip-list">{renderCompactTags(state.mustHaves)}</div>
+        <span className="dashboard-detail__label">중요 스킬</span>
+        <div className="dashboard-chip-list">{renderCompactTags(state.preferredSkills)}</div>
       </div>
       <div className="dashboard-detail">
-        <span className="dashboard-detail__label">Deal-breakers</span>
-        <div className="dashboard-chip-list">{renderCompactTags(state.dealBreakers)}</div>
+        <span className="dashboard-detail__label">제외 조건</span>
+        <div className="dashboard-chip-list">{renderCompactTags(state.exclusions)}</div>
       </div>
       <div className="dashboard-summary-card__footer">
         <span className="dashboard-summary-card__cta dashboard-summary-card__cta--subtle">

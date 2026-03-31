@@ -5,6 +5,7 @@ from typing import Any
 from pydantic import BaseModel, Field
 
 from agent.schemas.pipeline_job import PipelineJob
+from common.user_preferences import build_normalized_stored_preferences
 
 
 class NormalizedHardPreferences(BaseModel):
@@ -18,6 +19,11 @@ class NormalizedSoftPreferences(BaseModel):
     """Preference signals that help prioritization but are not hard constraints."""
 
     title_keywords: list[str] = Field(default_factory=list)
+    work_modes: list[str] = Field(default_factory=list)
+    locations: list[str] = Field(default_factory=list)
+    team_contexts: list[str] = Field(default_factory=list)
+    comparison_tones: list[str] = Field(default_factory=list)
+    note: str = ""
     minimum_fit_score: int | None = None
     recent_dislike_signals: list[str] = Field(default_factory=list)
 
@@ -79,6 +85,17 @@ class NormalizedEvaluationContext(BaseModel):
             "must_haves": _join_items(self.hard_preferences.must_haves, fallback="None provided"),
             "deal_breakers": _join_items(self.hard_preferences.deal_breakers, fallback="None provided"),
             "title_keywords": _join_items(self.soft_preferences.title_keywords, fallback="None provided"),
+            "work_modes": _join_items(self.soft_preferences.work_modes, fallback="No preference provided"),
+            "locations": _join_items(self.soft_preferences.locations, fallback="No preference provided"),
+            "team_contexts": _join_items(
+                self.soft_preferences.team_contexts,
+                fallback="No preference provided",
+            ),
+            "comparison_tones": _join_items(
+                self.soft_preferences.comparison_tones,
+                fallback="No preference provided",
+            ),
+            "preference_note": self.soft_preferences.note or "No additional note provided.",
             "minimum_fit_score": (
                 str(self.soft_preferences.minimum_fit_score)
                 if self.soft_preferences.minimum_fit_score is not None
@@ -131,19 +148,15 @@ def build_normalized_evaluation_context(
     recent_memory: str,
     job: PipelineJob,
 ) -> NormalizedEvaluationContext:
-    profile_data = user_context.get("profile_data", {}) if isinstance(user_context, dict) else {}
-    guidelines = user_context.get("guidelines", {}) if isinstance(user_context, dict) else {}
-    notification_settings = (
-        user_context.get("notification_settings", {}) if isinstance(user_context, dict) else {}
-    )
     source_metadata = job.source_metadata if isinstance(job.source_metadata, dict) else {}
+    normalized_preferences = build_normalized_stored_preferences(user_context)
 
-    role = _clean_string(profile_data.get("role")) or "unknown"
-    years = _coerce_int(profile_data.get("years_of_experience"))
-    title_keywords = _normalize_string_list(profile_data.get("title_keywords"))
-    must_haves = _normalize_string_list(guidelines.get("must_haves"))
-    deal_breakers = _normalize_string_list(guidelines.get("deal_breakers"))
-    minimum_fit_score = _coerce_int(notification_settings.get("minimum_fit_score"))
+    role = normalized_preferences.target_role or "unknown"
+    years = normalized_preferences.years_of_experience
+    title_keywords = normalized_preferences.title_keywords
+    must_haves = normalized_preferences.preferred_skills
+    deal_breakers = normalized_preferences.excluded_signals
+    minimum_fit_score = normalized_preferences.minimum_fit_score
     recent_dislike_signals = _normalize_memory(recent_memory)
 
     missing_profile_fields: list[str] = []
@@ -183,6 +196,11 @@ def build_normalized_evaluation_context(
         ),
         soft_preferences=NormalizedSoftPreferences(
             title_keywords=title_keywords,
+            work_modes=normalized_preferences.work_modes,
+            locations=normalized_preferences.locations,
+            team_contexts=normalized_preferences.team_contexts,
+            comparison_tones=normalized_preferences.comparison_tones,
+            note=normalized_preferences.note,
             minimum_fit_score=minimum_fit_score,
             recent_dislike_signals=recent_dislike_signals,
         ),

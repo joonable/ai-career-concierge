@@ -515,6 +515,7 @@ def seed_user(
     email: str = "scaffold-user@example.com",
     role: str = "Machine Learning Engineer",
     years_of_experience: int = 6,
+    preferences: dict | None = None,
 ) -> User:
     user = User(
         email=email,
@@ -528,6 +529,7 @@ def seed_user(
             "must_haves": ["Python", "SQL", "recommender systems"],
             "deal_breakers": ["contract-only", "pure frontend"],
         },
+        preferences=preferences or {},
         notification_settings={"minimum_fit_score": 80, "delivery_channel": "slack"},
     )
     session.add(user)

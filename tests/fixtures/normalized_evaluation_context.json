@@ -10,6 +10,24 @@
         "must_haves": ["Python", "SQL", "MLOps", "SQL"],
         "deal_breakers": ["contract-only", "onsite-only"]
       },
+      "preferences": {
+        "work_modes": ["hybrid"],
+        "locations": ["seoul", "pangyo"],
+        "team_contexts": ["ai-first", "product-team"],
+        "skills": {
+          "preset": ["python", "mlops"],
+          "custom": ["Feature Store"]
+        },
+        "exclusions": {
+          "preset": ["contract"],
+          "custom": ["박사 학위 필수"]
+        },
+        "comparisons": {
+          "delivery-vs-research": 1,
+          "llm-vs-classic": -1
+        },
+        "note": "B2B SaaS 경험이 있으면 더 좋음"
+      },
       "notification_settings": {
         "minimum_fit_score": 80,
         "delivery_channel": "slack"
@@ -39,11 +57,19 @@
     "target_role": "Machine Learning Engineer",
     "years_of_experience": 6,
     "hard_preferences": {
-      "must_haves": ["Python", "SQL", "MLOps"],
-      "deal_breakers": ["contract-only", "onsite-only"]
+      "must_haves": ["Python", "MLOps / serving", "Feature Store"],
+      "deal_breakers": ["계약직 중심", "박사 학위 필수"]
     },
     "soft_preferences": {
       "title_keywords": ["MLE", "ML Platform"],
+      "work_modes": ["하이브리드"],
+      "locations": ["서울", "판교"],
+      "team_contexts": ["AI/ML 팀이 핵심 조직", "프로덕트와 가까운 역할"],
+      "comparison_tones": [
+        "약하게 오른쪽: 모델 개발 중심 / 서비스 적용 중심",
+        "약하게 왼쪽: LLM 응용 중심 / 전통 ML 중심"
+      ],
+      "note": "B2B SaaS 경험이 있으면 더 좋음",
       "minimum_fit_score": 80,
       "recent_dislike_signals": ["weak infra ownership", "contract-only roles"]
     },

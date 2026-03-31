@@ -5,13 +5,14 @@ from typing import Any, Dict, List
 from uuid import UUID
 
 from agent.schemas.pipeline_job import PipelineJob
+from common.user_preferences import build_normalized_stored_preferences
 from db.enums import EvaluationStatus
 
 
 def _title_matches(job: PipelineJob, user_context: Dict[str, Any]) -> bool:
-    profile_data = user_context.get("profile_data", {})
-    role = str(profile_data.get("role", "")).lower().strip()
-    keywords = [keyword.lower() for keyword in profile_data.get("title_keywords", [])]
+    preferences = build_normalized_stored_preferences(user_context)
+    role = preferences.target_role.lower().strip()
+    keywords = [keyword.lower() for keyword in preferences.title_keywords]
 
     if role and role in job.title.lower():
         return True
@@ -20,7 +21,7 @@ def _title_matches(job: PipelineJob, user_context: Dict[str, Any]) -> bool:
 
 
 def _experience_matches(job: PipelineJob, user_context: Dict[str, Any]) -> bool:
-    years = user_context.get("profile_data", {}).get("years_of_experience")
+    years = build_normalized_stored_preferences(user_context).years_of_experience
     if years is None:
         return True
 
@@ -31,6 +32,70 @@ def _experience_matches(job: PipelineJob, user_context: Dict[str, Any]) -> bool:
         return False
 
     return True
+
+
+def _location_matches(job: PipelineJob, user_context: Dict[str, Any]) -> bool:
+    preferences = build_normalized_stored_preferences(user_context)
+    if not preferences.locations:
+        return True
+
+    source_metadata = job.source_metadata if isinstance(job.source_metadata, dict) else {}
+    location_text = " ".join(
+        [
+            str(source_metadata.get("location", "") or ""),
+            str(source_metadata.get("region", "") or ""),
+            str(source_metadata.get("workplace", "") or ""),
+            job.jd_raw_text,
+        ]
+    ).lower()
+    if not location_text.strip():
+        return True
+
+    aliases = {
+        "서울": ["seoul", "서울"],
+        "판교": ["pangyo", "판교"],
+        "분당": ["bundang", "분당"],
+        "경기권": ["gyeonggi", "경기", "수원", "성남"],
+        "대전": ["daejeon", "대전"],
+        "부산": ["busan", "부산"],
+        "전국 어디든": [],
+        "해외 포함": ["global", "overseas", "remote worldwide", "international", "해외"],
+    }
+    if "전국 어디든" in preferences.locations:
+        return True
+
+    return any(
+        any(alias in location_text for alias in aliases.get(location, [location.lower()]))
+        for location in preferences.locations
+    )
+
+
+def _work_mode_matches(job: PipelineJob, user_context: Dict[str, Any]) -> bool:
+    preferences = build_normalized_stored_preferences(user_context)
+    if not preferences.work_modes:
+        return True
+
+    source_metadata = job.source_metadata if isinstance(job.source_metadata, dict) else {}
+    work_mode_text = " ".join(
+        [
+            str(source_metadata.get("employment_type", "") or ""),
+            str(source_metadata.get("employmentType", "") or ""),
+            str(source_metadata.get("workplace", "") or ""),
+            job.jd_raw_text,
+        ]
+    ).lower()
+    if not work_mode_text.strip():
+        return True
+
+    aliases = {
+        "원격": ["remote", "원격", "재택"],
+        "하이브리드": ["hybrid", "하이브리드"],
+        "상주 출근": ["onsite", "on-site", "office", "출근", "상주"],
+    }
+    return any(
+        any(alias in work_mode_text for alias in aliases.get(mode, [mode.lower()]))
+        for mode in preferences.work_modes
+    )
 
 
 @dataclass
@@ -59,6 +124,22 @@ class RuleFilterNode:
                     user_id=user_id,
                     job_id=job.job_id,
                     reason="EXPERIENCE_MISMATCH",
+                )
+                continue
+
+            if not _location_matches(job, state["user_context"]):
+                self.evaluation_store.mark_rule_rejected(
+                    user_id=user_id,
+                    job_id=job.job_id,
+                    reason="LOCATION_MISMATCH",
+                )
+                continue
+
+            if not _work_mode_matches(job, state["user_context"]):
+                self.evaluation_store.mark_rule_rejected(
+                    user_id=user_id,
+                    job_id=job.job_id,
+                    reason="WORK_MODE_MISMATCH",
                 )
                 continue
 

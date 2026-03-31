@@ -35,7 +35,7 @@ function buildOnboardingState(
     completionLabel: "1/3 입력",
     completedCount: 1,
     requiredCount: 3,
-    missingFields: ["must_haves", "deal_breakers"],
+    missingFields: ["skills", "exclusions"],
     fields: [
       {
         key: "role",
@@ -45,15 +45,15 @@ function buildOnboardingState(
         statusLabel: "입력됨",
       },
       {
-        key: "must_haves",
-        label: "필수 조건",
+        key: "skills",
+        label: "중요 스킬",
         detail: "아직 입력되지 않음",
         isComplete: false,
         statusLabel: "미입력",
       },
       {
-        key: "deal_breakers",
-        label: "비선호 조건",
+        key: "exclusions",
+        label: "제외 조건",
         detail: "아직 입력되지 않음",
         isComplete: false,
         statusLabel: "미입력",
@@ -61,8 +61,11 @@ function buildOnboardingState(
     ],
     role: "ML Engineer",
     yearsOfExperience: 6,
-    mustHaves: [],
-    dealBreakers: [],
+    preferredSkills: [],
+    exclusions: [],
+    workModes: [],
+    locations: [],
+    teamContexts: [],
     minimumFitScore: 85,
     ...overrides,
   };
@@ -121,6 +124,15 @@ function buildProfile(overrides?: Partial<UserProfileResponse>): UserProfileResp
       must_haves: ["Python", "SQL", "MLOps"],
       deal_breakers: ["contract-only", "onsite-only"],
     },
+    preferences: {
+      work_modes: [],
+      locations: [],
+      team_contexts: [],
+      skills: { preset: ["python", "sql", "mlops"], custom: [] },
+      exclusions: { preset: ["contract", "onsite-only"], custom: [] },
+      comparisons: {},
+      note: null,
+    },
     notification_settings: {
       minimum_fit_score: 85,
       delivery_channel: "slack",
@@ -135,8 +147,8 @@ describe("OnboardingStatusCard", () => {
 
     expect(screen.getByText("추천 기준이 아직 부족합니다")).toBeInTheDocument();
     expect(screen.getByText("목표 직무")).toBeInTheDocument();
-    expect(screen.getByText("필수 조건")).toBeInTheDocument();
-    expect(screen.getByText("비선호 조건")).toBeInTheDocument();
+    expect(screen.getByText("중요 스킬")).toBeInTheDocument();
+    expect(screen.getByText("제외 조건")).toBeInTheDocument();
     expect(screen.getByText("1/3 입력")).toBeInTheDocument();
     expect(screen.getAllByText("아직 입력되지 않음")).toHaveLength(2);
     expect(screen.queryByText(/^온보딩$/)).not.toBeInTheDocument();
@@ -163,22 +175,22 @@ describe("OnboardingStatusCard", () => {
               statusLabel: "입력됨",
             },
             {
-              key: "must_haves",
-              label: "필수 조건",
+              key: "skills",
+              label: "중요 스킬",
               detail: "4개 입력됨",
               isComplete: true,
               statusLabel: "입력됨",
             },
             {
-              key: "deal_breakers",
-              label: "비선호 조건",
+              key: "exclusions",
+              label: "제외 조건",
               detail: "1개 입력됨",
               isComplete: true,
               statusLabel: "입력됨",
             },
           ],
-          mustHaves: ["Python", "LLM", "MLOps", "Remote"],
-          dealBreakers: ["Onsite"],
+          preferredSkills: ["Python", "LLM", "MLOps", "Remote"],
+          exclusions: ["Onsite"],
         })}
       />,
     );

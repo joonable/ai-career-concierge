@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Optional
 
+from common.user_preferences import build_normalized_stored_preferences
+
 
 class MockGeminiEvaluator:
     async def evaluate(
@@ -20,9 +22,9 @@ class MockGeminiEvaluator:
         del evaluation_id
 
         text = f"{job.title} {job.jd_raw_text}".lower()
-        guidelines = user_context.get("guidelines", {})
-        must_haves: List[str] = guidelines.get("must_haves", [])
-        deal_breakers: List[str] = guidelines.get("deal_breakers", [])
+        normalized_preferences = build_normalized_stored_preferences(user_context)
+        must_haves: List[str] = normalized_preferences.preferred_skills
+        deal_breakers: List[str] = normalized_preferences.excluded_signals
 
         must_have_hits = [item for item in must_haves if item.lower() in text]
         deal_breakers_found = [item for item in deal_breakers if item.lower() in text]

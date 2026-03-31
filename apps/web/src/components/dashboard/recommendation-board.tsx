@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 
 import type { DashboardRecommendation } from "@/lib/dashboard_mapper";
+import { deriveDashboardProfileSummary } from "@/lib/dashboard_profile";
 import { recordEvaluationFeedback } from "@/lib/api_client_browser";
 import type { UserProfileResponse } from "@/lib/profile_types";
 
@@ -664,8 +665,9 @@ function buildRecommendationDetail(
   minimumFitScore: number,
 ) {
   const normalizedText = `${recommendation.title} ${recommendation.jdRawText} ${JSON.stringify(recommendation.sourceMetadata)}`.toLowerCase();
-  const mustHaves = profile.guidelines.must_haves;
-  const dealBreakers = profile.guidelines.deal_breakers;
+  const profileSummary = deriveDashboardProfileSummary(profile);
+  const mustHaves = profileSummary.preferredSkills;
+  const dealBreakers = profileSummary.exclusions;
   const matchedMustHaves = mustHaves.filter((item) => normalizedText.includes(item.toLowerCase()));
   const flaggedDealBreakers = dealBreakers.filter((item) => normalizedText.includes(item.toLowerCase()));
   const verdict = getVerdict(recommendation, minimumFitScore);
@@ -687,7 +689,7 @@ function buildRecommendationDetail(
   }
 
   if (recommendation.minYearsExperience !== null || recommendation.maxYearsExperience !== null) {
-    const years = profile.profile_data.years_of_experience;
+    const years = profileSummary.yearsOfExperience;
     const lowerBound = recommendation.minYearsExperience ?? 0;
     const upperBound = recommendation.maxYearsExperience ?? 99;
     if (years >= lowerBound && years <= upperBound) {

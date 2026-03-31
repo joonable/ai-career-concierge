@@ -18,6 +18,16 @@ function buildProfile(overrides?: Partial<UserProfileResponse>): UserProfileResp
       deal_breakers: [],
       ...overrides?.guidelines,
     },
+    preferences: {
+      work_modes: [],
+      locations: [],
+      team_contexts: [],
+      skills: { preset: [], custom: [] },
+      exclusions: { preset: [], custom: [] },
+      comparisons: {},
+      note: null,
+      ...overrides?.preferences,
+    },
     notification_settings: {
       minimum_fit_score: 82,
       delivery_channel: "slack",
@@ -40,11 +50,11 @@ describe("dashboard_onboarding", () => {
 
     expect(state.isComplete).toBe(false);
     expect(state.completionLabel).toBe("1/3 입력");
-    expect(state.missingFields).toEqual(["must_haves", "deal_breakers"]);
+    expect(state.missingFields).toEqual(["skills", "exclusions"]);
     expect(state.fields.map((field) => field.statusLabel)).toEqual(["입력됨", "미입력", "미입력"]);
   });
 
-  it("marks onboarding complete once role, must-haves, and deal-breakers exist", () => {
+  it("marks onboarding complete once role, skills, and exclusions exist", () => {
     const state = deriveDashboardOnboardingState(
       buildProfile({
         profile_data: {
@@ -52,9 +62,14 @@ describe("dashboard_onboarding", () => {
           years_of_experience: 6,
           title_keywords: [],
         },
-        guidelines: {
-          must_haves: ["Python", "LLM"],
-          deal_breakers: ["Onsite"],
+        preferences: {
+          work_modes: [],
+          locations: [],
+          team_contexts: [],
+          skills: { preset: ["python", "llm"], custom: [] },
+          exclusions: { preset: ["onsite-only"], custom: [] },
+          comparisons: {},
+          note: null,
         },
       }),
     );
@@ -62,7 +77,7 @@ describe("dashboard_onboarding", () => {
     expect(state.isComplete).toBe(true);
     expect(state.completionLabel).toBe("3/3 입력");
     expect(state.missingFields).toEqual([]);
-    expect(state.mustHaves).toEqual(["Python", "LLM"]);
-    expect(state.dealBreakers).toEqual(["Onsite"]);
+    expect(state.preferredSkills).toEqual(["Python", "LLM application"]);
+    expect(state.exclusions).toEqual(["상주 출근만 가능"]);
   });
 });

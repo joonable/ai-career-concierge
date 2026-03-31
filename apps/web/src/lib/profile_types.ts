@@ -1,12 +1,30 @@
 export type ProfileData = {
   role: string;
+  roles?: string[];
+  primary_role?: string;
   years_of_experience: number;
+  seniority?: string;
   title_keywords: string[];
 };
 
 export type Guidelines = {
   must_haves: string[];
   deal_breakers: string[];
+};
+
+export type PreferenceKeywordBucket = {
+  preset: string[];
+  custom: string[];
+};
+
+export type Preferences = {
+  work_modes: string[];
+  locations: string[];
+  team_contexts: string[];
+  skills: PreferenceKeywordBucket;
+  exclusions: PreferenceKeywordBucket;
+  comparisons: Record<string, number>;
+  note: string | null;
 };
 
 export type NotificationSettings = {
@@ -17,10 +35,14 @@ export type NotificationSettings = {
 export type UserProfilePayload = {
   profile_data: {
     role: string;
+    roles?: string[];
+    primary_role?: string;
     years_of_experience: number;
+    seniority?: string;
     title_keywords?: string[];
   };
   guidelines: Guidelines;
+  preferences?: Preferences;
   notification_settings: {
     minimum_fit_score: number;
     delivery_channel?: "slack";
@@ -31,6 +53,7 @@ export type UserProfileResponse = UserProfilePayload & {
   user_id: string;
   email: string;
   profile_data: ProfileData;
+  preferences: Preferences;
   notification_settings: NotificationSettings;
 };
 

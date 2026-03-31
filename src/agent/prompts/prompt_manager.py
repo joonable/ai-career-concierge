@@ -18,6 +18,11 @@ EVALUATION_PROMPT_TEMPLATE = """당신은 한 명의 사용자를 기준으로 �
 필수 조건: {must_haves}
 결격 사유: {deal_breakers}
 선호 title keywords: {title_keywords}
+선호 근무 형태: {work_modes}
+선호 지역: {locations}
+선호 팀 맥락: {team_contexts}
+비교 선택 톤: {comparison_tones}
+추가 메모: {preference_note}
 알림 최소 적합도 기준: {minimum_fit_score}
 최근 싫어요 메모: {recent_memory}
 채용 공고 제목: {job_title}

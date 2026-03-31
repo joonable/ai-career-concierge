@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import Any, Iterable
 
 from api.schemas.users import UserProfileResponse
+from common.user_preferences import build_normalized_stored_preferences
 
 
 def build_dashboard_detail_fields(*, row, user: UserProfileResponse, minimum_fit_score: int) -> dict[str, Any]:
@@ -16,11 +17,12 @@ def build_dashboard_detail_fields(*, row, user: UserProfileResponse, minimum_fit
             ]
         )
     )
-    role = user.profile_data.role.strip()
-    years = user.profile_data.years_of_experience
-    title_keywords = [keyword.strip() for keyword in user.profile_data.title_keywords if keyword.strip()]
-    must_haves = [item.strip() for item in user.guidelines.must_haves if item.strip()]
-    deal_breakers = [item.strip() for item in user.guidelines.deal_breakers if item.strip()]
+    preferences = build_normalized_stored_preferences(user.model_dump())
+    role = preferences.target_role.strip()
+    years = preferences.years_of_experience or 0
+    title_keywords = [keyword.strip() for keyword in preferences.title_keywords if keyword.strip()]
+    must_haves = [item.strip() for item in preferences.preferred_skills if item.strip()]
+    deal_breakers = [item.strip() for item in preferences.excluded_signals if item.strip()]
 
     matched_must_haves = [item for item in must_haves if item.lower() in normalized_text]
     triggered_deal_breakers = [item for item in deal_breakers if item.lower() in normalized_text]
@@ -209,6 +211,16 @@ def _build_rule_rejection_details(
         return [
             f"현재 경력 {years}년과 공고의 권장 범위 {_format_experience_range(minimum_experience, maximum_experience)}가 어긋났습니다.",
             "연차 표기가 느슨한 공고일 수 있으니 실제 역할 범위는 원문에서 다시 확인하는 것이 좋습니다.",
+        ]
+    if reason == "LOCATION_MISMATCH":
+        return [
+            "공고에 표시된 지역이 현재 선호 지역과 충분히 겹치지 않았습니다.",
+            "원격 여부나 팀 운영 방식에 따라 예외가 있을 수 있으니 원문 확인은 여전히 가치가 있습니다.",
+        ]
+    if reason == "WORK_MODE_MISMATCH":
+        return [
+            "공고의 근무 형태가 현재 선호 조건과 충분히 맞지 않았습니다.",
+            "설명이 불명확한 공고는 실제 운영 방식이 다를 수 있으니 세부 문구를 다시 확인하는 것이 좋습니다.",
         ]
     return [f"규칙 기반 필터에서 {_format_rule_reason(reason)} 사유로 제외되었습니다."]
 

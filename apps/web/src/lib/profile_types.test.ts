@@ -20,6 +20,15 @@ describe("profile_types", () => {
         must_haves: ["Python", "SQL"],
         deal_breakers: ["contract-only"],
       },
+      preferences: {
+        work_modes: [],
+        locations: [],
+        team_contexts: [],
+        skills: { preset: [], custom: [] },
+        exclusions: { preset: [], custom: [] },
+        comparisons: {},
+        note: null,
+      },
       notification_settings: {
         minimum_fit_score: 82,
         delivery_channel: "slack",
