@@ -5,6 +5,7 @@
 시스템은 크게 4개의 논리적 계층(Logical Layers)으로 구성되며, 각 계층은 API와 이벤트(Webhook)를 통해 느슨하게 결합(Loosely Coupled)됩니다.
 
 - **Presentation Layer (Web UI & Chat Ops):** Next.js 기반의 사용자 대시보드 및 Slack 양방향 메시지(Block Kit).
+    - 내부 운영 가시성을 위해 `/internal/promptops` 라우트에 PromptOps 상태 스냅샷 패널을 둡니다.
 - **Application Layer (API & Orchestration):** Python FastAPI 기반의 백엔드 서버. 에이전트 워크플로우(LangGraph)의 실행 컨텍스트를 제공하고 외부 요청을 라우팅.
 - **Agentic Data Pipeline (Ingestion & Evaluation):** Playwright 기반의 데이터 수집 모듈과 Gemini 모델을 활용한 다단(Multi-stage) 평가 엔진.
 - **PromptOps Layer (Experimentation & Review):** Prompt family, experiment, evaluator, review workflow를 관리하는 내부 운영 계층. 현재는 저장소 내부 모듈로 시작하되 향후 분리 가능한 경계를 유지.
@@ -104,6 +105,10 @@ SaaS 확장을 염두에 두고 처음부터 아키텍처를 이원화(Dev/Prod)
     - Next.js 프론트엔드에서 칸반 보드를 렌더링하기 위한 개인화된 추천 공고 목록을 반환합니다.
     - 각 추천 항목은 기본 평가 필드 외에도 상세 패널용 구조화 필드(`decision_summary`, `match_highlights`, `risk_highlights`, `confidence_level`, `rule_match_reasons`, `rule_rejection_details`, `responsibilities`, `requirements`, `preferred_requirements`, `location`, `employment_type`)를 포함합니다.
     - 위 구조화 필드는 현재 PoC 단계에서 DB에 별도 컬럼으로 저장하지 않고, 공고 원문/메타데이터와 사용자 프로필, 평가 결과를 바탕으로 백엔드에서 파생하여 응답합니다.
+- **`GET /api/v1/users/me/promptops-status`**
+    - 내부 PromptOps 운영 패널용 read-only 스냅샷 응답을 반환합니다.
+    - 응답은 production/staging/candidate prompt 식별자, latest decision, LangSmith compare / annotation queue 링크, Notion backlog 링크, 최신 요약과 backlog top 3를 포함합니다.
+    - 접근 제어는 Supabase 세션 기반 bearer 인증 위에 `PROMPTOPS_ADMIN_EMAILS` allowlist를 추가로 적용합니다.
 
 ## 8. PromptOps Architecture Boundary
 
@@ -112,3 +117,4 @@ SaaS 확장을 염두에 두고 처음부터 아키텍처를 이원화(Dev/Prod)
 - 외부 backend 연동은 `src/promptops/adapters` 아래에 두고, LangSmith는 첫 번째 adapter로 사용합니다.
 - AI Career Concierge 특화 로직(평가 policy 의미, dataset bindings, review rubric, normalized context)은 `src/promptops/projects/ai_career_concierge`에 둡니다.
 - 이 경계는 향후 PromptOps core를 별도 패키지나 프로젝트로 분리할 수 있게 하기 위한 설계 규칙입니다.
+- 내부 운영 패널은 LangSmith/Notion의 live backend를 직접 호출하지 않고, 백엔드 서비스가 제공하는 수동 PromptOps 상태 스냅샷을 렌더링합니다.

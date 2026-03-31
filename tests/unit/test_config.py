@@ -80,3 +80,13 @@ def test_get_settings_loads_default_env_file(tmp_path, monkeypatch):
     assert settings.supabase_url == "https://loaded-from-env-file.supabase.co"
 
     get_settings.cache_clear()
+
+
+def test_settings_normalize_promptops_admin_emails():
+    settings = Settings(
+        APP_ENV="development",
+        DATABASE_URL="",
+        PROMPTOPS_ADMIN_EMAILS=" admin@example.com,ADMIN@example.com, second@example.com ",
+    )
+
+    assert settings.promptops_admin_emails == ["admin@example.com", "second@example.com"]

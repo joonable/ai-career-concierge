@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta, timezone
 
+from common.config import get_settings
 from tests.conftest import auth_headers
 
 
@@ -375,3 +376,43 @@ async def test_dashboard_rejects_missing_bearer_token(client):
     response = await client.get("/api/v1/users/me/dashboard")
 
     assert response.status_code == 401
+
+
+async def test_promptops_status_returns_snapshot_for_allowed_admin(client, monkeypatch):
+    monkeypatch.setenv("PROMPTOPS_ADMIN_EMAILS", "scaffold-user@example.com")
+    get_settings.cache_clear()
+
+    response = await client.get("/api/v1/users/me/promptops-status", headers=auth_headers())
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["prompt_family"] == "job-evaluation"
+    assert body["production_identifier"] == "job-evaluation:latest"
+    assert body["staging_identifier"] == "job-evaluation:staging"
+    assert body["candidate_identifier"] == "job-evaluation · local-v4"
+    assert body["latest_decision"] == "candidate 유지"
+    assert body["compare_url"].startswith("https://smith.langchain.com/")
+    assert body["review_queue_name"] == "job-evaluation-review"
+    assert body["review_queue_url"].startswith("https://smith.langchain.com/")
+    assert body["notion_backlog_url"] == "https://www.notion.so/c5fb7393ece54107b445e90bdabab642"
+    assert body["latest_iteration_url"] == "/internal/promptops/iterations/job-evaluation-001"
+    assert len(body["latest_summary"]) == 3
+    assert len(body["next_backlog_items"]) == 3
+
+
+async def test_promptops_status_returns_404_when_allowlist_is_missing(client, monkeypatch):
+    monkeypatch.delenv("PROMPTOPS_ADMIN_EMAILS", raising=False)
+    get_settings.cache_clear()
+
+    response = await client.get("/api/v1/users/me/promptops-status", headers=auth_headers())
+
+    assert response.status_code == 404
+
+
+async def test_promptops_status_returns_404_for_non_admin_email(client, monkeypatch):
+    monkeypatch.setenv("PROMPTOPS_ADMIN_EMAILS", "other-user@example.com")
+    get_settings.cache_clear()
+
+    response = await client.get("/api/v1/users/me/promptops-status", headers=auth_headers())
+
+    assert response.status_code == 404

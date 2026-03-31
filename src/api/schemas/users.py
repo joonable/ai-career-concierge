@@ -129,6 +129,27 @@ class DashboardResponse(BaseModel):
     recommendations: List[DashboardRecommendation] = Field(default_factory=list)
 
 
+class PromptOpsBacklogItem(BaseModel):
+    title: str
+    url: str
+
+
+class PromptOpsStatusResponse(BaseModel):
+    prompt_family: str
+    production_identifier: str
+    staging_identifier: str
+    candidate_identifier: str
+    latest_decision: str
+    compare_url: str
+    review_queue_name: str
+    review_queue_url: str
+    notion_backlog_url: str
+    latest_iteration_title: str
+    latest_iteration_url: str
+    latest_summary: List[str] = Field(default_factory=list)
+    next_backlog_items: List[PromptOpsBacklogItem] = Field(default_factory=list)
+
+
 def build_user_profile_response(
     *,
     user_id: UUID,

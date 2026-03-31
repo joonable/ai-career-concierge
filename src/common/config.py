@@ -4,10 +4,10 @@ import os
 from enum import Enum
 from functools import lru_cache
 from pathlib import Path
-from typing import Optional
+from typing import Annotated, Optional
 
-from pydantic import Field, model_validator
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic import Field, field_validator, model_validator
+from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
 
 
 class AppEnv(str, Enum):
@@ -25,6 +25,10 @@ class Settings(BaseSettings):
     api_host: str = Field(default="0.0.0.0", alias="API_HOST")
     api_port: int = Field(default=8000, alias="API_PORT")
     internal_api_key: str = Field(default="replace-me", alias="INTERNAL_API_KEY")
+    promptops_admin_emails: Annotated[list[str], NoDecode] = Field(
+        default_factory=list,
+        alias="PROMPTOPS_ADMIN_EMAILS",
+    )
     web_origin: str = Field(default="", alias="WEB_ORIGIN")
 
     database_url: str = Field(
@@ -100,6 +104,30 @@ class Settings(BaseSettings):
         default="https://job.incruit.com",
         alias="SCRAPER_INCRUIT_BASE_URL",
     )
+
+    @field_validator("promptops_admin_emails", mode="before")
+    @classmethod
+    def normalize_promptops_admin_emails(cls, value: object) -> list[str]:
+        if value is None:
+            return []
+        if isinstance(value, str):
+            items = value.split(",")
+        elif isinstance(value, list):
+            items = value
+        else:
+            raise ValueError("PROMPTOPS_ADMIN_EMAILS must be a comma-separated string or list.")
+
+        normalized: list[str] = []
+        seen: set[str] = set()
+        for item in items:
+            if not isinstance(item, str):
+                raise ValueError("PROMPTOPS_ADMIN_EMAILS items must be strings.")
+            email = item.strip().lower()
+            if not email or email in seen:
+                continue
+            seen.add(email)
+            normalized.append(email)
+        return normalized
 
     @property
     def supabase_jwks_url(self) -> str:

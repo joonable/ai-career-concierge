@@ -259,6 +259,133 @@ main {
   grid-template-columns: minmax(0, 1fr) minmax(320px, 420px);
 }
 
+.promptops-page {
+  min-height: 100vh;
+}
+
+.promptops-shell {
+  display: grid;
+  gap: 20px;
+  padding-top: 40px;
+}
+
+.promptops-hero {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 28px;
+}
+
+.promptops-hero__copy {
+  display: grid;
+  gap: 10px;
+  max-width: 42rem;
+}
+
+.promptops-grid {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+.promptops-card {
+  display: grid;
+  gap: 18px;
+  padding: 24px;
+}
+
+.promptops-card__header {
+  display: grid;
+  gap: 8px;
+}
+
+.promptops-card__header h2 {
+  margin: 0;
+  font-size: 1.35rem;
+}
+
+.promptops-kv {
+  display: grid;
+  gap: 14px;
+  margin: 0;
+}
+
+.promptops-kv div {
+  display: grid;
+  gap: 6px;
+  padding: 14px 16px;
+  border: 1px solid var(--panel-border);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.45);
+}
+
+.promptops-kv dt {
+  color: var(--muted);
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.promptops-kv dd {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  word-break: break-word;
+}
+
+.promptops-decision {
+  display: grid;
+  gap: 8px;
+  min-width: 220px;
+  padding: 18px 20px;
+  border: 1px solid rgba(15, 118, 110, 0.18);
+  border-radius: 22px;
+  background: rgba(15, 118, 110, 0.1);
+}
+
+.promptops-decision__label {
+  color: var(--accent-strong);
+  font-size: 0.82rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.promptops-decision strong,
+.promptops-decision-detail {
+  font-size: 1.2rem;
+  line-height: 1.5;
+}
+
+.promptops-link-list,
+.promptops-list {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding-left: 18px;
+}
+
+.promptops-link-list {
+  padding-left: 0;
+}
+
+.promptops-link-list a,
+.promptops-inline-link,
+.promptops-list--links a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  color: var(--accent-strong);
+  font-weight: 600;
+}
+
+.promptops-empty {
+  margin: 0;
+  color: var(--muted);
+}
+
 .login-hero__copy {
   display: grid;
   gap: 14px;

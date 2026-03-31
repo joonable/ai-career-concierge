@@ -4,8 +4,14 @@ from fastapi import APIRouter, Depends
 
 from api.dependencies.auth import UserIdentity, get_current_user_identity
 from api.dependencies.supabase_store import get_evaluation_store, get_user_store
-from api.schemas.users import DashboardResponse, UserProfilePayload, UserProfileResponse
+from api.schemas.users import (
+    DashboardResponse,
+    PromptOpsStatusResponse,
+    UserProfilePayload,
+    UserProfileResponse,
+)
 from api.services.dashboard_service import DashboardService
+from api.services.promptops_status_service import PromptOpsStatusService
 from api.services.profile_service import ProfileService
 
 
@@ -42,3 +48,11 @@ def get_my_dashboard(
         evaluation_store=evaluation_store,
     )
     return service.get_dashboard(identity)
+
+
+@router.get("/me/promptops-status", response_model=PromptOpsStatusResponse)
+def get_my_promptops_status(
+    identity: UserIdentity = Depends(get_current_user_identity),
+) -> PromptOpsStatusResponse:
+    service = PromptOpsStatusService()
+    return service.get_status(identity)
