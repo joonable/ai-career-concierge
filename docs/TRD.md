@@ -121,10 +121,10 @@ SaaS 확장을 염두에 두고 처음부터 아키텍처를 이원화(Dev/Prod)
     - 각 작업에 대한 UI 확인 경로 또는 검증 링크 노출
     - PromptOps, scraper, pipeline, delivery 같은 운영 모듈 상태를 additive하게 합류시킬 수 있는 카드형 구조
 - 운영 패널의 docs canonical source는 우선 다음 문서 집합입니다:
-    - `docs/internal_status.md`
-    - `docs/operations_panel.md`
-    - `docs/agent_workboard.md`
-- `docs/agent_workboard.md`는 에이전트가 작업 완료 시 갱신하는 운영용 현재 상태 문서이며, 운영 패널은 이를 1차 요약 source로 사용할 수 있어야 합니다.
+    - `docs/internal/status.md`
+    - `docs/internal/operations_panel.md`
+    - `docs/internal/agent_workboard.md`
+- `docs/internal/agent_workboard.md`는 에이전트가 작업 완료 시 갱신하는 운영용 현재 상태 문서이며, 운영 패널은 이를 1차 요약 source로 사용할 수 있어야 합니다.
 - 문서 편집 기능이 아직 구현되지 않았더라도, TRD 기준으로 운영 패널은 적어도 문서 보기/링크/업데이트 책임을 구조적으로 수용해야 합니다.
 
 ## 9. PromptOps Architecture Boundary

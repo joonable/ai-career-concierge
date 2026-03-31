@@ -26,7 +26,7 @@ export type PromptOpsDocumentSummary = {
 };
 
 export async function loadInternalStatusDocument(): Promise<InternalStatusDocument> {
-  const markdown = await readDocsMarkdown("internal_status.md");
+  const markdown = await readDocsMarkdown("internal/status.md");
 
   return {
     updatedAt: extractDocumentDate(markdown),
@@ -40,7 +40,7 @@ export async function loadInternalStatusDocument(): Promise<InternalStatusDocume
 }
 
 export async function loadPromptOpsDocumentSummary(): Promise<PromptOpsDocumentSummary> {
-  const markdown = await readDocsMarkdown("promptops_status.md");
+  const markdown = await readDocsMarkdown("promptops/status.md");
   const family = extractFirstFamilyHeading(markdown) ?? "job-evaluation";
 
   return {
@@ -53,8 +53,8 @@ export async function loadPromptOpsDocumentSummary(): Promise<PromptOpsDocumentS
   };
 }
 
-async function readDocsMarkdown(filename: string): Promise<string> {
-  const docsPath = path.resolve(process.cwd(), "..", "..", "docs", filename);
+async function readDocsMarkdown(relativePath: string): Promise<string> {
+  const docsPath = path.resolve(process.cwd(), "..", "..", "docs", relativePath);
   return readFile(docsPath, "utf-8");
 }
 

@@ -13,9 +13,11 @@ describe("internal docs parsing", () => {
     expect(result.backlog).toContain("prompt family가 늘어나도 /internal/prompts 카드 구조를 그대로 재사용할 수 있게 확장");
     expect(result.notes).toContain("운영 상태의 canonical source는 docs 문서로 유지");
     expect(result.references).toEqual([
-      { label: "PromptOps 기준서", url: "./PROMPTOPS.md" },
-      { label: "PromptOps 현재 상태", url: "./promptops_status.md" },
-      { label: "Iteration 001 기록", url: "./promptops_iterations/job_evaluation_iteration_001.md" },
+      { label: "PromptOps 기준서", url: "../promptops/README.md" },
+      { label: "PromptOps 현재 상태", url: "../promptops/status.md" },
+      { label: "Iteration 001 기록", url: "../promptops/iterations/job_evaluation_iteration_001.md" },
+      { label: "운영 패널 문서 계약", url: "./operations_panel.md" },
+      { label: "에이전트 작업 보드", url: "./agent_workboard.md" },
     ]);
   });
 
@@ -34,7 +36,7 @@ describe("internal docs parsing", () => {
       },
       {
         label: "latest iteration report: job_evaluation_iteration_001.md",
-        url: "./promptops_iterations/job_evaluation_iteration_001.md",
+        url: "./iterations/job_evaluation_iteration_001.md",
       },
       {
         label: "Notion backlog: PromptOps Backlog",

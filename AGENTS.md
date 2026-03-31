@@ -13,16 +13,16 @@
 1. [`docs/CONTEXT.md`](docs/CONTEXT.md)
 2. [`docs/TRD.md`](docs/TRD.md)
 3. [`docs/PRD.md`](docs/PRD.md)
-4. [`docs/operations_panel.md`](docs/operations_panel.md)
-5. [`docs/agent_workboard.md`](docs/agent_workboard.md)
+4. [`docs/internal/operations_panel.md`](docs/internal/operations_panel.md)
+5. [`docs/internal/agent_workboard.md`](docs/internal/agent_workboard.md)
 
 충돌이 발생하는 경우:
 
 - `CONTEXT.md`는 일상적인 구현을 위한 작업 요약입니다.
 - `TRD.md`는 아키텍처 및 기술 계약을 정의합니다.
 - `PRD.md`는 제품 의도와 비즈니스 목표를 정의합니다.
-- `operations_panel.md`는 `/internal` 운영 패널이 어떤 문서와 상태를 노출/편집해야 하는지 정의합니다.
-- `agent_workboard.md`는 최근 작업, 현재 상태, 다음 action, backlog의 운영용 현재 상태를 기록합니다.
+- `docs/internal/operations_panel.md`는 `/internal` 운영 패널이 어떤 문서와 상태를 노출/편집해야 하는지 정의합니다.
+- `docs/internal/agent_workboard.md`는 최근 작업, 현재 상태, 다음 action, backlog의 운영용 현재 상태를 기록합니다.
 
 중요한 충돌인 경우, 추측하지 말고 작업을 멈추고 명시적으로 해결하세요.
 
@@ -347,7 +347,7 @@ PoC 루프가 작동하기 전에 다음 작업에 시간을 낭비하지 마세
 - 사용자가 변경을 요청하지 않는 한 현재 스택과 아키텍처를 유지하세요.
 - 새 모듈을 추가할 때 이름을 명시적이고 제품 개념과 일치하도록 유지하세요.
 - 작업을 마친 뒤 가능하다면 사용자가 UI에서 직접 결과를 확인할 수 있도록 구현, 연결, 또는 검증 경로까지 함께 정리하세요.
-- 의미 있는 작업을 마치면 `docs/agent_workboard.md`와 필요 시 `docs/internal_status.md`를 업데이트해 `/internal` 운영 패널에서 최신 작업 맥락이 보이게 유지하세요.
+- 의미 있는 작업을 마치면 `docs/internal/agent_workboard.md`와 필요 시 `docs/internal/status.md`를 업데이트해 `/internal` 운영 패널에서 최신 작업 맥락이 보이게 유지하세요.
 - 불확실할 때에는 다음을 가장 잘 지원하는 경로를 선택하세요:
   - 엔드투엔드 PoC 운영 가능성
   - 낮은 LLM 비용
@@ -361,9 +361,9 @@ PoC 루프가 작동하기 전에 다음 작업에 시간을 낭비하지 마세
 - `docs/CONTEXT.md`
 - `docs/TRD.md`
 - `docs/PRD.md`
-- `docs/operations_panel.md`
-- `docs/agent_workboard.md`
-- `docs/internal_status.md` (운영 패널에 보여줄 현재 상태가 바뀌는 경우)
+- `docs/internal/operations_panel.md`
+- `docs/internal/agent_workboard.md`
+- `docs/internal/status.md` (운영 패널에 보여줄 현재 상태가 바뀌는 경우)
 
 `docs/CONTEXT.md`는 간결하고 구현 중심으로 유지하세요.
 
