@@ -14,32 +14,30 @@
 - 현재 staging tag: `job-evaluation:staging`
 - 현재 candidate prompt: `job-evaluation`
 - 현재 candidate 로컬 참조: `local-v4` (직전 후보안)
-- 최신 결정: `최신 staging 프롬프트 1회 검증 완료, 승격 보류`
+- 최신 결정: `자동화 이터레이션 시스템 도입 및 002-final 실험 완료, 지표 분석 중`
 
 ### LangSmith / 문서 / Notion 링크
 
 - production prompt: `job-evaluation:latest`
 - staging prompt: `job-evaluation:staging`
 - candidate prompt: `job-evaluation` candidate lineage
-- 직전 candidate vs 최신 staging 검증 compare: [compare link](https://smith.langchain.com/o/a5f5f699-f384-58ec-9be0-2a39bb96969e/datasets/277c4ae5-c460-4be4-8895-732911768cd7/compare?selectedSessions=4906f684-12db-4c1a-88d0-782d25f5bbda&selectedSessions=91e3e1bf-e2a1-426c-a155-ce616568eabd)
-- latest iteration report: [`job_evaluation_iteration_001.md`](./iterations/job_evaluation_iteration_001.md)
+- 최신 자동화 실험 리포트: [`iteration_002-final.md`](./iterations/iteration_002-final.md)
 - human review queue: `job-evaluation-review`
 - Notion backlog: [PromptOps Backlog](https://www.notion.so/c5fb7393ece54107b445e90bdabab642)
 
-### 최신 실험 요약
+### 최신 실험 요약 (Iteration 002-final)
 
-- 최신 `job-evaluation:staging` 1회 검증 run: `promptops-latest-local-v1-b9ea2745`
-- `fit_score_band`: `0.9333`
-- `classification_match`: `1.0`
-- `deal_breaker_severity_match`, `hard_reject_penalty`, `summary_concise`: 모두 `1.0`
-- 약한 축: `concern_keywords_match 0.2667`, `confidence_alignment 0.4`, `strength_keywords_match 0.2`
-- 중간 수준 축: `role_alignment_match 0.6667`, `transferable_skill_credit 0.6667`, `must_have_coverage_match 0.7333`
+- **Pass Rate:** `0.0%` (자동 평가 기준, 키워드 불일치 위주)
+- **주요 발견:** 
+    - `classification_match` 및 `fit_score_band`는 안정적이나, `keyword_match` 계열에서 한/영 불일치로 인한 실패가 다수 발생.
+    - 모델의 추론(Reasoning) 품질은 높으나, 평가기(Evaluator)가 기대하는 정적 키워드 형식을 벗어나는 경향이 있음.
+- **기술적 진보:** `run_iteration.py` 도입으로 데이터셋 동기화부터 리포트 생성까지 자동화됨.
 
 ### 현재 해석
 
-- 최신 staging 프롬프트는 점수 밴드와 분류 일관성은 충분히 안정적인 편입니다.
-- 다만 설명형 evaluator, 특히 concern/confidence/strength 관련 축은 여전히 흔들립니다.
-- 따라서 바로 승격하기보다 human review와 다음 prompt 보강을 거친 뒤 재판단하는 편이 안전합니다.
+- 현재의 "실패"는 프롬프트의 논리적 오류보다는 **평가 지표(Metric)와 모델 답변 간의 언어 불일치**에서 기인한 것이 많습니다.
+- 프롬프트를 수정하여 답변 형식을 더 엄격하게 제한하거나, 평가기 로직을 유연하게(예: 한/영 동시 지원) 개선해야 합니다.
+- 자동화된 이터레이션 루프가 완성되었으므로, 이제 프롬프트 수정 후 즉시 검증이 가능합니다.
 
 ### 다음 backlog top 3
 

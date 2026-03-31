@@ -216,13 +216,18 @@ PromptOps의 실제 운영 흐름은 아래와 같습니다.
 1. 대상 prompt family를 정한다.
 2. baseline을 기록한다.
 3. 작은 prompt 또는 context diff를 만든다.
-4. curated dataset으로 experiment를 실행한다.
-5. baseline과 candidate를 compare한다.
+4. **자동화된 이터레이션 도구를 사용하여 실험을 실행한다.**
+   ```bash
+   # 단일 명령어로 데이터셋 동기화 -> 실험 실행 -> 리포트 생성
+   export PYTHONPATH=$PYTHONPATH:$(pwd)/src
+   APP_ENV=development .venv/bin/python3 -m promptops.run_iteration [ID]
+   ```
+5. 생성된 `docs/promptops/iterations/iteration_[ID].md` 리포트를 확인한다.
 6. borderline / failed case를 review queue로 보낸다.
 7. review 결과를 해석한다.
 8. failure를 backlog 후보로 바꾼다.
 9. candidate 유지 / 승격 / 보류를 결정한다.
-10. iteration 결과를 문서로 남긴다.
+10. 결정 사항을 `status.md`에 반영한다.
 
 ## Iteration 기록 규칙
 
