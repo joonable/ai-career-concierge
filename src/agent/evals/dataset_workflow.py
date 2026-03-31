@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Any, Dict, List, Literal, Union
+from typing import Any, Dict, Iterable, List, Literal, Union
 from uuid import UUID
 
 from langsmith.schemas import ExampleCreate
@@ -80,22 +80,84 @@ def ensure_dataset(client, *, dataset_name: str, description: str) -> Any:
     )
 
 
+def _desired_split(example: Dict[str, Any]) -> List[str]:
+    return ["gold", example.get("metadata", {}).get("scenario_type", "default")]
+
+
+def _normalize_split(split: Any) -> List[str]:
+    if split is None:
+        return []
+    if isinstance(split, str):
+        return [split]
+    if isinstance(split, Iterable):
+        return list(split)
+    return [str(split)]
+
+
+def _example_needs_update(existing: Any, *, inputs: Dict[str, Any], outputs: Dict[str, Any], metadata: Dict[str, Any], split: List[str]) -> bool:
+    return any(
+        [
+            getattr(existing, "inputs", None) != inputs,
+            getattr(existing, "outputs", None) != outputs,
+            getattr(existing, "metadata", None) != metadata,
+            _normalize_split(getattr(existing, "split", None)) != split,
+        ]
+    )
+
+
 def sync_examples(client, *, dataset_name: str, examples: List[Dict[str, Any]]) -> Any:
-    existing_ids = {
-        str(example.id)
+    existing_examples = {
+        str(example.id): example
         for example in client.list_examples(dataset_name=dataset_name, limit=500)
     }
-    serialized = [
+    created_payload = [
         ExampleCreate(
             id=UUID(str(example["id"])),
             inputs=example["inputs"],
             outputs=example["outputs"],
             metadata=example.get("metadata", {}),
-            split=["gold", example.get("metadata", {}).get("scenario_type", "default")],
+            split=_desired_split(example),
         )
         for example in examples
-        if str(example["id"]) not in existing_ids
+        if str(example["id"]) not in existing_examples
     ]
-    if not serialized:
-        return {"dataset_name": dataset_name, "created": 0, "skipped": len(examples)}
-    return client.create_examples(dataset_name=dataset_name, examples=serialized)
+    updated = 0
+    skipped = 0
+
+    for example in examples:
+        existing = existing_examples.get(str(example["id"]))
+        if existing is None:
+            continue
+
+        inputs = example["inputs"]
+        outputs = example["outputs"]
+        metadata = example.get("metadata", {})
+        split = _desired_split(example)
+
+        if _example_needs_update(
+            existing,
+            inputs=inputs,
+            outputs=outputs,
+            metadata=metadata,
+            split=split,
+        ):
+            client.update_example(
+                example["id"],
+                inputs=inputs,
+                outputs=outputs,
+                metadata=metadata,
+                split=split,
+            )
+            updated += 1
+        else:
+            skipped += 1
+
+    if created_payload:
+        client.create_examples(dataset_name=dataset_name, examples=created_payload)
+
+    return {
+        "dataset_name": dataset_name,
+        "created": len(created_payload),
+        "updated": updated,
+        "skipped": skipped,
+    }
