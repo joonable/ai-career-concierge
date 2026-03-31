@@ -48,6 +48,9 @@ class ExperimentSpec(BaseModel):
     prompt_family: str = Field(min_length=1)
     dataset_name: str = Field(min_length=1)
     evaluator_bundle: str = Field(min_length=1)
+    fixture_path: str = Field(default="")
+    experiment_prefix: str = Field(default="promptops")
+    model: str | None = None
     backend: str = Field(default="langsmith")
     metadata: Dict[str, str] = Field(default_factory=dict)
     candidate_revision_id: str | None = None
@@ -74,3 +77,43 @@ class ReviewItem(BaseModel):
     prompt_family: str = Field(min_length=1)
     status: ReviewStatus = "pending"
     notes: str = Field(default="")
+
+
+class DatasetSyncSpec(BaseModel):
+    """Dataset sync request for PromptOps experiments."""
+
+    dataset_name: str = Field(min_length=1)
+    fixture_path: str = Field(min_length=1)
+    description: str = Field(min_length=1)
+
+
+class DatasetSyncResult(BaseModel):
+    """Dataset sync result summary."""
+
+    dataset_name: str = Field(min_length=1)
+    dataset_id: str = Field(default="")
+    example_count: int = Field(ge=0)
+    created: int = Field(default=0, ge=0)
+    updated: int = Field(default=0, ge=0)
+    skipped: int = Field(default=0, ge=0)
+
+
+class ExperimentRunResult(BaseModel):
+    """Experiment execution result returned by a backend adapter."""
+
+    prompt_family: str = Field(min_length=1)
+    dataset_name: str = Field(min_length=1)
+    experiment_name: str = Field(default="")
+    session_id: str = Field(default="")
+    compare_url: str = Field(default="")
+    metadata: Dict[str, str] = Field(default_factory=dict)
+
+
+class IterationSummary(BaseModel):
+    """PromptOps iteration-level summary for one experiment cycle."""
+
+    prompt_family: str = Field(min_length=1)
+    dataset_name: str = Field(min_length=1)
+    sync_result: DatasetSyncResult
+    experiment_result: ExperimentRunResult
+    compare_url: str = Field(default="")

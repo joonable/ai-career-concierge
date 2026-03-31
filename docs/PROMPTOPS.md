@@ -167,6 +167,8 @@ Lifecycle stages are:
 - `staging`
 - `production`
 
+In Sprint 4, PromptOps experiment orchestration should wrap the existing job-eval workflow instead of replacing it. The PromptOps layer is responsible for dataset sync, experiment execution, compare-link generation, and iteration summaries, while the underlying evaluation pipeline remains in `src/agent/evals`.
+
 ### `src/promptops/adapters`
 
 Holds integration adapters, starting with LangSmith.
