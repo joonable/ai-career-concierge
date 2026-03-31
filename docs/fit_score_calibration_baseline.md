@@ -220,3 +220,73 @@ Revisit this decision if all of the following are true:
 - dataset sync/upsert is fixed,
 - the clean rerun still misses the same adjacent-role family,
 - and prompt-only changes cannot raise `fit_score_band` further without causing regressions elsewhere.
+
+## Phase 14 decision: dashboard/UI exposure
+
+Date: 2026-03-31 (Asia/Seoul)
+
+### Current dashboard contract
+
+The current dashboard detail panel already exposes user-facing interpretation fields:
+
+- `decision_summary`
+- `match_highlights`
+- `risk_highlights`
+- `confidence_level`
+- `rule_match_reasons`
+- `rule_rejection_details`
+
+These fields are built for readability from persisted evaluation data and user profile context. They are easier to understand than raw calibration axes such as `role_alignment` or `must_have_coverage`.
+
+### Value assessment
+
+The new structured axes have clear product value, but that value is currently stronger for internal calibration and debugging than for end-user decision support.
+
+- `role_alignment` is useful for diagnosing adjacent-role drift.
+- `must_have_coverage` is useful for understanding why borderline roles scored too high or too low.
+- `deal_breaker_severity` is useful as an internal safety and delivery guardrail.
+- `transferable_skills` is useful for calibration and evaluator analysis.
+
+However, these labels are not yet obviously user-friendly in the dashboard without additional explanation. A user seeing `MEDIUM role_alignment` or `PARTIAL must_have_coverage` may not understand how that differs from the already visible summary and highlights.
+
+### Decision
+
+Do not expose the new calibration axes in the end-user dashboard detail panel right now.
+
+Instead:
+
+- Keep `role_alignment`, `must_have_coverage`, `deal_breaker_severity`, and `transferable_skills` as internal evaluation/debug signals for now.
+- Continue showing user-facing explanation through `decision_summary`, `match_highlights`, `risk_highlights`, and `confidence_level`.
+- Revisit UI exposure only if these axes become stable enough to support a dedicated internal review view or a clearly explained advanced detail section.
+
+### Internal debug exposure decision
+
+If these fields are surfaced before a full end-user rollout, they should appear only in an internal/debug context first, not in the default user-facing dashboard.
+
+That keeps the current dashboard simple while still leaving room for:
+
+- an evaluator debugging panel,
+- an admin-only recommendation inspection view,
+- or a temporary feature-flagged advanced details section.
+
+### User explanation requirement
+
+If these fields are ever shown in the product UI, they will require explicit explanation copy.
+
+Minimum explanation burden:
+
+- `role_alignment`: how directly the job responsibilities match the target role
+- `must_have_coverage`: how much of the user's required criteria are actually evidenced
+- `deal_breaker_severity`: whether any hard blockers are present
+- `transferable_skills`: how much adjacent experience can still transfer
+
+Without that explanation, these fields risk feeling like opaque classifier labels rather than helpful recommendation context.
+
+### Backlog status
+
+Status: backlog, not current sprint scope.
+
+Suggested future trigger:
+
+- add only after evaluation storage and dashboard data contracts can reliably carry the structured axes,
+- and only after the calibration policy has stabilized through clean experiment reruns.
