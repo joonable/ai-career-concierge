@@ -1,149 +1,114 @@
 # PromptOps
 
-Date: 2026-03-31 (Asia/Seoul)
+날짜: 2026-03-31 (Asia/Seoul)
 
-## Goal
+## 문서 목적
 
-PromptOps is the operating layer for prompt changes in this repository.
+이 문서는 AI Career Concierge 저장소에서 PromptOps를 어떻게 운영할지 정의하는 기준서입니다.
 
-Its purpose is to make prompt improvement:
+PromptOps의 목적은 프롬프트를 단순 텍스트 자산이 아니라 다음 요소를 포함한 운영 대상로 관리하는 것입니다.
 
-- smaller in scope,
-- safer to ship,
-- measurable through experiments,
-- reviewable by both LLM judges and humans,
-- and resilient to changing context quality from onboarding and future product features.
+- 버전과 lifecycle
+- 실험과 비교
+- LLM judge와 human review
+- failure 분석
+- 다음 iteration backlog
 
-This repository's PromptOps starts as an internal module, not as a separate package. However, the structure should preserve a clean boundary so that shared pieces can later be extracted into a reusable package or project.
+이 문서는 구현 히스토리나 스프린트 기록이 아니라, 현재 기준의 운영 원칙과 책임 경계를 설명합니다.
 
-## In Scope
+## PromptOps의 목표
 
-- prompt family registry and lifecycle metadata
-- experiment orchestration for curated datasets
-- evaluator composition
+이 저장소에서 PromptOps는 다음 문제를 해결해야 합니다.
+
+- 프롬프트 변경을 작은 단위로 안전하게 진행한다.
+- 프롬프트 변경 효과를 curated dataset 실험으로 측정한다.
+- borderline case와 실패 케이스를 사람 검토까지 연결한다.
+- 실패를 다음 수정 작업으로 바로 이어지게 만든다.
+- onboarding 및 향후 feature 변화로 context가 늘어나도 prompt가 덜 흔들리게 만든다.
+
+한 줄로 요약하면, PromptOps는 “좋은 프롬프트를 한 번 만드는 일”이 아니라 “프롬프트를 계속 안정적으로 개선하는 운영 체계”입니다.
+
+## 범위
+
+PromptOps가 담당하는 범위는 다음과 같습니다.
+
+- prompt family registry
+- prompt revision과 lifecycle metadata
+- curated dataset 기반 experiment orchestration
+- evaluator 결과 비교
+- review queue와 feedback contract
 - failure taxonomy
-- human review workflow contracts
-- iteration records and prompt change tracking
-- project-specific context normalization contracts
-- LangSmith integration as the initial experiment and review backend
+- backlog item 생성 규칙
+- project-specific context normalization contract
+- LangSmith 연동
 
-## Out Of Scope For The First Version
+## 비범위
 
-- a generic standalone PromptOps product
-- a full UI application for prompt review
-- automatic prompt rewriting without review
-- complex policy engines for score calibration
-- multi-project abstractions that are not yet proven by use
+현재 PromptOps가 직접 담당하지 않는 항목은 다음과 같습니다.
 
-## Design Principles
+- 범용 standalone PromptOps 제품화
+- prompt review 전용 커스텀 UI
+- review 없는 자동 prompt rewrite
+- 복잡한 score calibration rule engine
+- 아직 검증되지 않은 multi-project 공통 추상화
 
-### 1. Separate core from project-specific logic
+## 핵심 원칙
 
-The repository should distinguish between:
+### 1. Prompt는 더 큰 계약의 일부다
 
-- reusable PromptOps operating concepts
-- AI Career Concierge-specific scoring, context, and review policy
+프롬프트는 텍스트만으로 관리하지 않습니다.
 
-This allows us to move shared PromptOps pieces out later without untangling job-matching-specific logic.
-
-### 2. Treat prompt text as one artifact inside a larger contract
-
-Prompt changes should not live as raw text diffs only.
-
-Each prompt family should be understood together with:
+각 prompt family는 다음과 함께 관리되어야 합니다.
 
 - output schema contract
-- score or decision policy contract
+- policy contract
 - context normalization contract
 - evaluator set
 - review rubric
 
-### 3. Keep external backends behind adapters
+### 2. 작은 변경 단위로 개선한다
 
-LangSmith is the initial backend for:
+한 번에 큰 rewrite를 하지 않습니다.
 
-- experiments
-- dataset sync
-- compare links
-- annotation and review workflows
+기본 원칙은 다음과 같습니다.
 
-But PromptOps should depend on an adapter boundary rather than directly hard-coding backend behavior into project logic.
+- baseline을 기록한다.
+- 작은 diff 하나를 적용한다.
+- dataset 실험을 돌린다.
+- 결과를 비교한다.
+- 실패 케이스를 review로 넘긴다.
+- 다음 수정 항목을 backlog로 만든다.
 
-### 4. Normalize context before prompt injection
+### 3. raw context를 바로 prompt에 넣지 않는다
 
-Raw profile, onboarding, guideline, and job data will keep evolving.
+prompt는 raw onboarding/profile/job dict를 직접 읽는 대신 정규화된 context를 읽어야 합니다.
 
-Prompt families should consume normalized context blocks rather than raw incoming fields wherever possible. This reduces instability when upstream product features change shape or quality.
+이 원칙은 다음 문제를 줄입니다.
 
-## Core vs Project-Specific Boundary
+- upstream feature shape 변경
+- field naming drift
+- 누락 정보 처리의 일관성 부족
+- 프롬프트 본문에 과도한 데이터 의존성 발생
 
-### PromptOps Core
+### 4. 외부 backend는 adapter 뒤에 둔다
 
-The following concepts should stay generic enough to move into a future shared package:
+현재 PromptOps는 LangSmith를 backend로 사용하지만, core가 LangSmith API에 직접 종속되지는 않습니다.
 
-- prompt family metadata
-- prompt revision metadata
-- experiment spec and experiment summary
-- review item and review status
-- failure classification interface
-- iteration record
-- backlog item shape for prompt improvement work
-- LangSmith adapter boundary
+dataset sync, experiment 실행, compare link, review queue 연동은 adapter 계층 뒤에서 처리합니다.
 
-### AI Career Concierge Project Layer
+### 5. failure는 반드시 다음 액션으로 이어져야 한다
 
-The following concepts remain specific to this repository until proven reusable:
+실패는 “틀렸다”로 끝나면 안 됩니다.
 
-- `job-evaluation` and `memory-summary` prompt families
-- fit score policy and calibration semantics
-- role alignment / must-have coverage / deal-breaker severity meaning
-- onboarding and guideline normalization for job matching
-- curated job evaluation dataset and scenario families
-- human review rubric for job recommendation quality
+모든 실패는 가능한 한 다음 중 하나로 연결되어야 합니다.
 
-## Iteration Loop
+- prompt wording gap
+- policy gap
+- context normalization gap
+- dataset truth gap
+- missing product feature
 
-PromptOps iterations should follow a small-change loop:
-
-1. Record baseline prompt version and experiment result.
-2. Apply one focused prompt or context change.
-3. Run experiment against the curated dataset.
-4. Compare rule-based and LLM-judge outputs.
-5. Route borderline or failed cases to human review.
-6. Classify failures into taxonomy buckets.
-7. Convert validated gaps into prompt, context, dataset, or feature backlog items.
-8. Decide whether to promote, revise, or discard the candidate.
-
-The unit of improvement is an iteration, not an arbitrary prompt edit.
-
-Iteration artifacts should be written under `docs/promptops_iterations/` so each prompt family can keep a lightweight history of:
-
-- baseline and candidate revisions
-- experiment links and result deltas
-- human review queue handoff
-- next backlog items
-
-## LangSmith Decision
-
-LangSmith is the default backend for the first PromptOps version.
-
-It is responsible for:
-
-- prompt storage and version lineage
-- curated dataset sync
-- experiment execution and comparison
-- review queue support through annotation workflows
-- attaching machine and human feedback to runs
-
-This is a repository decision, not a permanent architecture lock-in. The boundary for later extraction is the adapter module under `src/promptops/adapters/`.
-
-Official LangSmith references used for Sprint 5 design:
-
-- Annotation queues: `https://docs.langchain.com/langsmith/annotation-queues`
-- Feedback configs and queue SDK: `https://docs.langchain.com/langsmith/annotation-queues-sdk`
-- Attach user feedback: `https://docs.langchain.com/langsmith/attach-user-feedback`
-
-## Initial Repository Layout
+## 구조
 
 ```text
 src/promptops/
@@ -155,70 +120,191 @@ src/promptops/
 
 ### `src/promptops/core`
 
-Holds generic PromptOps operating models and services:
+PromptOps의 공통 운영 개념과 로직을 둡니다.
 
-- models
-- registry
-- experiments
-- evaluators
-- reviews
-- failures
-- iterations
-- backlog
+대표 역할:
 
-The initial managed entities in Sprint 2 are:
+- prompt family / revision 모델
+- experiment spec / summary 모델
+- review item / feedback 모델
+- failure taxonomy 모델
+- backlog item 모델
+- dataset sync와 experiment orchestration
 
-- prompt family
-- prompt metadata
-- prompt revision
-- experiment spec
-- iteration record
+이 계층은 나중에 별도 패키지로 분리될 가능성이 있는 공통 영역입니다.
 
-Lifecycle stages are:
+### `src/promptops/adapters`
+
+외부 backend 연결부를 둡니다.
+
+현재 역할:
+
+- LangSmith dataset sync
+- LangSmith experiment 실행
+- compare link 생성
+- annotation queue 생성 및 run 연결
+
+### `src/promptops/projects/ai_career_concierge`
+
+이 저장소 전용 PromptOps 설정과 정책을 둡니다.
+
+대표 역할:
+
+- prompt family 등록
+- normalized evaluation context 정의
+- review rubric 정의
+- feedback를 backlog로 바꾸는 규칙
+
+이 계층은 도메인 의미가 강하므로 당분간 프로젝트 전용으로 유지합니다.
+
+## 핵심 엔티티
+
+### Prompt Family
+
+논리적으로 하나의 프롬프트 계열을 의미합니다.
+
+예:
+
+- `job-evaluation`
+- `memory-summary`
+
+각 family는 다음 정보를 가집니다.
+
+- 식별자
+- 설명
+- 현재 active stage
+- metadata
+- revision 목록
+
+### Prompt Revision
+
+하나의 구체적인 변경 버전입니다.
+
+revision은 최소한 다음 정보를 가져야 합니다.
+
+- revision id
+- 어떤 family에 속하는지
+- 어떤 stage에 속하는지
+- 어떤 이유로 바뀌었는지
+
+### Lifecycle Stage
+
+현재 lifecycle stage는 다음 세 가지를 사용합니다.
 
 - `candidate`
 - `staging`
 - `production`
 
-In Sprint 4, PromptOps experiment orchestration should wrap the existing job-eval workflow instead of replacing it. The PromptOps layer is responsible for dataset sync, experiment execution, compare-link generation, and iteration summaries, while the underlying evaluation pipeline remains in `src/agent/evals`.
+의미는 다음과 같습니다.
 
-In Sprint 5, review workflow contracts should define:
+- `candidate`: 실험과 검토 중인 버전
+- `staging`: 비교적 안정적이지만 추가 확인이 가능한 버전
+- `production`: 실제 기준 버전
 
-- which runs are routed to LLM judge vs human review
-- which rubric criteria humans score
-- how borderline and failure cases are selected
-- how review feedback is stored and converted into backlog candidates
-- how queue payloads map onto LangSmith annotation queue concepts
+### Experiment
 
-### `src/promptops/adapters`
+experiment는 특정 prompt revision을 curated dataset에 대해 평가한 실행 단위입니다.
 
-Holds integration adapters, starting with LangSmith.
+최소한 다음과 연결되어야 합니다.
 
-### `src/promptops/projects/ai_career_concierge`
+- prompt family
+- dataset
+- evaluator bundle
+- compare link
+- experiment metadata
 
-Holds this repository's prompt families, normalized context definitions, dataset bindings, evaluator bundles, review rubric, and backlog mapping rules.
+### Review Item
 
-In Sprint 3, job evaluation prompts should stop reading raw profile/guideline/job dictionaries directly and instead consume a normalized evaluation context contract from `projects/ai_career_concierge/context.py`.
+사람 또는 LLM judge가 검토할 개별 단위입니다.
 
-## Review Workflow Spec
+review item은 다음 정보를 가집니다.
 
-### Review modes
+- 어떤 prompt family인지
+- 어떤 experiment인지
+- 어떤 run인지
+- 어떤 이유로 review에 들어왔는지
+- 현재 상태가 무엇인지
+
+### Failure Record
+
+실패를 구조적으로 기록한 객체입니다.
+
+최소 정보:
+
+- taxonomy key
+- category
+- 요약
+- 근거
+
+### Backlog Item
+
+다음 iteration 후보 작업입니다.
+
+최소 정보:
+
+- item key
+- category
+- priority
+- title
+- action
+- evidence
+
+## PromptOps 운영 프로세스
+
+PromptOps는 아래 순서로 운영합니다.
+
+1. 대상 prompt family를 고른다.
+2. baseline revision과 baseline experiment를 기록한다.
+3. 작은 prompt diff 또는 context diff 하나를 만든다.
+4. curated dataset으로 experiment를 실행한다.
+5. baseline과 candidate를 compare한다.
+6. evaluator miss와 borderline case를 추린다.
+7. 필요한 case를 human review queue로 보낸다.
+8. review 결과를 taxonomy와 backlog item으로 변환한다.
+9. candidate를 유지, 수정, promote 중 하나로 결정한다.
+10. iteration 산출물을 문서로 남긴다.
+
+iteration 산출물은 `docs/promptops_iterations/` 아래에 기록합니다.
+
+## Context Normalization 원칙
+
+PromptOps에서 prompt는 raw 입력 대신 normalized context를 읽어야 합니다.
+
+현재 job evaluation 기준 normalized context는 다음 성격을 가집니다.
+
+- hard preferences
+- soft preferences
+- job evidence
+- missingness
+
+즉, prompt는 원본 onboarding payload의 shape에 직접 의존하지 않고 “평가에 필요한 의미 단위”에 의존해야 합니다.
+
+## Review 운영 원칙
+
+### Review mode
 
 - `llm_judge`
 - `human`
 
-### Review queue
+### Human review 대상
 
-For AI Career Concierge, the initial human review queue is:
+human review는 모든 케이스를 다루지 않습니다.
 
-- queue name: `job-evaluation-review`
-- backend: LangSmith
-- queue mode: `single`
-- prompt family: `job-evaluation`
+우선순위는 다음과 같습니다.
+
+- borderline case
+- evaluator miss가 있는 case
+- 정책적으로 민감한 case
+
+현재 기본 rule은 다음과 같습니다.
+
+- `fit_score`가 `40`에서 `79` 사이
+- 또는 `role_alignment = MEDIUM`
+- 또는 tracked evaluator score 중 하나라도 `1.0` 미만
 
 ### Human rubric
 
-The initial rubric criteria are:
+현재 `job-evaluation` human rubric은 다음 항목을 사용합니다.
 
 - `role_alignment`
 - `must_have_coverage`
@@ -226,44 +312,27 @@ The initial rubric criteria are:
 - `transferable_skill_credit`
 - `summary_usefulness`
 
-### Case selection rules
+### Review queue
 
-Send a case to human review when either of these is true:
+현재 기본 human review queue는 다음과 같습니다.
 
-- it is a borderline case
-  - current default: `fit_score` between `40` and `79`, or `role_alignment = MEDIUM`
-- it is a failure case
-  - current default: any tracked evaluator score is below `1.0`
+- queue name: `job-evaluation-review`
+- backend: LangSmith
+- queue mode: `single`
 
-This keeps human review focused on ambiguous or broken cases rather than obvious passes.
+## Failure Taxonomy 원칙
 
-### Feedback record
+실패는 category와 taxonomy key로 분류합니다.
 
-Review feedback should capture:
+현재 category는 다음과 같습니다.
 
-- review item id
-- reviewer type (`llm_judge` or `human`)
-- reviewer id when available
-- rubric scores
-- freeform notes
-- final decision
-- derived backlog candidates
+- `prompt`
+- `context`
+- `dataset`
+- `policy`
+- `feature`
 
-### Backlog mapping
-
-Review feedback should not stop at "good" or "bad". It should map into candidate work buckets such as:
-
-- prompt wording gaps
-- policy gaps
-- context normalization gaps
-- dataset truth gaps
-- missing product features
-
-## Failure Taxonomy And Backlog Rules
-
-### Failure taxonomy
-
-The initial taxonomy keys are:
+현재 대표 taxonomy key는 다음과 같습니다.
 
 - `prompt.role_alignment`
 - `prompt.must_have_coverage`
@@ -276,69 +345,68 @@ The initial taxonomy keys are:
 - `policy.score_band_definition`
 - `feature.onboarding_signal_missing`
 
-### Category split
+이 taxonomy는 “문제가 어디 있는가”를 빠르게 분리하기 위한 운영 도구입니다.
 
-PromptOps should separate failures into:
+## Backlog 운영 원칙
 
-- prompt issue
-- dataset issue
-- context issue
-- policy issue
-- feature issue
+review나 experiment 결과는 backlog item으로 이어져야 합니다.
 
-This matters because the correct next action is different:
+기본 priority 규칙은 다음과 같습니다.
 
-- prompt issue: change prompt wording or structure
-- dataset issue: add or fix gold truth
-- context issue: add or normalize an input signal
-- policy issue: clarify product scoring rules first
-- feature issue: collect a new signal in the product
+- `policy` → `P0`
+- `feature` → `P1`
+- `prompt` → `P1`
+- `context` → `P1`
+- `dataset` → `P2`
 
-### Backlog item format
+일반적으로 다음 흐름을 따릅니다.
 
-Each backlog item should capture:
+1. failure를 taxonomy로 분류한다.
+2. category를 정한다.
+3. evidence를 붙인다.
+4. backlog item을 만든다.
+5. 다음 iteration 후보로 등록한다.
 
-- stable item key
-- category
-- priority
-- title
-- next action
-- linked taxonomy keys
-- evidence from review or experiment
+## LangSmith 역할
 
-### Priority defaults
+현재 LangSmith는 PromptOps의 기본 backend입니다.
 
-Default priority by category:
+주요 역할:
 
-- `policy` -> `P0`
-- `feature` -> `P1`
-- `prompt` -> `P1`
-- `context` -> `P1`
-- `dataset` -> `P2`
+- prompt lineage 저장
+- dataset sync
+- experiment 실행
+- compare link 제공
+- annotation queue 기반 human review
+- machine / human feedback 저장
 
-### Operating rule
+이 프로젝트는 현재 LangSmith를 적극 활용하지만, PromptOps core는 LangSmith와 직접 결합하지 않도록 유지해야 합니다.
 
-Review should produce actionable backlog items, not just observations.
+## 분리 원칙
 
-If a reviewer says a case is wrong, PromptOps should answer:
+PromptOps는 현재 이 저장소 내부 모듈로 존재하지만, 나중에는 일부를 분리할 수 있어야 합니다.
 
-- what kind of failure it is,
-- what should change next,
-- and how urgent that change is.
+분리 가능성이 높은 부분:
 
-### Example failure backlog items
+- core models
+- registry interface
+- experiment orchestration interface
+- review item / feedback contract
+- failure / backlog 기본 모델
+- LangSmith adapter
 
-- `prompt:role-alignment`
-- `prompt:must-have-coverage`
-- `policy:deal-breaker-handling`
-- `dataset:borderline-coverage-gap`
-- `feature:onboarding-signal-missing`
+당분간 프로젝트 전용으로 남겨둘 부분:
 
-## Definition Of Done For Sprint 1
+- fit score 정책 의미
+- `job-evaluation` prompt 의미 체계
+- job matching용 normalized context
+- human review rubric
+- feedback에서 backlog로 가는 domain-specific 규칙
 
-Sprint 1 is complete when:
+즉, 운영 프레임은 공통화 가능하게 만들고, 평가 의미 체계는 프로젝트 전용으로 유지하는 것이 원칙입니다.
 
-- `docs/PROMPTOPS.md` makes the operating model understandable,
-- the `src/promptops/` package skeleton exists,
-- core vs project-specific boundaries are visible in code layout,
-- and the scaffold can be imported without implementation-specific coupling.
+## 참고 문서
+
+- 제품/기술 컨텍스트: [`CONTEXT.md`](./CONTEXT.md)
+- 기술 설계: [`TRD.md`](./TRD.md)
+- iteration 기록: `docs/promptops_iterations/`
