@@ -167,18 +167,21 @@ class FakeUserStore:
             email=user.email,
             profile_data=user.profile_data,
             guidelines=user.guidelines,
+            preferences=user.preferences,
             notification_settings=user.notification_settings,
         )
         sections = serialize_user_profile_sections(profile)
         if (
             user.profile_data != sections["profile_data"]
             or user.guidelines != sections["guidelines"]
+            or user.preferences != sections["preferences"]
             or user.notification_settings != sections["notification_settings"]
         ):
             user = self.repo.update_profile(
                 user=user,
                 profile_data=sections["profile_data"],
                 guidelines=sections["guidelines"],
+                preferences=sections["preferences"],
                 notification_settings=sections["notification_settings"],
             )
             profile = build_user_profile_response(
@@ -186,6 +189,7 @@ class FakeUserStore:
                 email=user.email,
                 profile_data=user.profile_data,
                 guidelines=user.guidelines,
+                preferences=user.preferences,
                 notification_settings=user.notification_settings,
             )
         return profile
@@ -201,6 +205,7 @@ class FakeUserStore:
             user=user,
             profile_data=sections["profile_data"],
             guidelines=sections["guidelines"],
+            preferences=sections["preferences"],
             notification_settings=sections["notification_settings"],
         )
         identity.user_id = updated.id

@@ -17,6 +17,15 @@ async def test_profile_get_and_update_round_trip(client, db_session):
     assert get_response.json()["email"] == "scaffold-user@example.com"
     assert get_response.json()["profile_data"]["role"] == ""
     assert get_response.json()["profile_data"]["title_keywords"] == []
+    assert get_response.json()["preferences"] == {
+        "work_modes": [],
+        "locations": [],
+        "team_contexts": [],
+        "skills": {"preset": [], "custom": []},
+        "exclusions": {"preset": [], "custom": []},
+        "comparisons": {},
+        "note": None,
+    }
     assert get_response.json()["guidelines"]["must_haves"] == []
     assert get_response.json()["notification_settings"]["minimum_fit_score"] == 80
     assert get_response.json()["notification_settings"]["delivery_channel"] == "slack"
@@ -40,13 +49,35 @@ async def test_profile_get_and_update_round_trip(client, db_session):
                 "must_haves": ["Python", "SQL"],
                 "deal_breakers": ["contract-only"],
             },
+            "preferences": {
+                "work_modes": ["hybrid"],
+                "locations": ["seoul", "pangyo"],
+                "team_contexts": ["ai-first"],
+                "skills": {
+                    "preset": ["python", "sql"],
+                    "custom": ["Spark"],
+                },
+                "exclusions": {
+                    "preset": ["contract"],
+                    "custom": ["박사 학위 필수"],
+                },
+                "comparisons": {"delivery-vs-research": 1},
+                "note": "B2B SaaS 선호",
+            },
             "notification_settings": {"minimum_fit_score": 82},
         },
     )
 
     assert update_response.status_code == 200
     assert update_response.json()["profile_data"]["role"] == "Machine Learning Engineer"
-    assert update_response.json()["guidelines"]["must_haves"] == ["Python", "SQL"]
+    assert update_response.json()["profile_data"]["primary_role"] == ""
+    assert update_response.json()["preferences"]["work_modes"] == ["hybrid"]
+    assert update_response.json()["preferences"]["skills"] == {
+        "preset": ["python", "sql"],
+        "custom": ["Spark"],
+    }
+    assert update_response.json()["guidelines"]["must_haves"] == ["python", "sql", "Spark"]
+    assert update_response.json()["guidelines"]["deal_breakers"] == ["contract", "박사 학위 필수"]
     assert update_response.json()["notification_settings"]["minimum_fit_score"] == 82
     assert update_response.json()["notification_settings"]["delivery_channel"] == "slack"
 
@@ -57,13 +88,14 @@ async def test_profile_get_and_update_round_trip(client, db_session):
 
     assert second_get_response.status_code == 200
     assert second_get_response.json()["profile_data"]["years_of_experience"] == 6
-    assert second_get_response.json()["guidelines"]["deal_breakers"] == ["contract-only"]
+    assert second_get_response.json()["guidelines"]["deal_breakers"] == ["contract", "박사 학위 필수"]
 
     db_session.expire_all()
     updated_user = db_session.get(User, UUID(update_response.json()["user_id"]))
     assert updated_user is not None
     assert updated_user.profile_data == second_get_response.json()["profile_data"]
     assert updated_user.guidelines == second_get_response.json()["guidelines"]
+    assert updated_user.preferences == second_get_response.json()["preferences"]
     assert updated_user.notification_settings == second_get_response.json()["notification_settings"]
 
 
@@ -81,6 +113,19 @@ async def test_profile_normalizes_whitespace_and_duplicates(client):
                 "must_haves": [" Python ", "", "python", " SQL "],
                 "deal_breakers": [" contract-only ", "contract-only", " "],
             },
+            "preferences": {
+                "work_modes": [" hybrid ", "hybrid"],
+                "skills": {
+                    "preset": [" python ", "python"],
+                    "custom": [" Spark ", "spark"],
+                },
+                "exclusions": {
+                    "preset": [" contract ", "contract"],
+                    "custom": ["  박사 학위 필수  "],
+                },
+                "comparisons": {"delivery-vs-research": "1"},
+                "note": "  remote 협업 선호  ",
+            },
             "notification_settings": {"minimum_fit_score": 80, "delivery_channel": " slack "},
         },
     )
@@ -89,8 +134,12 @@ async def test_profile_normalizes_whitespace_and_duplicates(client):
     body = response.json()
     assert body["profile_data"]["role"] == "Machine Learning Engineer"
     assert body["profile_data"]["title_keywords"] == ["ML", "ai"]
-    assert body["guidelines"]["must_haves"] == ["Python", "SQL"]
-    assert body["guidelines"]["deal_breakers"] == ["contract-only"]
+    assert body["preferences"]["work_modes"] == ["hybrid"]
+    assert body["preferences"]["skills"] == {"preset": ["python"], "custom": ["Spark"]}
+    assert body["preferences"]["comparisons"] == {"delivery-vs-research": 1}
+    assert body["preferences"]["note"] == "remote 협업 선호"
+    assert body["guidelines"]["must_haves"] == ["python", "Spark"]
+    assert body["guidelines"]["deal_breakers"] == ["contract", "박사 학위 필수"]
     assert body["notification_settings"]["delivery_channel"] == "slack"
 
 
@@ -110,6 +159,16 @@ async def test_profile_update_derives_internal_defaults_for_onboarding_fields(cl
                 "must_haves": ["Python", "SQL"],
                 "deal_breakers": ["contract-only"],
             },
+            "preferences": {
+                "skills": {
+                    "preset": ["python", "sql"],
+                    "custom": [],
+                },
+                "exclusions": {
+                    "preset": ["contract"],
+                    "custom": [],
+                },
+            },
             "notification_settings": {"minimum_fit_score": 85},
         },
     )
@@ -118,12 +177,15 @@ async def test_profile_update_derives_internal_defaults_for_onboarding_fields(cl
     body = response.json()
     assert body["profile_data"]["title_keywords"] == ["machine learning engineer"]
     assert body["notification_settings"]["delivery_channel"] == "slack"
+    assert body["guidelines"]["must_haves"] == ["python", "sql"]
+    assert body["guidelines"]["deal_breakers"] == ["contract"]
 
     db_session.expire_all()
     stored_user = db_session.get(User, UUID(body["user_id"]))
     assert stored_user is not None
     assert stored_user.profile_data == body["profile_data"]
     assert stored_user.guidelines == body["guidelines"]
+    assert stored_user.preferences == body["preferences"]
     assert stored_user.notification_settings == body["notification_settings"]
 
 
@@ -140,6 +202,11 @@ async def test_profile_rejects_invalid_payload_shape(client):
             "guidelines": {
                 "must_haves": ["Python", 123],
                 "deal_breakers": "contract-only",
+            },
+            "preferences": {
+                "comparisons": {
+                    "delivery-vs-research": 9,
+                }
             },
             "notification_settings": {"minimum_fit_score": 120},
         },

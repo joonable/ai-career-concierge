@@ -184,6 +184,8 @@ class SupabaseUserStore:
             updates["profile_data"] = normalized_sections["profile_data"]
         if existing.get("guidelines") != normalized_sections["guidelines"]:
             updates["guidelines"] = normalized_sections["guidelines"]
+        if existing.get("preferences") != normalized_sections["preferences"]:
+            updates["preferences"] = normalized_sections["preferences"]
         if existing.get("notification_settings") != normalized_sections["notification_settings"]:
             updates["notification_settings"] = normalized_sections["notification_settings"]
 
@@ -272,6 +274,7 @@ class SupabaseUserStore:
             email=row["email"],
             profile_data=row.get("profile_data"),
             guidelines=row.get("guidelines"),
+            preferences=row.get("preferences"),
             notification_settings=row.get("notification_settings"),
         )
 

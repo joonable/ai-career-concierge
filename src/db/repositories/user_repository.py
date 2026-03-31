@@ -52,10 +52,12 @@ class UserRepository:
         user: User,
         profile_data: Dict[str, Any],
         guidelines: Dict[str, Any],
+        preferences: Dict[str, Any],
         notification_settings: Dict[str, Any],
     ) -> User:
         user.profile_data = profile_data
         user.guidelines = guidelines
+        user.preferences = preferences
         user.notification_settings = notification_settings
         user.updated_at = datetime.now(timezone.utc)
 

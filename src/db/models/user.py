@@ -20,6 +20,7 @@ class User(SQLModel, table=True):
     email: str = Field(sa_column=Column(String(320), unique=True, nullable=False, index=True))
     profile_data: Dict[str, Any] = Field(default_factory=dict, sa_column=Column(JSON, nullable=False))
     guidelines: Dict[str, Any] = Field(default_factory=dict, sa_column=Column(JSON, nullable=False))
+    preferences: Dict[str, Any] = Field(default_factory=dict, sa_column=Column(JSON, nullable=False))
     notification_settings: Dict[str, Any] = Field(
         default_factory=dict,
         sa_column=Column(JSON, nullable=False),

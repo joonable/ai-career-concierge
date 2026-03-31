@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Any, List, Optional
+from typing import Any, Dict, List, Optional
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
@@ -16,13 +16,21 @@ class ProfileData(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     role: str = Field(default="", max_length=120)
+    roles: List[str] = Field(default_factory=list)
+    primary_role: str = Field(default="", max_length=120)
     years_of_experience: int = Field(default=0, ge=0, le=50)
+    seniority: str = Field(default="", max_length=40)
     title_keywords: List[str] = Field(default_factory=list)
 
-    @field_validator("role")
+    @field_validator("role", "primary_role", "seniority")
     @classmethod
     def validate_role(cls, value: str) -> str:
         return value.strip()
+
+    @field_validator("roles", mode="before")
+    @classmethod
+    def normalize_roles(cls, value: Any) -> List[str]:
+        return _normalize_string_list(value)
 
     @field_validator("title_keywords", mode="before")
     @classmethod
@@ -30,7 +38,13 @@ class ProfileData(BaseModel):
         return _normalize_string_list(value)
 
     @model_validator(mode="after")
-    def ensure_keywords_include_role(self) -> "ProfileData":
+    def ensure_profile_identity_fields(self) -> "ProfileData":
+        if not self.roles and self.primary_role:
+            self.roles = [self.primary_role]
+        if self.roles and not self.primary_role:
+            self.primary_role = self.roles[0]
+        if not self.role and self.primary_role:
+            self.role = self.primary_role
         if not self.title_keywords and self.role:
             self.title_keywords = [self.role.lower()]
         return self
@@ -46,6 +60,84 @@ class Guidelines(BaseModel):
     @classmethod
     def normalize_guideline_items(cls, value: Any) -> List[str]:
         return _normalize_string_list(value)
+
+
+class PreferenceKeywordBucket(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    preset: List[str] = Field(default_factory=list)
+    custom: List[str] = Field(default_factory=list)
+
+    @field_validator("preset", "custom", mode="before")
+    @classmethod
+    def normalize_keyword_bucket_items(cls, value: Any) -> List[str]:
+        return _normalize_string_list(value)
+
+
+class Preferences(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    work_modes: List[str] = Field(default_factory=list)
+    locations: List[str] = Field(default_factory=list)
+    team_contexts: List[str] = Field(default_factory=list)
+    skills: PreferenceKeywordBucket = Field(default_factory=PreferenceKeywordBucket)
+    exclusions: PreferenceKeywordBucket = Field(default_factory=PreferenceKeywordBucket)
+    comparisons: Dict[str, int] = Field(default_factory=dict)
+    note: Optional[str] = None
+
+    @field_validator("work_modes", "locations", "team_contexts", mode="before")
+    @classmethod
+    def normalize_preference_lists(cls, value: Any) -> List[str]:
+        return _normalize_string_list(value)
+
+    @field_validator("comparisons", mode="before")
+    @classmethod
+    def normalize_comparisons(cls, value: Any) -> Dict[str, int]:
+        if value is None:
+            return {}
+        if not isinstance(value, dict):
+            raise ValueError("Comparisons must be an object.")
+
+        normalized: Dict[str, int] = {}
+        for key, raw in value.items():
+            if not isinstance(key, str):
+                raise ValueError("Comparison keys must be strings.")
+            key_name = key.strip()
+            if not key_name:
+                continue
+            try:
+                parsed = int(raw)
+            except (TypeError, ValueError) as exc:
+                raise ValueError("Comparison values must be integers.") from exc
+            if parsed < -2 or parsed > 2:
+                raise ValueError("Comparison values must be between -2 and 2.")
+            normalized[key_name] = parsed
+        return normalized
+
+    @field_validator("note", mode="before")
+    @classmethod
+    def normalize_note(cls, value: Any) -> Optional[str]:
+        if value is None:
+            return None
+        if not isinstance(value, str):
+            raise ValueError("Note must be a string.")
+        normalized = value.strip()
+        return normalized or None
+
+    def has_content(self) -> bool:
+        return any(
+            [
+                self.work_modes,
+                self.locations,
+                self.team_contexts,
+                self.skills.preset,
+                self.skills.custom,
+                self.exclusions.preset,
+                self.exclusions.custom,
+                self.comparisons,
+                self.note,
+            ]
+        )
 
 
 class NotificationSettings(BaseModel):
@@ -75,7 +167,14 @@ class UserProfileBody(BaseModel):
 
     profile_data: ProfileData = Field(default_factory=ProfileData)
     guidelines: Guidelines = Field(default_factory=Guidelines)
+    preferences: Preferences = Field(default_factory=Preferences)
     notification_settings: NotificationSettings = Field(default_factory=NotificationSettings)
+
+    @model_validator(mode="after")
+    def apply_structured_compatibility_defaults(self) -> "UserProfileBody":
+        if self.preferences.has_content():
+            self.guidelines = _build_legacy_guidelines_from_preferences(self.preferences)
+        return self
 
 
 class UserProfilePayload(UserProfileBody):
@@ -156,13 +255,15 @@ def build_user_profile_response(
     email: str,
     profile_data: Any,
     guidelines: Any,
+    preferences: Any,
     notification_settings: Any,
 ) -> UserProfileResponse:
     return UserProfileResponse(
         user_id=user_id,
         email=email,
         profile_data=_build_profile_data(profile_data),
-        guidelines=_build_guidelines(guidelines),
+        guidelines=_build_guidelines(guidelines, preferences=preferences),
+        preferences=_build_preferences(preferences),
         notification_settings=_build_notification_settings(notification_settings),
     )
 
@@ -171,6 +272,7 @@ def serialize_user_profile_sections(profile: UserProfileBody) -> dict[str, dict[
     return {
         "profile_data": profile.profile_data.model_dump(),
         "guidelines": profile.guidelines.model_dump(),
+        "preferences": profile.preferences.model_dump(),
         "notification_settings": profile.notification_settings.model_dump(),
     }
 
@@ -205,17 +307,20 @@ def _build_profile_data(value: Any) -> ProfileData:
 
     return ProfileData(
         role=_coerce_string(payload.get("role")),
+        roles=payload.get("roles", []),
+        primary_role=_coerce_string(payload.get("primary_role")),
         years_of_experience=_coerce_bounded_int(
             payload.get("years_of_experience"),
             default=0,
             minimum=0,
             maximum=50,
         ),
+        seniority=_coerce_string(payload.get("seniority")),
         title_keywords=title_keywords,
     )
 
 
-def _build_guidelines(value: Any) -> Guidelines:
+def _build_guidelines(value: Any, *, preferences: Any) -> Guidelines:
     payload = value if isinstance(value, dict) else {}
     must_haves = payload.get("must_haves", [])
     if not isinstance(must_haves, list):
@@ -225,9 +330,39 @@ def _build_guidelines(value: Any) -> Guidelines:
     if not isinstance(deal_breakers, list):
         deal_breakers = []
 
-    return Guidelines(
+    explicit = Guidelines(
         must_haves=must_haves,
         deal_breakers=deal_breakers,
+    )
+    structured_preferences = _build_preferences(preferences)
+    if structured_preferences.has_content():
+        return _build_legacy_guidelines_from_preferences(structured_preferences)
+    return explicit
+
+
+def _build_preferences(value: Any) -> Preferences:
+    payload = value if isinstance(value, dict) else {}
+    return Preferences(
+        work_modes=payload.get("work_modes", []),
+        locations=payload.get("locations", []),
+        team_contexts=payload.get("team_contexts", []),
+        skills=payload.get("skills", {}),
+        exclusions=payload.get("exclusions", {}),
+        comparisons=payload.get("comparisons", {}),
+        note=payload.get("note"),
+    )
+
+
+def _build_legacy_guidelines_from_preferences(preferences: Preferences) -> Guidelines:
+    return Guidelines(
+        must_haves=[
+            *preferences.skills.preset,
+            *preferences.skills.custom,
+        ],
+        deal_breakers=[
+            *preferences.exclusions.preset,
+            *preferences.exclusions.custom,
+        ],
     )
 
 
