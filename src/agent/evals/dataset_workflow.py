@@ -2,11 +2,17 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, List, Literal, Union
 from uuid import UUID
 
 from langsmith.schemas import ExampleCreate
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
+
+
+RoleAlignment = Literal["HIGH", "MEDIUM", "LOW"]
+MustHaveCoverage = Literal["STRONG", "PARTIAL", "WEAK"]
+DealBreakerSeverity = Literal["NONE", "SOFT", "HARD"]
+TransferableSkillLevel = Literal["HIGH", "MEDIUM", "LOW"]
 
 
 class CuratedExampleOutputs(BaseModel):
@@ -19,15 +25,40 @@ class CuratedExampleOutputs(BaseModel):
     expected_strength_keywords: List[str] = Field(default_factory=list)
     expected_concern_keywords: List[str] = Field(default_factory=list)
     expected_confidence: str = Field(default="")
+    expected_role_alignment: RoleAlignment
+    expected_must_have_coverage: MustHaveCoverage
+    expected_deal_breaker_severity: DealBreakerSeverity
+    expected_transferable_skill_level: TransferableSkillLevel
+    scoring_note: str = Field(min_length=1)
+
+    @model_validator(mode="after")
+    def validate_fit_score_range(self) -> "CuratedExampleOutputs":
+        minimum = self.fit_score_range.get("min")
+        maximum = self.fit_score_range.get("max")
+        if minimum is None or maximum is None:
+            raise ValueError("fit_score_range must include both min and max.")
+        if minimum > maximum:
+            raise ValueError("fit_score_range min cannot exceed max.")
+        return self
+
+
+class CuratedExampleMetadata(BaseModel):
+    model_config = ConfigDict(extra="allow")
+
+    scenario_type: str = Field(min_length=1)
+    scenario_family: str = Field(min_length=1)
+    platform: str = Field(default="curated")
+    difficulty: str = Field(default="medium")
+    source: str = Field(default="curated")
 
 
 class CuratedExample(BaseModel):
-    model_config = ConfigDict(extra="allow")
+    model_config = ConfigDict(extra="forbid")
 
     id: UUID
     inputs: Dict[str, Any]
     outputs: CuratedExampleOutputs
-    metadata: Dict[str, Any] = Field(default_factory=dict)
+    metadata: CuratedExampleMetadata
 
 
 def load_curated_examples(path: Union[str, Path]) -> List[Dict[str, Any]]:

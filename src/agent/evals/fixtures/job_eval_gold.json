@@ -30,15 +30,21 @@
     },
     "outputs": {
       "should_pass": true,
-      "fit_score_range": {"min": 80, "max": 100},
+      "fit_score_range": { "min": 80, "max": 100 },
       "expected_must_have_matches": ["Python", "SQL", "MLOps"],
       "expected_deal_breaker_flags": [],
       "expected_strength_keywords": ["python", "sql", "mlops"],
       "expected_concern_keywords": [],
-      "expected_confidence": "HIGH"
+      "expected_confidence": "HIGH",
+      "expected_role_alignment": "HIGH",
+      "expected_must_have_coverage": "STRONG",
+      "expected_deal_breaker_severity": "NONE",
+      "expected_transferable_skill_level": "HIGH",
+      "scoring_note": "Direct role match with strong must-have coverage and no meaningful deal-breaker concern."
     },
     "metadata": {
       "scenario_type": "strong_match",
+      "scenario_family": "direct_mle_match",
       "platform": "curated",
       "difficulty": "easy",
       "source": "curated"
@@ -75,15 +81,21 @@
     },
     "outputs": {
       "should_pass": false,
-      "fit_score_range": {"min": 1, "max": 59},
+      "fit_score_range": { "min": 1, "max": 39 },
       "expected_must_have_matches": [],
       "expected_deal_breaker_flags": ["contract-only", "onsite-only"],
       "expected_strength_keywords": [],
       "expected_concern_keywords": ["contract", "onsite"],
-      "expected_confidence": "HIGH"
+      "expected_confidence": "HIGH",
+      "expected_role_alignment": "LOW",
+      "expected_must_have_coverage": "WEAK",
+      "expected_deal_breaker_severity": "HARD",
+      "expected_transferable_skill_level": "LOW",
+      "scoring_note": "Clear role mismatch plus explicit hard deal-breakers should keep this in the reject band."
     },
     "metadata": {
       "scenario_type": "obvious_reject",
+      "scenario_family": "non_ml_reject",
       "platform": "curated",
       "difficulty": "easy",
       "source": "curated"
@@ -120,15 +132,21 @@
     },
     "outputs": {
       "should_pass": false,
-      "fit_score_range": {"min": 55, "max": 79},
+      "fit_score_range": { "min": 60, "max": 79 },
       "expected_must_have_matches": ["Python"],
       "expected_deal_breaker_flags": [],
       "expected_strength_keywords": ["python", "ranking"],
       "expected_concern_keywords": ["sql", "mlops"],
-      "expected_confidence": "MEDIUM"
+      "expected_confidence": "MEDIUM",
+      "expected_role_alignment": "MEDIUM",
+      "expected_must_have_coverage": "PARTIAL",
+      "expected_deal_breaker_severity": "NONE",
+      "expected_transferable_skill_level": "MEDIUM",
+      "scoring_note": "High topical relevance keeps it reviewable, but missing SQL depth and unclear MLOps ownership should block 80+."
     },
     "metadata": {
       "scenario_type": "borderline_case",
+      "scenario_family": "applied_scientist_without_ownership",
       "platform": "curated",
       "difficulty": "medium",
       "source": "curated"
@@ -165,15 +183,21 @@
     },
     "outputs": {
       "should_pass": false,
-      "fit_score_range": {"min": 1, "max": 70},
+      "fit_score_range": { "min": 40, "max": 70 },
       "expected_must_have_matches": ["Python", "MLOps"],
       "expected_deal_breaker_flags": ["onsite-only"],
       "expected_strength_keywords": ["python", "mlops", "deployment"],
       "expected_concern_keywords": ["onsite"],
-      "expected_confidence": "HIGH"
+      "expected_confidence": "HIGH",
+      "expected_role_alignment": "MEDIUM",
+      "expected_must_have_coverage": "PARTIAL",
+      "expected_deal_breaker_severity": "HARD",
+      "expected_transferable_skill_level": "HIGH",
+      "scoring_note": "Operational overlap is real, but the explicit onsite-only deal-breaker should block recommendation regardless of strong overlap."
     },
     "metadata": {
       "scenario_type": "deal_breaker_hit",
+      "scenario_family": "mlops_heavy_weak_modeling",
       "platform": "curated",
       "difficulty": "easy",
       "source": "curated"
@@ -210,15 +234,531 @@
     },
     "outputs": {
       "should_pass": false,
-      "fit_score_range": {"min": 40, "max": 79},
+      "fit_score_range": { "min": 40, "max": 59 },
       "expected_must_have_matches": ["Python", "SQL"],
       "expected_deal_breaker_flags": [],
       "expected_strength_keywords": ["python", "sql"],
       "expected_concern_keywords": ["mlops", "serving"],
-      "expected_confidence": "MEDIUM"
+      "expected_confidence": "MEDIUM",
+      "expected_role_alignment": "MEDIUM",
+      "expected_must_have_coverage": "PARTIAL",
+      "expected_deal_breaker_severity": "NONE",
+      "expected_transferable_skill_level": "HIGH",
+      "scoring_note": "Strong adjacent data skills should earn some credit, but missing MLOps and serving ownership should keep it below the reviewable 60+ band."
     },
     "metadata": {
       "scenario_type": "must_have_mismatch",
+      "scenario_family": "ml_adjacent_data_engineer",
+      "platform": "curated",
+      "difficulty": "medium",
+      "source": "curated"
+    }
+  },
+  {
+    "id": "f7c5f30e-286e-4f20-b0fa-c767b3f6c106",
+    "inputs": {
+      "user_context": {
+        "user_id": "11111111-1111-1111-1111-111111111111",
+        "profile_data": {
+          "role": "Machine Learning Engineer",
+          "years_of_experience": 6
+        },
+        "guidelines": {
+          "must_haves": ["Python", "SQL", "MLOps"],
+          "deal_breakers": ["contract-only", "onsite-only"]
+        },
+        "notification_settings": {
+          "minimum_fit_score": 80,
+          "delivery_channel": "slack"
+        }
+      },
+      "recent_memory": "",
+      "job": {
+        "job_id": "18f3fb52-d02c-4f2a-b0df-20467365ad32",
+        "platform": "curated",
+        "external_job_id": "gold-006",
+        "title": "Senior Data Engineer, Experimentation Platform",
+        "company": "Metric Forge",
+        "jd_raw_text": "Build event pipelines, experiment datasets, and metrics tables with Python and SQL. Little evidence of model deployment ownership.",
+        "url": "https://example.com/jobs/gold-006"
+      }
+    },
+    "outputs": {
+      "should_pass": false,
+      "fit_score_range": { "min": 40, "max": 59 },
+      "expected_must_have_matches": ["Python", "SQL"],
+      "expected_deal_breaker_flags": [],
+      "expected_strength_keywords": ["python", "sql", "experimentation"],
+      "expected_concern_keywords": ["mlops", "deployment", "serving"],
+      "expected_confidence": "MEDIUM",
+      "expected_role_alignment": "MEDIUM",
+      "expected_must_have_coverage": "PARTIAL",
+      "expected_deal_breaker_severity": "NONE",
+      "expected_transferable_skill_level": "HIGH",
+      "scoring_note": "Experiment infrastructure overlap makes it worth tracking, but this is still data-first rather than end-to-end MLE work."
+    },
+    "metadata": {
+      "scenario_type": "borderline_case",
+      "scenario_family": "ml_adjacent_data_engineer",
+      "platform": "curated",
+      "difficulty": "medium",
+      "source": "curated"
+    }
+  },
+  {
+    "id": "f7c5f30e-286e-4f20-b0fa-c767b3f6c107",
+    "inputs": {
+      "user_context": {
+        "user_id": "11111111-1111-1111-1111-111111111111",
+        "profile_data": {
+          "role": "Machine Learning Engineer",
+          "years_of_experience": 6
+        },
+        "guidelines": {
+          "must_haves": ["Python", "SQL", "MLOps"],
+          "deal_breakers": ["contract-only", "onsite-only"]
+        },
+        "notification_settings": {
+          "minimum_fit_score": 80,
+          "delivery_channel": "slack"
+        }
+      },
+      "recent_memory": "",
+      "job": {
+        "job_id": "18f3fb52-d02c-4f2a-b0df-20467365ad33",
+        "platform": "curated",
+        "external_job_id": "gold-007",
+        "title": "Senior Backend Engineer, Model Serving",
+        "company": "Inference Loop",
+        "jd_raw_text": "Own Python inference APIs, deployment workflows, autoscaling, and service reliability for model-backed products.",
+        "url": "https://example.com/jobs/gold-007"
+      }
+    },
+    "outputs": {
+      "should_pass": false,
+      "fit_score_range": { "min": 60, "max": 79 },
+      "expected_must_have_matches": ["Python", "MLOps"],
+      "expected_deal_breaker_flags": [],
+      "expected_strength_keywords": ["python", "serving", "deployment"],
+      "expected_concern_keywords": ["modeling", "training"],
+      "expected_confidence": "MEDIUM",
+      "expected_role_alignment": "MEDIUM",
+      "expected_must_have_coverage": "PARTIAL",
+      "expected_deal_breaker_severity": "NONE",
+      "expected_transferable_skill_level": "HIGH",
+      "scoring_note": "Production serving ownership is highly relevant to MLE, but limited modeling scope should keep it below strong-recommendation territory."
+    },
+    "metadata": {
+      "scenario_type": "borderline_case",
+      "scenario_family": "backend_model_serving",
+      "platform": "curated",
+      "difficulty": "medium",
+      "source": "curated"
+    }
+  },
+  {
+    "id": "f7c5f30e-286e-4f20-b0fa-c767b3f6c108",
+    "inputs": {
+      "user_context": {
+        "user_id": "11111111-1111-1111-1111-111111111111",
+        "profile_data": {
+          "role": "Machine Learning Engineer",
+          "years_of_experience": 6
+        },
+        "guidelines": {
+          "must_haves": ["Python", "SQL", "MLOps"],
+          "deal_breakers": ["contract-only", "onsite-only"]
+        },
+        "notification_settings": {
+          "minimum_fit_score": 80,
+          "delivery_channel": "slack"
+        }
+      },
+      "recent_memory": "",
+      "job": {
+        "job_id": "18f3fb52-d02c-4f2a-b0df-20467365ad34",
+        "platform": "curated",
+        "external_job_id": "gold-008",
+        "title": "Backend Platform Engineer, AI Runtime",
+        "company": "Runtime Harbor",
+        "jd_raw_text": "Build Python services, rollout tooling, and observability for AI runtime infrastructure. SQL appears occasionally but is not central.",
+        "url": "https://example.com/jobs/gold-008"
+      }
+    },
+    "outputs": {
+      "should_pass": false,
+      "fit_score_range": { "min": 60, "max": 79 },
+      "expected_must_have_matches": ["Python"],
+      "expected_deal_breaker_flags": [],
+      "expected_strength_keywords": ["python", "platform", "inference"],
+      "expected_concern_keywords": ["sql", "modeling", "scope"],
+      "expected_confidence": "MEDIUM",
+      "expected_role_alignment": "MEDIUM",
+      "expected_must_have_coverage": "PARTIAL",
+      "expected_deal_breaker_severity": "NONE",
+      "expected_transferable_skill_level": "HIGH",
+      "scoring_note": "The production infra overlap is meaningful enough for human review, but must-have coverage remains incomplete for a stronger score."
+    },
+    "metadata": {
+      "scenario_type": "borderline_case",
+      "scenario_family": "backend_model_serving",
+      "platform": "curated",
+      "difficulty": "medium",
+      "source": "curated"
+    }
+  },
+  {
+    "id": "f7c5f30e-286e-4f20-b0fa-c767b3f6c109",
+    "inputs": {
+      "user_context": {
+        "user_id": "11111111-1111-1111-1111-111111111111",
+        "profile_data": {
+          "role": "Machine Learning Engineer",
+          "years_of_experience": 6
+        },
+        "guidelines": {
+          "must_haves": ["Python", "SQL", "MLOps"],
+          "deal_breakers": ["contract-only", "onsite-only"]
+        },
+        "notification_settings": {
+          "minimum_fit_score": 80,
+          "delivery_channel": "slack"
+        }
+      },
+      "recent_memory": "",
+      "job": {
+        "job_id": "18f3fb52-d02c-4f2a-b0df-20467365ad35",
+        "platform": "curated",
+        "external_job_id": "gold-009",
+        "title": "Applied Scientist, Ranking",
+        "company": "Relevance Works",
+        "jd_raw_text": "Own offline experiments and model iteration for ranking systems with Python. Production deployment and MLOps responsibility are shared elsewhere.",
+        "url": "https://example.com/jobs/gold-009"
+      }
+    },
+    "outputs": {
+      "should_pass": false,
+      "fit_score_range": { "min": 60, "max": 79 },
+      "expected_must_have_matches": ["Python"],
+      "expected_deal_breaker_flags": [],
+      "expected_strength_keywords": ["python", "ranking", "experimentation"],
+      "expected_concern_keywords": ["sql", "mlops", "ownership"],
+      "expected_confidence": "MEDIUM",
+      "expected_role_alignment": "MEDIUM",
+      "expected_must_have_coverage": "PARTIAL",
+      "expected_deal_breaker_severity": "NONE",
+      "expected_transferable_skill_level": "MEDIUM",
+      "scoring_note": "This should remain above exploratory adjacent roles because the ML problem space is highly relevant, even though shipping ownership is incomplete."
+    },
+    "metadata": {
+      "scenario_type": "borderline_case",
+      "scenario_family": "applied_scientist_without_ownership",
+      "platform": "curated",
+      "difficulty": "medium",
+      "source": "curated"
+    }
+  },
+  {
+    "id": "f7c5f30e-286e-4f20-b0fa-c767b3f6c110",
+    "inputs": {
+      "user_context": {
+        "user_id": "11111111-1111-1111-1111-111111111111",
+        "profile_data": {
+          "role": "Machine Learning Engineer",
+          "years_of_experience": 6
+        },
+        "guidelines": {
+          "must_haves": ["Python", "SQL", "MLOps"],
+          "deal_breakers": ["contract-only", "onsite-only"]
+        },
+        "notification_settings": {
+          "minimum_fit_score": 80,
+          "delivery_channel": "slack"
+        }
+      },
+      "recent_memory": "",
+      "job": {
+        "job_id": "18f3fb52-d02c-4f2a-b0df-20467365ad36",
+        "platform": "curated",
+        "external_job_id": "gold-010",
+        "title": "Research Scientist, Personalization",
+        "company": "Theory Signal",
+        "jd_raw_text": "Focus on model prototyping, papers, and offline evaluation for personalization. Limited evidence of production system ownership or MLOps work.",
+        "url": "https://example.com/jobs/gold-010"
+      }
+    },
+    "outputs": {
+      "should_pass": false,
+      "fit_score_range": { "min": 40, "max": 59 },
+      "expected_must_have_matches": ["Python"],
+      "expected_deal_breaker_flags": [],
+      "expected_strength_keywords": ["python", "personalization", "modeling"],
+      "expected_concern_keywords": ["production", "mlops", "ownership"],
+      "expected_confidence": "MEDIUM",
+      "expected_role_alignment": "MEDIUM",
+      "expected_must_have_coverage": "WEAK",
+      "expected_deal_breaker_severity": "NONE",
+      "expected_transferable_skill_level": "MEDIUM",
+      "scoring_note": "The ML overlap is real, but the role is too research-leaning and too light on operational ownership to treat as clearly reviewable."
+    },
+    "metadata": {
+      "scenario_type": "borderline_case",
+      "scenario_family": "applied_scientist_without_ownership",
+      "platform": "curated",
+      "difficulty": "medium",
+      "source": "curated"
+    }
+  },
+  {
+    "id": "f7c5f30e-286e-4f20-b0fa-c767b3f6c111",
+    "inputs": {
+      "user_context": {
+        "user_id": "11111111-1111-1111-1111-111111111111",
+        "profile_data": {
+          "role": "Machine Learning Engineer",
+          "years_of_experience": 6
+        },
+        "guidelines": {
+          "must_haves": ["Python", "SQL", "MLOps"],
+          "deal_breakers": ["contract-only", "onsite-only"]
+        },
+        "notification_settings": {
+          "minimum_fit_score": 80,
+          "delivery_channel": "slack"
+        }
+      },
+      "recent_memory": "",
+      "job": {
+        "job_id": "18f3fb52-d02c-4f2a-b0df-20467365ad37",
+        "platform": "curated",
+        "external_job_id": "gold-011",
+        "title": "Software Engineer, Experimentation Infrastructure",
+        "company": "Growth Matrix",
+        "jd_raw_text": "Build experimentation tooling, metrics services, and offline analysis workflows using Python and SQL. No direct model lifecycle ownership.",
+        "url": "https://example.com/jobs/gold-011"
+      }
+    },
+    "outputs": {
+      "should_pass": false,
+      "fit_score_range": { "min": 40, "max": 59 },
+      "expected_must_have_matches": ["Python", "SQL"],
+      "expected_deal_breaker_flags": [],
+      "expected_strength_keywords": ["python", "sql", "experimentation"],
+      "expected_concern_keywords": ["mlops", "serving", "lifecycle"],
+      "expected_confidence": "MEDIUM",
+      "expected_role_alignment": "MEDIUM",
+      "expected_must_have_coverage": "PARTIAL",
+      "expected_deal_breaker_severity": "NONE",
+      "expected_transferable_skill_level": "MEDIUM",
+      "scoring_note": "The systems overlap is practical, but the role still sits one layer away from end-to-end ML engineering ownership."
+    },
+    "metadata": {
+      "scenario_type": "borderline_case",
+      "scenario_family": "analytics_infra",
+      "platform": "curated",
+      "difficulty": "medium",
+      "source": "curated"
+    }
+  },
+  {
+    "id": "f7c5f30e-286e-4f20-b0fa-c767b3f6c112",
+    "inputs": {
+      "user_context": {
+        "user_id": "11111111-1111-1111-1111-111111111111",
+        "profile_data": {
+          "role": "Machine Learning Engineer",
+          "years_of_experience": 6
+        },
+        "guidelines": {
+          "must_haves": ["Python", "SQL", "MLOps"],
+          "deal_breakers": ["contract-only", "onsite-only"]
+        },
+        "notification_settings": {
+          "minimum_fit_score": 80,
+          "delivery_channel": "slack"
+        }
+      },
+      "recent_memory": "",
+      "job": {
+        "job_id": "18f3fb52-d02c-4f2a-b0df-20467365ad38",
+        "platform": "curated",
+        "external_job_id": "gold-012",
+        "title": "MLOps Engineer",
+        "company": "Delivery Mesh",
+        "jd_raw_text": "Own training pipelines, deployment automation, model registry, CI/CD, and monitoring with Python. Modeling depth is limited and SQL is secondary.",
+        "url": "https://example.com/jobs/gold-012"
+      }
+    },
+    "outputs": {
+      "should_pass": false,
+      "fit_score_range": { "min": 60, "max": 79 },
+      "expected_must_have_matches": ["Python", "MLOps"],
+      "expected_deal_breaker_flags": [],
+      "expected_strength_keywords": ["python", "mlops", "deployment"],
+      "expected_concern_keywords": ["modeling", "sql"],
+      "expected_confidence": "MEDIUM",
+      "expected_role_alignment": "MEDIUM",
+      "expected_must_have_coverage": "PARTIAL",
+      "expected_deal_breaker_severity": "NONE",
+      "expected_transferable_skill_level": "HIGH",
+      "scoring_note": "Real production ownership and strong MLOps overlap make this clearly reviewable, but narrower modeling breadth should keep it below 80+."
+    },
+    "metadata": {
+      "scenario_type": "borderline_case",
+      "scenario_family": "mlops_heavy_weak_modeling",
+      "platform": "curated",
+      "difficulty": "medium",
+      "source": "curated"
+    }
+  },
+  {
+    "id": "f7c5f30e-286e-4f20-b0fa-c767b3f6c113",
+    "inputs": {
+      "user_context": {
+        "user_id": "11111111-1111-1111-1111-111111111111",
+        "profile_data": {
+          "role": "Machine Learning Engineer",
+          "years_of_experience": 6
+        },
+        "guidelines": {
+          "must_haves": ["Python", "SQL", "MLOps"],
+          "deal_breakers": ["contract-only", "onsite-only"]
+        },
+        "notification_settings": {
+          "minimum_fit_score": 80,
+          "delivery_channel": "slack"
+        }
+      },
+      "recent_memory": "",
+      "job": {
+        "job_id": "18f3fb52-d02c-4f2a-b0df-20467365ad39",
+        "platform": "curated",
+        "external_job_id": "gold-013",
+        "title": "AI Platform Engineer",
+        "company": "Warehouse Brain",
+        "jd_raw_text": "The title is AI-facing, but the day-to-day work is batch ETL, internal data tooling, and warehouse performance tuning with Python and SQL.",
+        "url": "https://example.com/jobs/gold-013"
+      }
+    },
+    "outputs": {
+      "should_pass": false,
+      "fit_score_range": { "min": 40, "max": 59 },
+      "expected_must_have_matches": ["Python", "SQL"],
+      "expected_deal_breaker_flags": [],
+      "expected_strength_keywords": ["python", "sql", "platform"],
+      "expected_concern_keywords": ["mlops", "serving", "title"],
+      "expected_confidence": "HIGH",
+      "expected_role_alignment": "LOW",
+      "expected_must_have_coverage": "PARTIAL",
+      "expected_deal_breaker_severity": "NONE",
+      "expected_transferable_skill_level": "MEDIUM",
+      "scoring_note": "The AI-flavored title should not inflate the score when the actual responsibilities are mostly data platform work."
+    },
+    "metadata": {
+      "scenario_type": "borderline_case",
+      "scenario_family": "title_mismatch_skill_overlap",
+      "platform": "curated",
+      "difficulty": "medium",
+      "source": "curated"
+    }
+  },
+  {
+    "id": "f7c5f30e-286e-4f20-b0fa-c767b3f6c114",
+    "inputs": {
+      "user_context": {
+        "user_id": "11111111-1111-1111-1111-111111111111",
+        "profile_data": {
+          "role": "Machine Learning Engineer",
+          "years_of_experience": 6
+        },
+        "guidelines": {
+          "must_haves": ["Python", "SQL", "MLOps"],
+          "deal_breakers": ["contract-only", "onsite-only"]
+        },
+        "notification_settings": {
+          "minimum_fit_score": 80,
+          "delivery_channel": "slack"
+        }
+      },
+      "recent_memory": "",
+      "job": {
+        "job_id": "18f3fb52-d02c-4f2a-b0df-20467365ad40",
+        "platform": "curated",
+        "external_job_id": "gold-014",
+        "title": "Software Engineer, AI Developer Experience",
+        "company": "Prompt Foundry",
+        "jd_raw_text": "Build Python SDKs, eval workflows, prompt tooling, and internal services for ML teams. SQL is limited and direct deployment ownership is partial.",
+        "url": "https://example.com/jobs/gold-014"
+      }
+    },
+    "outputs": {
+      "should_pass": false,
+      "fit_score_range": { "min": 60, "max": 79 },
+      "expected_must_have_matches": ["Python"],
+      "expected_deal_breaker_flags": [],
+      "expected_strength_keywords": ["python", "tooling", "workflow"],
+      "expected_concern_keywords": ["sql", "deployment", "scope"],
+      "expected_confidence": "MEDIUM",
+      "expected_role_alignment": "MEDIUM",
+      "expected_must_have_coverage": "WEAK",
+      "expected_deal_breaker_severity": "NONE",
+      "expected_transferable_skill_level": "HIGH",
+      "scoring_note": "The title is not classic MLE, but overlap with ML tooling and production workflows is high enough to justify human review."
+    },
+    "metadata": {
+      "scenario_type": "borderline_case",
+      "scenario_family": "title_mismatch_skill_overlap",
+      "platform": "curated",
+      "difficulty": "medium",
+      "source": "curated"
+    }
+  },
+  {
+    "id": "f7c5f30e-286e-4f20-b0fa-c767b3f6c115",
+    "inputs": {
+      "user_context": {
+        "user_id": "11111111-1111-1111-1111-111111111111",
+        "profile_data": {
+          "role": "Machine Learning Engineer",
+          "years_of_experience": 6
+        },
+        "guidelines": {
+          "must_haves": ["Python", "SQL", "MLOps"],
+          "deal_breakers": ["contract-only", "onsite-only"]
+        },
+        "notification_settings": {
+          "minimum_fit_score": 80,
+          "delivery_channel": "slack"
+        }
+      },
+      "recent_memory": "",
+      "job": {
+        "job_id": "18f3fb52-d02c-4f2a-b0df-20467365ad41",
+        "platform": "curated",
+        "external_job_id": "gold-015",
+        "title": "Machine Learning Infra Engineer",
+        "company": "Scale Engine",
+        "jd_raw_text": "Own feature pipelines, training orchestration, deployment tooling, and reliability for production ML systems using Python, SQL, and MLOps practices.",
+        "url": "https://example.com/jobs/gold-015"
+      }
+    },
+    "outputs": {
+      "should_pass": true,
+      "fit_score_range": { "min": 80, "max": 95 },
+      "expected_must_have_matches": ["Python", "SQL", "MLOps"],
+      "expected_deal_breaker_flags": [],
+      "expected_strength_keywords": ["python", "sql", "deployment"],
+      "expected_concern_keywords": [],
+      "expected_confidence": "HIGH",
+      "expected_role_alignment": "HIGH",
+      "expected_must_have_coverage": "STRONG",
+      "expected_deal_breaker_severity": "NONE",
+      "expected_transferable_skill_level": "HIGH",
+      "scoring_note": "Although the title leans infra, the responsibilities still align tightly with practical MLE ownership and should clear the recommendation threshold."
+    },
+    "metadata": {
+      "scenario_type": "strong_match",
+      "scenario_family": "title_mismatch_skill_overlap",
       "platform": "curated",
       "difficulty": "medium",
       "source": "curated"

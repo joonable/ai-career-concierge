@@ -130,7 +130,13 @@ def test_curated_dataset_fixture_and_rule_based_evaluators():
     examples = load_curated_examples(
         Path("src/agent/evals/fixtures/job_eval_gold.json")
     )
-    assert len(examples) >= 5
+    assert len(examples) >= 15
+    assert examples[0]["metadata"]["scenario_family"]
+    assert examples[0]["outputs"]["scoring_note"]
+    assert examples[0]["outputs"]["expected_role_alignment"] in {"HIGH", "MEDIUM", "LOW"}
+    assert examples[0]["outputs"]["expected_must_have_coverage"] in {"STRONG", "PARTIAL", "WEAK"}
+    assert examples[0]["outputs"]["expected_deal_breaker_severity"] in {"NONE", "SOFT", "HARD"}
+    assert examples[0]["outputs"]["expected_transferable_skill_level"] in {"HIGH", "MEDIUM", "LOW"}
 
     class Run:
         outputs = {
