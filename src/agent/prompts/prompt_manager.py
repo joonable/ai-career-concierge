@@ -7,6 +7,7 @@ from langchain_core.prompts import PromptTemplate
 
 from agent.schemas.pipeline_job import PipelineJob
 from common.errors import PromptLoadError
+from promptops.projects.ai_career_concierge.context import build_normalized_evaluation_context
 
 PROMPT_SCHEMA_VERSION = "3"
 
@@ -16,10 +17,18 @@ EVALUATION_PROMPT_TEMPLATE = """당신은 한 명의 사용자를 기준으로 �
 경력 연차: {years_of_experience}
 필수 조건: {must_haves}
 결격 사유: {deal_breakers}
+선호 title keywords: {title_keywords}
+알림 최소 적합도 기준: {minimum_fit_score}
 최근 싫어요 메모: {recent_memory}
 채용 공고 제목: {job_title}
 회사명: {company}
 채용 공고 설명: {job_description}
+구조화된 JD 책임 근거: {responsibilities}
+구조화된 JD 요구사항: {requirements}
+우대 조건: {preferred_requirements}
+위치: {location}
+고용 형태: {employment_type}
+누락/불명확한 컨텍스트: {missing_context}
 평가 원칙:
 - `fit_score`는 단순 호감 점수가 아니라 실제 추천 운영 점수입니다.
 - `80~100`: 강한 추천. 역할 정렬이 높고, 핵심 must-have 대부분이 충족되며, 뚜렷한 deal-breaker가 없어야 합니다.
@@ -138,20 +147,12 @@ class PromptManager:
         recent_memory: str,
         job: PipelineJob,
     ) -> RenderedPrompt:
-        variables = {
-            "role": user_context.get("profile_data", {}).get("role", "unknown"),
-            "years_of_experience": user_context.get("profile_data", {}).get(
-                "years_of_experience", "unknown"
-            ),
-            "must_haves": ", ".join(user_context.get("guidelines", {}).get("must_haves", []))
-            or "None provided",
-            "deal_breakers": ", ".join(user_context.get("guidelines", {}).get("deal_breakers", []))
-            or "None provided",
-            "recent_memory": recent_memory or "No recent dislike memory.",
-            "job_title": job.title,
-            "company": job.company,
-            "job_description": job.jd_raw_text,
-        }
+        normalized_context = build_normalized_evaluation_context(
+            user_context=user_context,
+            recent_memory=recent_memory,
+            job=job,
+        )
+        variables = normalized_context.to_prompt_variables()
         return self._render_prompt(
             identifier=self.eval_prompt_identifier,
             fallback_prompt=self._fallback_eval_prompt,

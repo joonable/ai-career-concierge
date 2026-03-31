@@ -143,6 +143,10 @@ def test_local_v3_prompt_contains_score_policy_and_structured_axes():
 
     assert rendered.metadata.schema_version == "3"
     assert "`80~100`" in rendered.text
+    assert "선호 title keywords" in rendered.text
+    assert "알림 최소 적합도 기준" in rendered.text
+    assert "구조화된 JD 책임 근거" in rendered.text
+    assert "누락/불명확한 컨텍스트" in rendered.text
     assert "인접 직무 판단 규칙" in rendered.text
     assert "must-have 판단 규칙" in rendered.text
     assert "deal-breaker 판단 규칙" in rendered.text
@@ -151,6 +155,47 @@ def test_local_v3_prompt_contains_score_policy_and_structured_axes():
     assert '"must_have_coverage"' in rendered.text
     assert '"deal_breaker_severity"' in rendered.text
     assert '"transferable_skills"' in rendered.text
+
+
+def test_prompt_manager_uses_normalized_context_values_in_rendered_prompt():
+    manager = build_prompt_manager(client=FakeClient(should_fail=True))
+
+    rendered = manager.render_evaluation_prompt(
+        user_context={
+            "profile_data": {
+                "role": "Machine Learning Engineer",
+                "years_of_experience": 6,
+                "title_keywords": ["MLE", "Platform"],
+            },
+            "guidelines": {
+                "must_haves": ["Python", "SQL"],
+                "deal_breakers": ["contract-only"],
+            },
+            "notification_settings": {"minimum_fit_score": 80},
+        },
+        recent_memory="weak infra ownership; contract-only roles",
+        job=PipelineJob(
+            job_id="18f3fb52-d02c-4f2a-b0df-20467365ad27",
+            platform="test_source",
+            external_job_id="job-001",
+            title="Backend Engineer, Model Serving",
+            company="Signal Labs",
+            jd_raw_text="Build inference APIs and deployment tooling.",
+            url="https://example.com/jobs/job-001",
+            source_metadata={
+                "responsibilities": ["Build inference APIs"],
+                "requirements": ["Python", "Kubernetes"],
+                "location": "Seoul",
+                "employment_type": "full-time",
+            },
+        ),
+    )
+
+    assert "MLE, Platform" in rendered.text
+    assert "알림 최소 적합도 기준: 80" in rendered.text
+    assert "Build inference APIs" in rendered.text
+    assert "Seoul" in rendered.text
+    assert "No major missing context." in rendered.text
 
 
 def test_memory_summary_render_returns_metadata():

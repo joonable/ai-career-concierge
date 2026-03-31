@@ -1,0 +1,69 @@
+{
+  "raw": {
+    "user_context": {
+      "profile_data": {
+        "role": "Machine Learning Engineer",
+        "years_of_experience": 6,
+        "title_keywords": ["MLE", "ML Platform", "MLE"]
+      },
+      "guidelines": {
+        "must_haves": ["Python", "SQL", "MLOps", "SQL"],
+        "deal_breakers": ["contract-only", "onsite-only"]
+      },
+      "notification_settings": {
+        "minimum_fit_score": 80,
+        "delivery_channel": "slack"
+      }
+    },
+    "recent_memory": "weak infra ownership; contract-only roles",
+    "job": {
+      "job_id": "18f3fb52-d02c-4f2a-b0df-20467365ad27",
+      "platform": "test_source",
+      "external_job_id": "job-001",
+      "title": "Senior Machine Learning Platform Engineer",
+      "company": "Signal Labs",
+      "jd_raw_text": "Build training pipelines and deploy models to production.",
+      "url": "https://example.com/jobs/job-001",
+      "min_years_experience": 5,
+      "max_years_experience": 8,
+      "source_metadata": {
+        "responsibilities": ["Build training pipelines", "Own model deployment"],
+        "requirements": ["Python", "Kubernetes"],
+        "preferred_requirements": ["Vertex AI"],
+        "location": "Seoul",
+        "employment_type": "full-time"
+      }
+    }
+  },
+  "expected": {
+    "target_role": "Machine Learning Engineer",
+    "years_of_experience": 6,
+    "hard_preferences": {
+      "must_haves": ["Python", "SQL", "MLOps"],
+      "deal_breakers": ["contract-only", "onsite-only"]
+    },
+    "soft_preferences": {
+      "title_keywords": ["MLE", "ML Platform"],
+      "minimum_fit_score": 80,
+      "recent_dislike_signals": ["weak infra ownership", "contract-only roles"]
+    },
+    "job_evidence": {
+      "title": "Senior Machine Learning Platform Engineer",
+      "company": "Signal Labs",
+      "description": "Build training pipelines and deploy models to production.",
+      "responsibilities": ["Build training pipelines", "Own model deployment"],
+      "requirements": ["Python", "Kubernetes"],
+      "preferred_requirements": ["Vertex AI"],
+      "location": "Seoul",
+      "employment_type": "full-time",
+      "min_years_experience": 5,
+      "max_years_experience": 8
+    },
+    "missingness": {
+      "missing_profile_fields": [],
+      "missing_preference_fields": [],
+      "missing_job_fields": [],
+      "missing_memory": false
+    }
+  }
+}

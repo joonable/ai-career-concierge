@@ -175,6 +175,8 @@ Holds integration adapters, starting with LangSmith.
 
 Holds this repository's prompt families, normalized context definitions, dataset bindings, evaluator bundles, review rubric, and backlog mapping rules.
 
+In Sprint 3, job evaluation prompts should stop reading raw profile/guideline/job dictionaries directly and instead consume a normalized evaluation context contract from `projects/ai_career_concierge/context.py`.
+
 ## Definition Of Done For Sprint 1
 
 Sprint 1 is complete when:
