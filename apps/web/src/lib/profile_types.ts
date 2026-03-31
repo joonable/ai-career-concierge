@@ -41,71 +41,61 @@ export type UserProfilePayload = {
     seniority?: string;
     title_keywords?: string[];
   };
-  guidelines: Guidelines;
   preferences?: Preferences;
+  guidelines?: Guidelines;
   notification_settings: {
     minimum_fit_score: number;
     delivery_channel?: "slack";
   };
 };
 
-export type UserProfileResponse = UserProfilePayload & {
+export type UserProfileResponse = {
   user_id: string;
   email: string;
   profile_data: ProfileData;
   preferences: Preferences;
+  guidelines: Guidelines;
   notification_settings: NotificationSettings;
 };
 
-export type OnboardingFormState = {
-  role: string;
-  yearsOfExperience: string;
-  mustHaves: string;
-  dealBreakers: string;
-  minimumFitScore: string;
+export const EMPTY_PREFERENCES: Preferences = {
+  work_modes: [],
+  locations: [],
+  team_contexts: [],
+  skills: {
+    preset: [],
+    custom: [],
+  },
+  exclusions: {
+    preset: [],
+    custom: [],
+  },
+  comparisons: {},
+  note: null,
 };
 
-export const EMPTY_ONBOARDING_FORM_STATE: OnboardingFormState = {
+export const EMPTY_PROFILE_DATA: ProfileData = {
   role: "",
-  yearsOfExperience: "0",
-  mustHaves: "",
-  dealBreakers: "",
-  minimumFitScore: "80",
+  roles: [],
+  primary_role: "",
+  years_of_experience: 0,
+  seniority: "",
+  title_keywords: [],
 };
 
-export function mapProfileToOnboardingFormState(
-  profile: UserProfileResponse,
-): OnboardingFormState {
-  return {
-    role: profile.profile_data.role,
-    yearsOfExperience: String(profile.profile_data.years_of_experience),
-    mustHaves: profile.guidelines.must_haves.join(", "),
-    dealBreakers: profile.guidelines.deal_breakers.join(", "),
-    minimumFitScore: String(profile.notification_settings.minimum_fit_score),
-  };
-}
+export const EMPTY_GUIDELINES: Guidelines = {
+  must_haves: [],
+  deal_breakers: [],
+};
 
-export function mapOnboardingFormStateToProfilePayload(
-  state: OnboardingFormState,
-): UserProfilePayload {
-  return {
-    profile_data: {
-      role: state.role,
-      years_of_experience: Number(state.yearsOfExperience),
-    },
-    guidelines: {
-      must_haves: splitCommaSeparatedValues(state.mustHaves),
-      deal_breakers: splitCommaSeparatedValues(state.dealBreakers),
-    },
-    notification_settings: {
-      minimum_fit_score: Number(state.minimumFitScore),
-    },
-  };
-}
-
-function splitCommaSeparatedValues(value: string): string[] {
-  return value
-    .split(",")
-    .map((item) => item.trim())
-    .filter(Boolean);
-}
+export const EMPTY_USER_PROFILE_RESPONSE: UserProfileResponse = {
+  user_id: "",
+  email: "",
+  profile_data: EMPTY_PROFILE_DATA,
+  preferences: EMPTY_PREFERENCES,
+  guidelines: EMPTY_GUIDELINES,
+  notification_settings: {
+    minimum_fit_score: 80,
+    delivery_channel: "slack",
+  },
+};
