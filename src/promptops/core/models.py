@@ -10,6 +10,27 @@ ReviewStatus = Literal["pending", "in_review", "approved", "rejected"]
 FailureCategory = Literal["prompt", "context", "dataset", "policy", "feature"]
 
 
+class PromptMetadata(BaseModel):
+    """Metadata describing how a prompt family is managed."""
+
+    owner: str = Field(min_length=1)
+    backend: str = Field(default="langsmith")
+    identifier: str = Field(min_length=1)
+    local_version: str = Field(min_length=1)
+    schema_version: int = Field(ge=1)
+    tags: Dict[PromptStage, str] = Field(default_factory=dict)
+
+
+class PromptRevision(BaseModel):
+    """Recorded prompt revision shape for PromptOps iteration tracking."""
+
+    family_key: str = Field(min_length=1)
+    revision_id: str = Field(min_length=1)
+    stage: PromptStage
+    summary: str = Field(default="")
+    change_reason: str = Field(default="")
+
+
 class PromptFamily(BaseModel):
     """Logical prompt family managed by PromptOps."""
 
@@ -17,6 +38,8 @@ class PromptFamily(BaseModel):
     description: str = Field(default="")
     project_key: str = Field(min_length=1)
     active_stage: PromptStage = "candidate"
+    metadata: PromptMetadata
+    revisions: List[PromptRevision] = Field(default_factory=list)
 
 
 class ExperimentSpec(BaseModel):
@@ -27,6 +50,8 @@ class ExperimentSpec(BaseModel):
     evaluator_bundle: str = Field(min_length=1)
     backend: str = Field(default="langsmith")
     metadata: Dict[str, str] = Field(default_factory=dict)
+    candidate_revision_id: str | None = None
+    baseline_revision_id: str | None = None
 
 
 class IterationRecord(BaseModel):
@@ -34,6 +59,8 @@ class IterationRecord(BaseModel):
 
     prompt_family: str = Field(min_length=1)
     goal: str = Field(min_length=1)
+    stage: PromptStage = "candidate"
+    prompt_revision_id: str | None = None
     baseline_experiment_id: str | None = None
     candidate_experiment_id: str | None = None
     failure_categories: List[FailureCategory] = Field(default_factory=list)

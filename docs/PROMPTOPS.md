@@ -153,6 +153,20 @@ Holds generic PromptOps operating models and services:
 - iterations
 - backlog
 
+The initial managed entities in Sprint 2 are:
+
+- prompt family
+- prompt metadata
+- prompt revision
+- experiment spec
+- iteration record
+
+Lifecycle stages are:
+
+- `candidate`
+- `staging`
+- `production`
+
 ### `src/promptops/adapters`
 
 Holds integration adapters, starting with LangSmith.
