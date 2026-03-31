@@ -84,6 +84,64 @@ PoC는 핵심 루프를 엔드투엔드(end-to-end)로 지원해야 합니다:
 
 여기서 완료된 공고는 `LLM_EVALUATED` 상태로 저장되어야 합니다.
 
+### 적합도 점수 정책 (Fit Score Policy)
+
+`fit_score`는 단순한 "좋아 보임" 점수가 아니라, 현재 PoC의 단일 사용자에게 실제로 추천할 만한지에 대한 운영 점수입니다. 이 점수는 재현율보다 정밀도를 우선해야 하며, 특히 애매한 인접 직무는 설명 가능한 기준으로 일관되게 다뤄야 합니다.
+
+기본 점수 밴드 정의:
+
+- `80~100`: 강한 추천
+  - 목표 직무와 역할 정렬(role alignment)이 높고, 핵심 must-have 대부분이 충족되며, 뚜렷한 deal-breaker가 없어야 합니다.
+- `60~79`: 검토 가능
+  - 전반적으로 관련성이 높지만 일부 must-have 공백, 소유권 불명확성, 경계 조건이 남아 있는 경우입니다.
+- `40~59`: 인접 직무 또는 전환 가능성
+  - 직접적인 타깃 역할은 아니지만 transferable skill이 분명하고, 사용자 관점에서 탐색 가치는 있는 경우입니다.
+- `1~39`: 비추천
+  - 핵심 역할 불일치가 크거나, must-have 결손이 심하거나, 추천을 보수적으로 막아야 할 사유가 있는 경우입니다.
+
+인접 직무(adjacent role) 정책:
+
+- 직무명이 다르더라도 실제 업무가 MLE 역할과 충분히 겹치면 자동 저점 처리하지 않습니다.
+- 다만 인접 직무는 "관련 있음"만으로 고득점을 주지 않고, 실제 역할 정렬과 책임 범위를 함께 봐야 합니다.
+- 예를 들어 ML platform, backend serving, experimentation infra, data engineer for ML 같은 역할은 transferable skill이 강하면 `40~59` 또는 `60~79`까지 열어둘 수 있습니다.
+- 반대로 타이틀은 ML과 가까워 보여도 실제 책임이 모델링, 서빙, 실험, 운영 중 핵심 축과 멀면 보수적으로 낮춰야 합니다.
+
+must-have 부족 페널티 정책:
+
+- must-have는 있으면 가산점이 아니라, 없으면 감점 또는 상한 제한을 만드는 핵심 조건으로 해석합니다.
+- 핵심 must-have 대부분이 충족되면 `80+` 후보가 될 수 있습니다.
+- 일부만 충족하는 경우에는 `60~79` 또는 `40~59`로 제한하는 것이 기본입니다.
+- 타깃 역할의 핵심 축이 빠져 있으면 transferable skill이 있더라도 `80+`로 올리지 않습니다.
+- must-have 부족은 단순 키워드 누락이 아니라 실제 책임, 소유권, 운영 경험 부족까지 포함해 판단합니다.
+
+deal-breaker 정책:
+
+- 명시적 deal-breaker가 감지되면 추천 여부를 보수적으로 판단합니다.
+- hard deal-breaker가 있으면 높은 기술 적합도가 보여도 강한 추천으로 올리지 않습니다.
+- deal-breaker는 점수만 낮추는 신호가 아니라, 실제 전달 여부와 reviewer 주의도를 함께 높이는 신호입니다.
+- 운영상 명확한 결격 사유가 있으면 `should_pass`는 false가 되어야 하며, 필요하면 점수는 중간대에 머물더라도 추천은 막을 수 있습니다.
+
+transferable skill 정책:
+
+- transferable skill은 역할 불일치를 완전히 상쇄하지는 않지만, 인접 직무를 `1~39`에서 `40~59` 이상으로 끌어올릴 수 있는 근거입니다.
+- transferable skill을 인정하려면 사용자의 핵심 강점이 실제 업무 책임과 연결되어 있어야 합니다.
+- 단순 기술 스택 일부 중복만으로는 부족하며, Python/SQL/infra 경험이 실제 ML platform, serving, experimentation, data workflow ownership으로 이어지는지 봐야 합니다.
+- 역할 정렬이 중간 수준이고 transferable skill이 강하면 최소한 "탐색 가치가 있는 인접 직무"로 평가할 수 있습니다.
+
+confidence 정책:
+
+- `confidence`는 점수 자체와 동일한 개념이 아니며, 모델이 현재 판단을 얼마나 명확한 근거로 내렸는지 나타내는 별도 축입니다.
+- 높은 점수라도 근거가 불완전하거나 책임 범위가 모호하면 `MEDIUM` 또는 `LOW` confidence가 가능해야 합니다.
+- 낮은 점수라도 deal-breaker나 역할 불일치가 명확하면 `HIGH` confidence가 가능해야 합니다.
+- 따라서 `confidence`는 `fit_score`에 종속되지 않고, 점수 이유의 명확성과 정보 충분성을 반영해야 합니다.
+
+운영 해석 가이드:
+
+- `80+`는 Slack 추천 대상으로 간주하는 기본 후보입니다.
+- `60~79`는 저장 및 검토 가치는 있지만, 현재 PoC 기본 알림 임계치보다 낮을 수 있습니다.
+- `40~59`는 향후 calibration과 dataset 확장을 위한 중요한 borderline 관찰 구간입니다.
+- borderline 사례에서는 점수 숫자 하나보다 역할 정렬, must-have 결손, transferable skill, deal-breaker 해석이 일관되게 유지되는지가 더 중요합니다.
+
 ### 피드백 루프 (Feedback Loop)
 
 - 사용자는 추천을 `LIKE`, `DISLIKE`, `LATER`로 표시할 수 있습니다.
