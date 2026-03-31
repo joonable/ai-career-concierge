@@ -71,9 +71,11 @@ class FakeTraceHandle:
 class FakeTracer:
     def __init__(self) -> None:
         self.calls = []
+        self.handles = []
 
     @contextmanager
     def llm_run(self, *, name, inputs, metadata, tags):
+        handle = FakeTraceHandle()
         self.calls.append(
             {
                 "name": name,
@@ -82,7 +84,8 @@ class FakeTracer:
                 "tags": tags,
             }
         )
-        yield FakeTraceHandle()
+        self.handles.append(handle)
+        yield handle
 
 
 @pytest.mark.asyncio
@@ -125,6 +128,7 @@ async def test_evaluate_job_records_prompt_tag_and_commit_hash():
     )
 
     trace_call = tracer.calls[0]
+    trace_handle = tracer.handles[0]
     assert execution.rendered_prompt.metadata.prompt_tag == "staging"
     assert execution.rendered_prompt.metadata.prompt_commit_hash == "commit-123"
     assert trace_call["metadata"]["prompt_identifier"] == "job-evaluation:staging"
@@ -132,3 +136,11 @@ async def test_evaluate_job_records_prompt_tag_and_commit_hash():
     assert trace_call["metadata"]["prompt_commit_hash"] == "commit-123"
     assert "prompt_tag:staging" in trace_call["tags"]
     assert trace_call["inputs"]["rendered_prompt"] == "Hub prompt for Senior Machine Learning Engineer"
+    assert execution.result.role_alignment == "HIGH"
+    assert execution.result.must_have_coverage == "PARTIAL"
+    assert execution.result.deal_breaker_severity == "NONE"
+    assert execution.result.transferable_skills == "HIGH"
+    assert trace_handle.outputs["role_alignment"] == "HIGH"
+    assert trace_handle.outputs["must_have_coverage"] == "PARTIAL"
+    assert trace_handle.outputs["deal_breaker_severity"] == "NONE"
+    assert trace_handle.outputs["transferable_skills"] == "HIGH"
