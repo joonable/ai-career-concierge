@@ -19,6 +19,13 @@ logger = get_logger(__name__)
 
 @dataclass
 class LLMEvalNode:
+    """
+    LangGraph 파이프라인의 세 번째 단계이자 가장 핵심적인 평가 모듈입니다. (LLM 비용 발생)
+    RuleFilter를 통과한 유망한 공고들에 대해 LLM(Gemini)을 호출하여 심층 평가를 진행합니다.
+    사용자의 상세 프로필(연차, 직무 경험, 강점)과 결격 사유(Deal-breakers), 필수 요건(Must-haves)을 
+    바탕으로 적합도 점수(fit_score, 1~100점)를 계산하며, 상세한 추천/비추천 논리(reasoning)를 생성합니다.
+    평가가 완료된 건은 DB에 'LLM_EVALUATED' 상태로 기록됩니다.
+    """
     evaluator: LLMEvaluator
     prompt_manager: PromptManager
     tracer: object

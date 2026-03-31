@@ -10,6 +10,11 @@ class InvalidScrapedJobError(ValueError):
 
 
 def normalize_scraped_job(scraped_job: ScrapedJob) -> ScrapedJob:
+    """
+    스크래퍼가 막 가져온 거친(Raw) 형태의 공고 데이터를 시스템 저장에 적합하게 정제합니다.
+    (연속된 띄어쓰기/줄바꿈 압축, 상대 URL을 절대 URL로 변환 등)
+    또한 필수 필드(title, platform 등)가 누락되거나 JD 텍스트 길이가 극단적으로 짧은 경우 InvalidScrapedJobError를 발생시킵니다.
+    """
     base_url = str(scraped_job.source_metadata.get("base_url", "")).strip()
     normalized_job = ScrapedJob(
         platform=scraped_job.platform.strip(),

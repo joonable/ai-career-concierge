@@ -376,6 +376,11 @@ function ToggleGroup({
   );
 }
 
+/**
+ * 사용자가 자신의 선호 직무, 경력, 관심 스킬, 제외 조건 등을 설정하는 핵심 클라이언트 컴포넌트입니다.
+ * 여기서 저장된 선호도(Preferences)는 백엔드 `UserProfilePayload` 형태로 전송되며,
+ * LangGraph 파이프라인에서 LLM이 공고를 평가할 때 "기준(Must-haves / Deal-breakers)"으로 사용됩니다.
+ */
 export function OnboardingForm({ initialProfile }: OnboardingFormProps) {
   const [state, setState] = useState(() => buildInitialPreferenceState(initialProfile));
   const [skillInput, setSkillInput] = useState("");

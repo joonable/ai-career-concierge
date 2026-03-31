@@ -18,6 +18,13 @@ type FeedbackFilter = "ALL" | "LIKE" | "DISLIKE" | "LATER" | "UNANSWERED";
 type SavedView = "recommended" | "review" | "all";
 type FeedbackAction = "LIKE" | "DISLIKE" | "LATER";
 
+/**
+ * 대시보드의 메인 뷰 컴포넌트(Client Component)로, 파이프라인을 거친 추천 공고를 보여줍니다.
+ * 기능 요약:
+ * - 상태별/플랫폼별 필터링 기능
+ * - 모달을 통한 공고 상세 평가 사유 확인
+ * - 👍/👎 피드백 액션 (이 피드백은 시스템의 단기 기억으로 저장되어 다음 평가에 반영됨)
+ */
 export function RecommendationBoard({
   minimumFitScore,
   profile,

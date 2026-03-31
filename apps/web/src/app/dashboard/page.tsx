@@ -9,6 +9,11 @@ import { mapDashboardRecommendations } from "@/lib/dashboard_mapper";
 import { deriveDashboardOnboardingState } from "@/lib/dashboard_onboarding";
 import { isPromptOpsAdminEmail } from "@/lib/promptops_access";
 
+/**
+ * Next.js 메인 대시보드 서버 컴포넌트입니다.
+ * 사용자의 설정 상태(온보딩 완료 여부)와 평가 파이프라인을 거친 추천 공고 목록을 조회한 뒤,
+ * RecommendationBoard(칸반 리스트)와 OnboardingStatusCard를 렌더링합니다.
+ */
 export default async function DashboardPage() {
   const dashboardPageData = await loadDashboardPageData();
 

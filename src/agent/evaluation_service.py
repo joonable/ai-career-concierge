@@ -42,6 +42,16 @@ async def evaluate_job(
     job,
     evaluation_id: str,
 ) -> EvaluationExecutionResult:
+    """
+    단일 채용 공고(PipelineJob)에 대해 실제로 LLM 평가를 구동하는 핵심 서비스(Service) 레이어입니다.
+    (LLMEvalNode 내에서 주로 호출됩니다.)
+
+    핵심 흐름:
+    1. PromptManager: 사용자 프로필, 결격 사유, 단기 기억(최근 피드백)을 조합해 실제 전송할 프롬프트를 렌더링합니다.
+    2. Telemetry (Tracer): LangSmith 같은 옵저버빌리티 도구에 입출력 데이터, 프롬프트 버전, 실행 시간 등을 로깅합니다.
+    3. LLM API Call: Gemini 모델을 호출해 구조화된 JSON(fit_score, reasoning 등) 응답을 받아옵니다.
+    4. Validation & Parsing: 결과를 LLMEvaluationResult Pydantic 스키마로 검증하고 반환합니다.
+    """
     rendered_prompt = prompt_manager.render_evaluation_prompt(
         user_context=user_context,
         recent_memory=recent_memory,

@@ -11,6 +11,11 @@ class SlackNotifier(Protocol):
 
 @dataclass
 class DeliverNode:
+    """
+    LangGraph 파이프라인의 마지막(네 번째) 단계입니다.
+    LLMEvalNode에서 완료된 평가 결과들 중, 사용자가 설정한 알림 조건 기준 점수(minimum_fit_score, 기본값 80점) 이상을 획득한
+    핵심 추천 공고들만 추려내어 Slack Webhook 등을 통해 사용자에게 최종 알림을 전송(deliver)합니다.
+    """
     slack_notifier: SlackNotifier
 
     async def run(self, state: Dict[str, Any]) -> Dict[str, Any]:

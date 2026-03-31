@@ -4,6 +4,11 @@ import { OnboardingForm } from "@/components/profile/onboarding-form";
 import { getProfileSnapshot } from "@/lib/api_client_server";
 import { EMPTY_USER_PROFILE_RESPONSE } from "@/lib/profile_types";
 
+/**
+ * 사용자 초기 설정(온보딩/프로필 변경) 페이지 서버 컴포넌트입니다.
+ * 현재 저장된 프로필과 선호 조건 스냅샷을 백엔드에서 불러와 
+ * OnboardingForm 클라이언트 컴포넌트의 초기 상태로 전달합니다.
+ */
 export default async function OnboardingPage() {
   let initialProfile = EMPTY_USER_PROFILE_RESPONSE;
 

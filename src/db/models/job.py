@@ -13,6 +13,11 @@ def utc_now() -> datetime:
 
 
 class Job(SQLModel, table=True):
+    """
+    수집된 단일 '채용 공고' 데이터베이스 모델입니다.
+    공고 원본 데이터 자체를 보관하며, 사용자별 맞춤 평가는 `Evaluation` 테이블에서 별도로 관리됩니다.
+    `platform`과 `external_job_id`의 조합에 유니크(Unique) 제약을 두어 중복 스크래핑 시 중복 삽입을 방지합니다.
+    """
     __tablename__ = "jobs"
     __table_args__ = (UniqueConstraint("platform", "external_job_id", name="uq_jobs_platform_external"),)
 

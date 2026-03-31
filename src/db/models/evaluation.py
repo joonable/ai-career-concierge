@@ -15,6 +15,15 @@ def utc_now() -> datetime:
 
 
 class Evaluation(SQLModel, table=True):
+    """
+    프로젝트 데이터 모델 중 가장 핵심이 되는 '사용자별 채용 공고 평가 결과' 엔티티입니다.
+    User와 Job 사이를 다대다(N:M) 관계로 이어주는 조인 테이블(Join Table) 역할을 겸합니다.
+    
+    저장 정보:
+    - 상태 전이: PENDING(대기) -> RULE_REJECTED(규칙 탈락) -> LLM_EVALUATED(LLM 완료)
+    - LLM 평가 결과: 적합도 점수(fit_score) 및 세부 이유(reasoning)
+    - 사용자 피드백: 좋아요/싫어요(user_feedback) 이력 (단기 기억 갱신용)
+    """
     __tablename__ = "evaluations"
     __table_args__ = (UniqueConstraint("user_id", "job_id", name="uq_evaluations_user_job"),)
 

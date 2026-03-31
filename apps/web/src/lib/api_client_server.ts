@@ -1,3 +1,9 @@
+/**
+ * Next.js App Router의 서버 컴포넌트(RSC) 환경에서 FastAPI 백엔드와 통신하는 유틸리티입니다.
+ * Supabase Server Client를 통해 인증 토큰을 획득하며, 
+ * 주로 페이지 렌더링을 위한 데이터 페칭(대시보드 목록, 프로필 조회 등)에 사용됩니다.
+ */
+
 import { createSupabaseServerClient } from "@/lib/supabase_auth_server";
 import { DashboardDataError } from "@/lib/dashboard_errors";
 import type { DashboardResponse } from "@/lib/dashboard_types";

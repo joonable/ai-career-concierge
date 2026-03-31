@@ -3,6 +3,11 @@ import { NextResponse, type NextRequest } from "next/server";
 import { resolvePostLoginPath, resolveSafeNextPath } from "@/lib/login_redirect";
 import { createSupabaseRouteHandlerClient } from "@/lib/supabase_auth_server";
 
+/**
+ * Supabase Google OAuth 로그인 성공 직후 호출되는 콜백 라우트 핸들러입니다.
+ * URL의 인증 `code`를 유효한 세션(Session) 쿠키로 교환하며, 
+ * 신규 유저는 온보딩(/onboarding)으로, 기존 유저는 대시보드로 리다이렉트합니다.
+ */
 export async function GET(request: NextRequest) {
   const requestUrl = new URL(request.url);
   const code = requestUrl.searchParams.get("code");

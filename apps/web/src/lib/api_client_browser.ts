@@ -1,5 +1,11 @@
 "use client";
 
+/**
+ * Next.js 프론트엔드의 클라이언트 컴포넌트(Client Component) 환경에서 FastAPI 백엔드와 통신하는 유틸리티입니다.
+ * 브라우저의 Supabase 세션을 통해 인증 토큰을 전달하며,
+ * 폼 제출(프로필 업데이트)이나 버튼 클릭(좋아요/싫어요 피드백 제출) 같은 동적 액션에 사용됩니다.
+ */
+
 import { createSupabaseBrowserClient } from "@/lib/supabase_auth_browser";
 import { webEnv } from "@/lib/env";
 import type { UserProfilePayload, UserProfileResponse } from "@/lib/profile_types";
