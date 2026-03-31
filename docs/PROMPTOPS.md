@@ -116,6 +116,13 @@ PromptOps iterations should follow a small-change loop:
 
 The unit of improvement is an iteration, not an arbitrary prompt edit.
 
+Iteration artifacts should be written under `docs/promptops_iterations/` so each prompt family can keep a lightweight history of:
+
+- baseline and candidate revisions
+- experiment links and result deltas
+- human review queue handoff
+- next backlog items
+
 ## LangSmith Decision
 
 LangSmith is the default backend for the first PromptOps version.

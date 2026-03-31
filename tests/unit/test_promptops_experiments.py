@@ -109,6 +109,36 @@ def test_langsmith_adapter_build_compare_link_uses_workspace_scope():
     )
 
 
+def test_langsmith_adapter_builds_annotation_queue_payload():
+    adapter = LangSmithPromptOpsAdapter(
+        client=SimpleNamespace(),
+        settings=SimpleNamespace(
+            langsmith_api_key="test-key",
+            gemini_model="gemini-test",
+            langsmith_eval_prompt_identifier="job-evaluation:staging",
+            langsmith_eval_prompt_version="local-v4",
+        ),
+        workspace_id="workspace-123",
+    )
+
+    from promptops.core.reviews import create_review_item
+    from promptops.projects.ai_career_concierge.review_rubric import DEFAULT_REVIEW_QUEUE
+
+    item = create_review_item(
+        item_id="review-1",
+        prompt_family="job-evaluation",
+        experiment_id="experiment-1",
+        run_id="run-1",
+        queue_name="job-evaluation-review",
+        reasons=["borderline_case"],
+    )
+
+    payload = adapter.build_annotation_queue_payload(queue=DEFAULT_REVIEW_QUEUE, items=[item])
+
+    assert payload["queue_name"] == "job-evaluation-review"
+    assert payload["items"][0]["run_id"] == "run-1"
+
+
 @pytest.mark.asyncio
 async def test_promptops_iteration_orchestration_runs_sync_and_experiment():
     adapter = FakeIterationAdapter()

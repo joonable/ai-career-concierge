@@ -38,6 +38,7 @@ EVALUATION_PROMPT_TEMPLATE = """당신은 한 명의 사용자를 기준으로 �
 인접 직무 판단 규칙:
 - 직무명이 달라도 실제 책임이 MLE와 충분히 겹치면 자동 저점 처리하지 마세요.
 - backend/model serving, ML platform, experimentation infra, data engineer for ML 같은 역할은 transferable skill이 강하면 `40~59` 또는 `60~79` 후보가 될 수 있습니다.
+- 다만 experimentation infra, data platform, analytics infra 계열에서 모델 학습/서빙/배포 ownership 근거가 약하면 기본값은 `40~59`로 두고, 강한 추가 근거가 있을 때만 `60+`를 고려하세요.
 - 단, 관련 기술이 일부 겹친다는 이유만으로 `80+`를 주지 마세요. 역할 정렬과 실제 ownership을 함께 보세요.
 must-have 판단 규칙:
 - must-have는 있으면 가산점이 아니라, 없으면 감점 또는 상한 제한을 만드는 핵심 조건입니다.
@@ -266,7 +267,7 @@ def build_evaluation_prompt(
         client=None,
         eval_prompt_identifier="",
         eval_prompt_name="job-evaluation",
-        eval_prompt_version="local-v3",
+        eval_prompt_version="local-v4",
         eval_prompt_variant="default",
         memory_prompt_identifier="",
         memory_prompt_name="memory-summary",

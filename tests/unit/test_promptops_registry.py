@@ -56,8 +56,8 @@ def test_promptops_registry_exposes_registered_prompt_families():
     families = list_prompt_families()
 
     assert [item.key for item in families] == ["job-evaluation", "memory-summary"]
-    assert get_prompt_family("job-evaluation").metadata.local_version == "local-v3"
-    assert [item.key for item in list_prompt_families_by_stage("staging")] == [
-        "job-evaluation",
-        "memory-summary",
-    ]
+    assert get_prompt_family("job-evaluation").metadata.local_version == "local-v4"
+    assert get_prompt_family("job-evaluation").active_stage == "candidate"
+    assert get_prompt_family("job-evaluation").revisions[0].revision_id == "local-v4"
+    assert [item.key for item in list_prompt_families_by_stage("staging")] == ["memory-summary"]
+    assert [item.key for item in list_prompt_families_by_stage("candidate")] == ["job-evaluation"]

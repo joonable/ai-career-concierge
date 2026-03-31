@@ -9,12 +9,12 @@ PROMPT_FAMILIES = [
         key="job-evaluation",
         description="Structured evaluation prompt for job recommendation scoring.",
         project_key=PROJECT_KEY,
-        active_stage="staging",
+        active_stage="candidate",
         metadata=PromptMetadata(
             owner="agent",
             backend="langsmith",
             identifier="job-evaluation",
-            local_version="local-v3",
+            local_version="local-v4",
             schema_version=3,
             tags={
                 "candidate": "job-evaluation",
@@ -23,6 +23,13 @@ PROMPT_FAMILIES = [
             },
         ),
         revisions=[
+            PromptRevision(
+                family_key="job-evaluation",
+                revision_id="local-v4",
+                stage="candidate",
+                summary="Tighten adjacent infra role scoring guidance.",
+                change_reason="Keep infra-heavy adjacent roles in 40~59 by default unless direct ML ownership is evidenced.",
+            ),
             PromptRevision(
                 family_key="job-evaluation",
                 revision_id="local-v3",

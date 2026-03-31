@@ -114,6 +114,33 @@ class LangSmithPromptOpsAdapter:
             return f"{base}/datasets/{dataset_id}/compare?{session_params}"
         return f"{base}/datasets/{dataset_id}/compare"
 
+    def ensure_annotation_queue(self, *, queue: ReviewQueueSpec, rubric_instructions: str = "") -> Any:
+        """Create or reuse an annotation queue in LangSmith."""
+
+        existing = next(
+            iter(self.client.list_annotation_queues(name=queue.queue_name, limit=1)),
+            None,
+        )
+        if existing is not None:
+            return existing
+        return self.client.create_annotation_queue(
+            name=queue.queue_name,
+            description=queue.description,
+            rubric_instructions=rubric_instructions or None,
+        )
+
+    def add_runs_to_queue(self, *, queue_id: str, run_ids: list[str]) -> None:
+        """Attach run ids to an annotation queue."""
+
+        if not run_ids:
+            return
+        self.client.add_runs_to_annotation_queue(queue_id, run_ids=run_ids)
+
+    def list_root_runs(self, *, project_name: str, limit: int = 100) -> list[Any]:
+        """List root runs for an experiment project."""
+
+        return list(self.client.list_runs(project_name=project_name, is_root=True, limit=limit))
+
     def build_annotation_queue_payload(self, *, queue: ReviewQueueSpec, items: list[ReviewItem]) -> dict[str, Any]:
         """Build a backend-ready annotation queue payload.
 
@@ -200,7 +227,7 @@ async def _run_langsmith_experiment(
         or getattr(results, "project_name", "")
         or ""
     )
-    session_id = _extract_session_id(results)
+    session_id = _extract_session_id(results, client=client, experiment_name=experiment_name)
     dataset_id = _extract_dataset_id(results)
     return {
         "experiment_name": experiment_name,
@@ -209,14 +236,24 @@ async def _run_langsmith_experiment(
     }
 
 
-def _extract_session_id(results: Any) -> str:
+def _extract_session_id(results: Any, *, client: Any, experiment_name: str) -> str:
     experiment_id = getattr(results, "experiment_id", None)
     if experiment_id:
         return str(experiment_id)
     manager = getattr(results, "_manager", None)
     project = getattr(manager, "project", None)
     project_id = getattr(project, "id", None)
-    return str(project_id or "")
+    if project_id:
+        return str(project_id)
+    if experiment_name:
+        try:
+            project = client.read_project(project_name=experiment_name)
+            project_id = getattr(project, "id", None)
+            if project_id:
+                return str(project_id)
+        except Exception:
+            return ""
+    return ""
 
 
 def _extract_dataset_id(results: Any) -> str:

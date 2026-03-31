@@ -148,6 +148,7 @@ def test_local_v3_prompt_contains_score_policy_and_structured_axes():
     assert "구조화된 JD 책임 근거" in rendered.text
     assert "누락/불명확한 컨텍스트" in rendered.text
     assert "인접 직무 판단 규칙" in rendered.text
+    assert "기본값은 `40~59`로 두고" in rendered.text
     assert "must-have 판단 규칙" in rendered.text
     assert "deal-breaker 판단 규칙" in rendered.text
     assert "transferable skill 판단 규칙" in rendered.text
