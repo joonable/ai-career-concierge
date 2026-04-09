@@ -46,15 +46,15 @@ AGENTS.md의 도메인별 섹션을 개별 파일로 추출.
 ## Phase 2: 문서 고도화 및 추적 체계
 
 ### 2-1. MILESTONE.md
-- [ ] 프로젝트 루트에 MILESTONE.md 생성 (Phase 0~4 진화 이력)
+- [x] 프로젝트 루트에 MILESTONE.md 생성 (Phase 0~4 진화 이력)
 
 ### 2-2. 세션 히스토리
-- [ ] `.claude/sessions/` 디렉토리 생성
-- [ ] 세션 로그 템플릿 파일 생성
-- [ ] `.gitignore`에 `.claude/sessions/` 추가
+- [x] `.claude/sessions/` 디렉토리 생성
+- [x] 세션 로그 템플릿 파일 생성
+- [x] `.gitignore`에 `.claude/sessions/` 추가
 
 ### 2-3. 첫 세션 기록
-- [ ] 이번 세션(하네스 리스트럭처링 계획) 기록 작성
+- [x] 이번 세션(하네스 리스트럭처링 계획) 기록 작성
 
 ---
 
