@@ -1,0 +1,32 @@
+{
+  "hooks": {
+    "PreCommit": [
+      {
+        "command": "cd apps/web && npx tsc --noEmit 2>&1 | head -30",
+        "description": "프론트엔드 타입 체크"
+      },
+      {
+        "command": "poetry run pytest tests/unit -x -q --tb=short 2>&1 | tail -20",
+        "description": "유닛 테스트 실행"
+      }
+    ],
+    "PostCommit": [
+      {
+        "command": "echo 'docs/internal/status.md 업데이트 필요 여부를 확인하세요.'",
+        "description": "상태판 업데이트 리마인더"
+      }
+    ]
+  },
+  "permissions": {
+    "allow": [
+      "Bash(poetry run pytest*)",
+      "Bash(poetry run dev*)",
+      "Bash(poetry run eval-jobs*)",
+      "Bash(cd apps/web && npm*)",
+      "Bash(cd apps/web && npx*)",
+      "Bash(git status*)",
+      "Bash(git log*)",
+      "Bash(git diff*)"
+    ]
+  }
+}

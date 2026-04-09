@@ -21,3 +21,4 @@ node_modules/
 coverage/
 .data/
 *.tsbuildinfo
+.claude/settings.local.json
