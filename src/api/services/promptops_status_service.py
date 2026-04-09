@@ -10,7 +10,6 @@ from api.schemas.users import (
 from common.config import Settings, get_settings
 from promptops.core.registry import get_prompt_family
 
-
 LANGSMITH_WORKSPACE_ID = "a5f5f699-f384-58ec-9be0-2a39bb96969e"
 LANGSMITH_BASE_URL = "https://smith.langchain.com"
 PROMPTOPS_REVIEW_QUEUE_ID = "a1438ae9-2449-4798-94f1-0243ab9b1e18"
@@ -78,7 +77,4 @@ class PromptOpsStatusService:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not found.")
 
     def _build_review_queue_url(self) -> str:
-        return (
-            f"{LANGSMITH_BASE_URL}/o/{LANGSMITH_WORKSPACE_ID}/annotation-queues/"
-            f"{PROMPTOPS_REVIEW_QUEUE_ID}"
-        )
+        return f"{LANGSMITH_BASE_URL}/o/{LANGSMITH_WORKSPACE_ID}/annotation-queues/{PROMPTOPS_REVIEW_QUEUE_ID}"

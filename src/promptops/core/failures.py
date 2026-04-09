@@ -4,7 +4,6 @@ from typing import Any
 
 from promptops.core.models import FailureRecord
 
-
 FAILURE_TAXONOMY = {
     "prompt.role_alignment": "Prompt is not steering enough on direct vs adjacent role alignment.",
     "prompt.must_have_coverage": "Prompt is not consistently translating must-have gaps into score limits.",
@@ -34,10 +33,7 @@ def is_failure_case(*, evaluator_scores: dict[str, Any] | None = None) -> bool:
 
     if not evaluator_scores:
         return False
-    for value in evaluator_scores.values():
-        if isinstance(value, (int, float)) and value < 1:
-            return True
-    return False
+    return any(isinstance(value, (int, float)) and value < 1 for value in evaluator_scores.values())
 
 
 def build_failure_record(

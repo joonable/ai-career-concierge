@@ -5,7 +5,6 @@ from uuid import UUID
 
 from pydantic import BaseModel, Field, field_validator, model_validator
 
-
 RoleAlignment = Literal["HIGH", "MEDIUM", "LOW"]
 MustHaveCoverage = Literal["STRONG", "PARTIAL", "WEAK"]
 DealBreakerSeverity = Literal["NONE", "SOFT", "HARD"]
@@ -35,7 +34,7 @@ class LLMEvaluationResult(BaseModel):
     deal_breakers_found: List[str] = Field(default_factory=list)
 
     @model_validator(mode="after")
-    def normalize_legacy_fields(self) -> "LLMEvaluationResult":
+    def normalize_legacy_fields(self) -> LLMEvaluationResult:
         if not self.reasoning:
             self.reasoning = self.summary.strip()
         else:
@@ -54,7 +53,7 @@ class LLMEvaluationResult(BaseModel):
             self.deal_breaker_flags = list(self.deal_breakers_found)
 
         if hasattr(self, "transferable_skill_level") and getattr(self, "transferable_skill_level", None):
-            self.transferable_skills = getattr(self, "transferable_skill_level")
+            self.transferable_skills = self.transferable_skill_level
 
         return self
 

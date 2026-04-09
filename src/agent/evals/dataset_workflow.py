@@ -1,13 +1,13 @@
 from __future__ import annotations
 
 import json
+from collections.abc import Iterable
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Literal, Union
+from typing import Any, Dict, List, Literal, Union
 from uuid import UUID
 
 from langsmith.schemas import ExampleCreate
 from pydantic import BaseModel, ConfigDict, Field, model_validator
-
 
 RoleAlignment = Literal["HIGH", "MEDIUM", "LOW"]
 MustHaveCoverage = Literal["STRONG", "PARTIAL", "WEAK"]
@@ -32,7 +32,7 @@ class CuratedExampleOutputs(BaseModel):
     scoring_note: str = Field(min_length=1)
 
     @model_validator(mode="after")
-    def validate_fit_score_range(self) -> "CuratedExampleOutputs":
+    def validate_fit_score_range(self) -> CuratedExampleOutputs:
         minimum = self.fit_score_range.get("min")
         maximum = self.fit_score_range.get("max")
         if minimum is None or maximum is None:
@@ -94,7 +94,9 @@ def _normalize_split(split: Any) -> List[str]:
     return [str(split)]
 
 
-def _example_needs_update(existing: Any, *, inputs: Dict[str, Any], outputs: Dict[str, Any], metadata: Dict[str, Any], split: List[str]) -> bool:
+def _example_needs_update(
+    existing: Any, *, inputs: Dict[str, Any], outputs: Dict[str, Any], metadata: Dict[str, Any], split: List[str]
+) -> bool:
     return any(
         [
             getattr(existing, "inputs", None) != inputs,
@@ -107,8 +109,7 @@ def _example_needs_update(existing: Any, *, inputs: Dict[str, Any], outputs: Dic
 
 def sync_examples(client, *, dataset_name: str, examples: List[Dict[str, Any]]) -> Any:
     existing_examples = {
-        str(example.id): example
-        for example in client.list_examples(dataset_name=dataset_name, limit=500)
+        str(example.id): example for example in client.list_examples(dataset_name=dataset_name, limit=500)
     }
     created_payload = [
         ExampleCreate(

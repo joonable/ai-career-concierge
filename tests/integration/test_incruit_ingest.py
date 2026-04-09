@@ -1,10 +1,9 @@
-from agent.nodes.ingest_node import IngestNode
-from scraper.sources.incruit.scraper import IncruitScraper
 from sqlmodel import select
-
-from db.models import Job
 from tests.conftest import FakeJobStore, FakeSystemLogStore, seed_user
 
+from agent.nodes.ingest_node import IngestNode
+from db.models import Job
+from scraper.sources.incruit.scraper import IncruitScraper
 
 LISTING_HTML = """
 <section class="jobs">

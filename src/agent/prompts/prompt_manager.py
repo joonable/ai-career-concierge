@@ -1,7 +1,8 @@
 from __future__ import annotations
 
+from collections.abc import Iterable
 from dataclasses import dataclass
-from typing import Any, Dict, Iterable, Optional
+from typing import Any, Dict, Optional
 
 from langchain_core.prompts import PromptTemplate
 
@@ -79,9 +80,7 @@ transferable skill 판단 규칙:
 }}
 마크다운 코드펜스나 추가 설명은 절대 포함하지 마세요."""
 
-MEMORY_SUMMARY_PROMPT_TEMPLATE = (
-    "최근 싫어요 사유와 유사한 공고는 피하세요: {joined_reasons}."
-)
+MEMORY_SUMMARY_PROMPT_TEMPLATE = "최근 싫어요 사유와 유사한 공고는 피하세요: {joined_reasons}."
 
 
 @dataclass(frozen=True)
@@ -133,7 +132,7 @@ class PromptManager:
         self._fallback_memory_prompt = PromptTemplate.from_template(MEMORY_SUMMARY_PROMPT_TEMPLATE)
 
     @classmethod
-    def from_settings(cls, settings: Any, *, client: Optional[Any] = None) -> "PromptManager":
+    def from_settings(cls, settings: Any, *, client: Optional[Any] = None) -> PromptManager:
         return cls(
             client=client,
             eval_prompt_identifier=settings.langsmith_eval_prompt_identifier,

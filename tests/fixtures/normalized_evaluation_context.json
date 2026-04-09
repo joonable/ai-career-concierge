@@ -55,6 +55,7 @@
   },
   "expected": {
     "target_role": "Machine Learning Engineer",
+    "role_targets": ["Machine Learning Engineer"],
     "years_of_experience": 6,
     "hard_preferences": {
       "must_haves": ["Python", "MLOps / serving", "Feature Store"],

@@ -6,9 +6,7 @@ from promptops.projects.ai_career_concierge.context import build_normalized_eval
 
 
 def test_build_normalized_evaluation_context_matches_fixture_contract():
-    fixture = json.loads(
-        Path("tests/fixtures/normalized_evaluation_context.json").read_text(encoding="utf-8")
-    )
+    fixture = json.loads(Path("tests/fixtures/normalized_evaluation_context.json").read_text(encoding="utf-8"))
 
     normalized = build_normalized_evaluation_context(
         user_context=fixture["raw"]["user_context"],

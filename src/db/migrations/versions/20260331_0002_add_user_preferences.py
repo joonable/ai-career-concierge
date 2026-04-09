@@ -1,8 +1,7 @@
 """Add user preferences column."""
 
-from alembic import op
 import sqlalchemy as sa
-
+from alembic import op
 
 revision = "20260331_0002"
 down_revision = "20260326_0001"

@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from urllib.parse import urlencode
 
-
 SOURCE_NAME = "incruit"
 DEFAULT_BASE_URL = "https://job.incruit.com"
 LIST_PATH = "/jobdb_list/searchjob.asp"

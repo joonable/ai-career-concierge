@@ -5,8 +5,9 @@ from db.models import Evaluation, SystemLog
 
 
 async def test_pipeline_continues_when_one_scraper_fails(client, db_session, app):
-    from api.dependencies.runtime import get_runtime
     from tests.conftest import FailingScraper, StaticScraper, build_runtime, seed_user
+
+    from api.dependencies.runtime import get_runtime
 
     runtime = build_runtime(scrapers=[FailingScraper(), StaticScraper()])
     app.dependency_overrides[get_runtime] = lambda: runtime
@@ -24,8 +25,9 @@ async def test_pipeline_continues_when_one_scraper_fails(client, db_session, app
 
 
 async def test_invalid_llm_output_is_logged_and_keeps_evaluation_pending(client, db_session, app):
-    from api.dependencies.runtime import get_runtime
     from tests.conftest import InvalidEvaluator, StaticScraper, build_runtime, seed_user
+
+    from api.dependencies.runtime import get_runtime
 
     runtime = build_runtime(scrapers=[StaticScraper()], evaluator=InvalidEvaluator())
     app.dependency_overrides[get_runtime] = lambda: runtime
@@ -40,9 +42,7 @@ async def test_invalid_llm_output_is_logged_and_keeps_evaluation_pending(client,
     assert response.status_code == 200
     assert response.json()["runs"][0]["jobs_sent"] == 0
 
-    evaluations = db_session.exec(
-        select(Evaluation).where(Evaluation.user_id == user.id)
-    ).all()
+    evaluations = db_session.exec(select(Evaluation).where(Evaluation.user_id == user.id)).all()
     assert any(evaluation.status == EvaluationStatus.PENDING for evaluation in evaluations)
 
     logs = db_session.exec(select(SystemLog)).all()

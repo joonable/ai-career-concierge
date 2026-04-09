@@ -11,9 +11,8 @@ from api.schemas.users import (
     UserProfileResponse,
 )
 from api.services.dashboard_service import DashboardService
-from api.services.promptops_status_service import PromptOpsStatusService
 from api.services.profile_service import ProfileService
-
+from api.services.promptops_status_service import PromptOpsStatusService
 
 router = APIRouter(prefix="/api/v1/users", tags=["users"])
 
@@ -49,7 +48,7 @@ def get_my_dashboard(
     evaluation_store=Depends(get_evaluation_store),
 ) -> DashboardResponse:
     """
-    Next.js 프론트엔드의 메인 대시보드(칸반 뷰 등)를 그리기 위해, 
+    Next.js 프론트엔드의 메인 대시보드(칸반 뷰 등)를 그리기 위해,
     평가 상태(Pending, Rule-Rejected, Evaluated 등) 별 추천 공고 목록을 조회 및 가공하여 반환합니다.
     """
     service = DashboardService(

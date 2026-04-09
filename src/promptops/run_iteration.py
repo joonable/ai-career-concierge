@@ -1,6 +1,4 @@
 import asyncio
-import json
-import os
 from datetime import datetime
 from pathlib import Path
 from uuid import uuid4
@@ -8,9 +6,9 @@ from uuid import uuid4
 from langsmith import Client
 from langsmith.evaluation import aevaluate
 
-from agent.evaluation_service import evaluate_job
 from agent.evals.dataset_workflow import ensure_dataset, load_curated_examples, sync_examples
 from agent.evals.rule_based_evaluators import RULE_BASED_EVALUATORS
+from agent.evaluation_service import evaluate_job
 from agent.prompts import PromptManager
 from agent.schemas.pipeline_job import PipelineJob
 from api.services.gemini_evaluator import GeminiEvaluator
@@ -21,31 +19,34 @@ from common.telemetry import LangSmithTracer
 DEFAULT_FIXTURE_PATH = Path("src/agent/evals/fixtures/job_eval_gold.json")
 ITERATIONS_DIR = Path("docs/promptops/iterations")
 
+
 async def run_iteration(iteration_id: str, description: str = "Prompt optimization iteration"):
     settings = get_settings()
     client = Client(api_key=settings.langsmith_api_key)
     tracer = LangSmithTracer.from_settings(settings)
     prompt_manager = PromptManager.from_settings(settings, client=client)
     evaluator = GeminiEvaluator(api_key=settings.gemini_api_key, model=settings.gemini_model)
-    
+
     dataset_name = settings.langsmith_eval_dataset_name
     experiment_prefix = f"iter-{iteration_id}"
-    
+
     print(f"🚀 Starting Iteration {iteration_id}...")
-    
+
     # 1. Sync Dataset
     try:
         print(f"📦 Syncing dataset '{dataset_name}' from {DEFAULT_FIXTURE_PATH}...")
         examples = load_curated_examples(str(DEFAULT_FIXTURE_PATH))
-        ensure_dataset(client, dataset_name=dataset_name, description="Curated gold set for job evaluation experiments.")
+        ensure_dataset(
+            client, dataset_name=dataset_name, description="Curated gold set for job evaluation experiments."
+        )
         sync_examples(client, dataset_name=dataset_name, examples=examples)
     except Exception as e:
         print(f"⚠️ Dataset sync failed, but continuing: {e}")
-        examples = [] # list_runs will still work if experiment was created
-    
+        examples = []  # list_runs will still work if experiment was created
+
     # 2. Run Experiment
-    print(f"🧪 Running experiment...")
-    
+    print("🧪 Running experiment...")
+
     async def target(inputs):
         job = PipelineJob.model_validate(inputs["job"])
         execution = await evaluate_job(
@@ -75,9 +76,9 @@ async def run_iteration(iteration_id: str, description: str = "Prompt optimizati
         )
     except Exception as e:
         print(f"⚠️ Experiment run encountered errors (possibly API 503), will attempt to report partial results: {e}")
-    
+
     # 3. Generate Report
-    print(f"📝 Generating markdown report...")
+    print("📝 Generating markdown report...")
     # Find the most recent experiment matching prefix if results is None
     project_name = getattr(experiment_results, "experiment_name", None)
     if not project_name:
@@ -95,13 +96,14 @@ async def run_iteration(iteration_id: str, description: str = "Prompt optimizati
     else:
         print("❌ Could not find an experiment to report on.")
 
+
 async def generate_markdown_report(iteration_id: str, description: str, project_name: str, client: Client):
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     report_file = ITERATIONS_DIR / f"iteration_{iteration_id}.md"
-    
+
     # Get detailed results for reporting
     runs = list(client.list_runs(project_name=project_name, execution_order=1))
-    
+
     total_cases = len(runs)
     passed_cases = 0
     failure_details = []
@@ -110,25 +112,27 @@ async def generate_markdown_report(iteration_id: str, description: str, project_
         # Check feedback/scores
         feedbacks = list(client.list_feedback(run_ids=[run.id]))
         all_passed = all(f.score == 1 for f in feedbacks if f.score is not None)
-        
+
         # Safe access to outputs
         outputs = run.outputs or {}
-        
+
         if all_passed and outputs:
             passed_cases += 1
         else:
             scenario = ((run.extra or {}).get("metadata") or {}).get("scenario_type", "Unknown")
             failed_rules = [f"{f.key}: {f.comment}" for f in feedbacks if f.score == 0]
-            failure_details.append({
-                "run_id": str(run.id),
-                "scenario": scenario,
-                "input_title": run.inputs.get("job", {}).get("title") if run.inputs else "Unknown",
-                "failed_rules": failed_rules,
-                "reasoning": outputs.get("summary") or "N/A (Run Failed/Incomplete)"
-            })
+            failure_details.append(
+                {
+                    "run_id": str(run.id),
+                    "scenario": scenario,
+                    "input_title": run.inputs.get("job", {}).get("title") if run.inputs else "Unknown",
+                    "failed_rules": failed_rules,
+                    "reasoning": outputs.get("summary") or "N/A (Run Failed/Incomplete)",
+                }
+            )
 
     pass_rate = (passed_cases / total_cases * 100) if total_cases > 0 else 0
-    
+
     content = f"""# Iteration {iteration_id} Report
 - **Date:** {timestamp}
 - **Description:** {description}
@@ -155,10 +159,12 @@ async def generate_markdown_report(iteration_id: str, description: str, project_
     ITERATIONS_DIR.mkdir(parents=True, exist_ok=True)
     with open(report_file, "w", encoding="utf-8") as f:
         f.write(content)
-        
+
     return report_file
+
 
 if __name__ == "__main__":
     import sys
+
     iter_id = sys.argv[1] if len(sys.argv) > 1 else datetime.now().strftime("%H%M%S")
     asyncio.run(run_iteration(iter_id, "Automated iteration run"))

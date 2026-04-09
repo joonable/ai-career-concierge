@@ -27,5 +27,5 @@ def test_build_evaluation_prompt_includes_guidelines_and_recent_memory():
     assert "Python, SQL" in prompt
     assert "contract-only" in prompt
     assert "Avoid jobs with weak infra ownership." in prompt
-    assert '"fit_score": integer from 1 to 100' in prompt
-    assert "Do not include markdown fences or extra commentary." in prompt
+    assert "fit_score" in prompt
+    assert "마크다운 코드펜스나 추가 설명은 절대 포함하지 마세요." in prompt

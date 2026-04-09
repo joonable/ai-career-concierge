@@ -1,7 +1,8 @@
+from tests.conftest import FakeEvaluationStore
+
 from agent.nodes.rule_filter_node import RuleFilterNode
 from agent.schemas.pipeline_job import PipelineJob
 from db.enums import EvaluationStatus
-from tests.conftest import FakeEvaluationStore
 
 
 async def test_rule_filter_marks_title_mismatch_as_rule_rejected(db_session):

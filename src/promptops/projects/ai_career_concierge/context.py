@@ -129,13 +129,9 @@ class NormalizedEvaluationContext(BaseModel):
     def describe_missingness(self) -> str:
         messages: list[str] = []
         if self.missingness.missing_profile_fields:
-            messages.append(
-                f"profile: {', '.join(self.missingness.missing_profile_fields)}"
-            )
+            messages.append(f"profile: {', '.join(self.missingness.missing_profile_fields)}")
         if self.missingness.missing_preference_fields:
-            messages.append(
-                f"preferences: {', '.join(self.missingness.missing_preference_fields)}"
-            )
+            messages.append(f"preferences: {', '.join(self.missingness.missing_preference_fields)}")
         if self.missingness.missing_job_fields:
             messages.append(f"job: {', '.join(self.missingness.missing_job_fields)}")
         if self.missingness.missing_memory:
@@ -212,9 +208,7 @@ def build_normalized_evaluation_context(
             description=_clean_string(job.jd_raw_text),
             responsibilities=_normalize_string_list(source_metadata.get("responsibilities")),
             requirements=_normalize_string_list(source_metadata.get("requirements")),
-            preferred_requirements=_normalize_string_list(
-                source_metadata.get("preferred_requirements")
-            ),
+            preferred_requirements=_normalize_string_list(source_metadata.get("preferred_requirements")),
             location=_first_non_empty(
                 source_metadata,
                 ["location", "region", "workplace"],

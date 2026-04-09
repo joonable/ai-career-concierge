@@ -1,8 +1,9 @@
 from __future__ import annotations
 
-from typing import Iterable
+from collections.abc import Iterable
 
 from agent.prompts.prompt_manager import PromptManager, RenderedPrompt
+
 
 def summarize_recent_dislikes(dislike_reasons: Iterable[str]) -> str:
     return build_memory_summary(dislike_reasons).text

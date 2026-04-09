@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Dict, List
+from typing import Any, Dict
 
 from langsmith.evaluation.evaluator import EvaluationResult, EvaluationResults
 
@@ -67,17 +67,24 @@ def evaluate_score_policy_alignment(run, example=None):
             ),
             EvaluationResult(
                 key="must_have_coverage_match",
-                score=1 if expected_must_have_coverage and actual_must_have_coverage == expected_must_have_coverage else 0,
+                score=1
+                if expected_must_have_coverage and actual_must_have_coverage == expected_must_have_coverage
+                else 0,
                 comment=f"expected={expected_must_have_coverage}, actual={actual_must_have_coverage}",
             ),
             EvaluationResult(
                 key="deal_breaker_severity_match",
-                score=1 if expected_deal_breaker_severity and actual_deal_breaker_severity == expected_deal_breaker_severity else 0,
+                score=1
+                if expected_deal_breaker_severity and actual_deal_breaker_severity == expected_deal_breaker_severity
+                else 0,
                 comment=f"expected={expected_deal_breaker_severity}, actual={actual_deal_breaker_severity}",
             ),
             EvaluationResult(
                 key="transferable_skill_credit",
-                score=1 if expected_transferable_skill_level and actual_transferable_skill_level == expected_transferable_skill_level else 0,
+                score=1
+                if expected_transferable_skill_level
+                and actual_transferable_skill_level == expected_transferable_skill_level
+                else 0,
                 comment=f"expected={expected_transferable_skill_level}, actual={actual_transferable_skill_level}",
             ),
             EvaluationResult(

@@ -42,10 +42,7 @@ def test_langsmith_prompt_identifiers_default_to_tagged_references():
 def test_settings_preserve_placeholder_database_url():
     settings = Settings(
         APP_ENV="development",
-        DATABASE_URL=(
-            "postgresql+psycopg://postgres:<SUPABASE_DB_PASSWORD>@"
-            "db.example.supabase.co:5432/postgres"
-        ),
+        DATABASE_URL=("postgresql+psycopg://postgres:<SUPABASE_DB_PASSWORD>@db.example.supabase.co:5432/postgres"),
     )
     assert "<SUPABASE_DB_PASSWORD>" in settings.database_url
 

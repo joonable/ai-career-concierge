@@ -16,18 +16,13 @@ def _result_map(evaluation_results) -> dict[str, object]:
 def test_borderline_fixture_examples_include_score_policy_metadata():
     examples = load_curated_examples(Path("src/agent/evals/fixtures/job_eval_gold.json"))
 
-    borderline_examples = [
-        example
-        for example in examples
-        if example["metadata"]["scenario_type"] == "경계_사례"
-    ]
+    borderline_examples = [example for example in examples if example["metadata"]["scenario_type"] == "경계_사례"]
 
     assert len(borderline_examples) >= 8
     assert all(example["metadata"]["scenario_family"] for example in borderline_examples)
     assert all(example["outputs"]["scoring_note"] for example in borderline_examples)
     assert all(
-        example["outputs"]["expected_role_alignment"] in {"HIGH", "MEDIUM", "LOW"}
-        for example in borderline_examples
+        example["outputs"]["expected_role_alignment"] in {"HIGH", "MEDIUM", "LOW"} for example in borderline_examples
     )
     assert all(
         example["outputs"]["expected_must_have_coverage"] in {"STRONG", "PARTIAL", "WEAK"}
@@ -46,9 +41,7 @@ def test_borderline_fixture_examples_include_score_policy_metadata():
 def test_borderline_regression_is_decomposed_when_fit_score_band_misses():
     examples = load_curated_examples(Path("src/agent/evals/fixtures/job_eval_gold.json"))
     borderline_example = next(
-        example
-        for example in examples
-        if example["inputs"]["job"]["external_job_id"] == "gold-005"
+        example for example in examples if example["inputs"]["job"]["external_job_id"] == "gold-005"
     )
 
     class Run:

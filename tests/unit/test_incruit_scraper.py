@@ -8,7 +8,6 @@ from scraper.sources.incruit.parsers import (
 )
 from scraper.sources.incruit.selectors import build_search_url
 
-
 LISTING_HTML = """
 <section class="jobs">
   <article class="job-card" data-job-id="1001">

@@ -9,7 +9,6 @@ from api.dependencies.supabase_store import get_evaluation_store, get_user_store
 from api.schemas.evaluations import FeedbackRequest, FeedbackResponse
 from api.services.feedback_service import FeedbackService
 
-
 router = APIRouter(prefix="/api/v1/evaluations", tags=["evaluations"])
 
 

@@ -57,8 +57,9 @@ class RecordingTracer:
 
 
 async def test_pipeline_with_gemini_evaluator_persists_llm_results(client, db_session, app):
-    from api.dependencies.runtime import get_runtime
     from tests.conftest import StaticScraper, ValidGeminiTransport, build_runtime, seed_user
+
+    from api.dependencies.runtime import get_runtime
 
     http_client = httpx.AsyncClient(transport=httpx.MockTransport(ValidGeminiTransport()))
     runtime = build_runtime(
@@ -82,8 +83,9 @@ async def test_pipeline_with_gemini_evaluator_persists_llm_results(client, db_se
 
 
 async def test_pipeline_logs_provider_failures_from_gemini_evaluator(client, db_session, app):
-    from api.dependencies.runtime import get_runtime
     from tests.conftest import FailingGeminiTransport, StaticScraper, build_runtime, seed_user
+
+    from api.dependencies.runtime import get_runtime
 
     http_client = httpx.AsyncClient(transport=httpx.MockTransport(FailingGeminiTransport()))
     runtime = build_runtime(
@@ -110,8 +112,9 @@ async def test_pipeline_logs_provider_failures_from_gemini_evaluator(client, db_
 
 
 async def test_pipeline_records_langsmith_root_and_llm_traces(client, db_session, app):
-    from api.dependencies.runtime import get_runtime
     from tests.conftest import StaticScraper, ValidGeminiTransport, build_runtime, seed_user
+
+    from api.dependencies.runtime import get_runtime
 
     tracer = RecordingTracer()
     http_client = httpx.AsyncClient(transport=httpx.MockTransport(ValidGeminiTransport()))

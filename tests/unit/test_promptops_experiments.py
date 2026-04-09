@@ -5,7 +5,7 @@ from types import SimpleNamespace
 import pytest
 
 from promptops.adapters.langsmith import LangSmithPromptOpsAdapter
-from promptops.core.experiments import run_iteration, sync_dataset
+from promptops.core.experiments import run_iteration
 from promptops.core.models import DatasetSyncResult, DatasetSyncSpec, ExperimentRunResult, ExperimentSpec
 
 

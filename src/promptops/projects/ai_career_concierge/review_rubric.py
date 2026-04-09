@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from promptops.core.models import ReviewFeedbackRecord, ReviewQueueSpec, ReviewRubricCriterion
 
-
 HUMAN_REVIEW_RUBRIC = [
     ReviewRubricCriterion(
         key="role_alignment",

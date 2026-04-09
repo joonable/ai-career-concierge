@@ -16,7 +16,6 @@ from scraper.sources.incruit.selectors import (
     TITLE_HINTS,
 )
 
-
 WHITESPACE_RE = re.compile(r"\s+")
 TAG_RE = re.compile(r"<[^>]+>")
 PATH_ID_RE = re.compile(r"(\d{4,})")
@@ -107,19 +106,14 @@ class _ListingParser(HTMLParser):
 
         if tag == "a" and attr_map.get("href"):
             href = attr_map["href"]
-            data_hint = (
-                attr_map.get("data-job-id")
-                or attr_map.get("data-posting-id")
-                or self._current["external_hint"]
-            )
+            data_hint = attr_map.get("data-job-id") or attr_map.get("data-posting-id") or self._current["external_hint"]
             is_job_link = looks_like_job_detail_link(href)
             if is_job_link:
                 self._current["detail_url"] = href
                 self._current["external_hint"] = data_hint
                 self._capture_title = True
-            elif (
-                (not self._current["detail_url"] and class_matches(attr_map, TITLE_HINTS))
-                or (not self._current["title"] and class_matches(attr_map, TITLE_HINTS))
+            elif (not self._current["detail_url"] and class_matches(attr_map, TITLE_HINTS)) or (
+                not self._current["title"] and class_matches(attr_map, TITLE_HINTS)
             ):
                 self._current["detail_url"] = href
                 self._capture_title = True
@@ -194,14 +188,9 @@ class _DetailParser(HTMLParser):
             self.canonical_url = attr_map["content"]
 
         if any(key in attr_map for key in ("data-job-id", "data-posting-id")):
-            self.external_hint = (
-                attr_map.get("data-job-id") or attr_map.get("data-posting-id") or self.external_hint
-            )
+            self.external_hint = attr_map.get("data-job-id") or attr_map.get("data-posting-id") or self.external_hint
 
-        if (
-            tag == "script"
-            and attr_map.get("type", "").lower() == "application/ld+json"
-        ):
+        if tag == "script" and attr_map.get("type", "").lower() == "application/ld+json":
             self._capture_json_ld = True
 
         if class_matches(attr_map, DETAIL_HINTS):

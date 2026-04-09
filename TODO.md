@@ -61,12 +61,14 @@ AGENTS.md의 도메인별 섹션을 개별 파일로 추출.
 ## Phase 3: CI/CD 및 코드 품질
 
 ### 3-1. 린터 설정
-- [ ] `pyproject.toml`에 ruff dev 의존성 추가
-- [ ] `[tool.ruff]` 설정 추가
-- [ ] `ruff check --fix` 첫 실행으로 자동 수정 가능한 이슈 처리
+- [x] `pyproject.toml`에 ruff dev 의존성 추가
+- [x] `[tool.ruff]` 설정 추가
+- [x] `ruff check --fix` 첫 실행으로 자동 수정 가능한 이슈 처리
+- [x] `ruff format` 첫 실행으로 포맷팅 정리
+- [x] pre-existing 버그 수정 (eval_type_backport 추가, 테스트 fixture 동기화)
 
 ### 3-2. GitHub Actions
-- [ ] `.github/workflows/ci.yml` 생성
+- [x] `.github/workflows/ci.yml` 생성
   - backend job: ruff lint → ruff format check → pytest unit → pytest contract
   - frontend job: npm ci → tsc --noEmit → vitest run
 
