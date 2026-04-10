@@ -63,6 +63,7 @@ PoC는 다음 루프를 지원해야 합니다:
 - [테스트 규칙 및 완료 조건](.claude/rules/testing.md)
 - [API 계약 및 인증 경계](.claude/rules/api-contracts.md)
 - [설정 및 환경 변수 규칙](.claude/rules/config-env.md)
+- [Implementation 문서 규칙](.claude/rules/implementation-docs.md)
 
 ## 범위 가드레일 (Scope Guardrails)
 
@@ -119,3 +120,7 @@ scripts/start_integration_task.sh --task dashboard-filter
 - 참조 문서와 운영 문서는 기본적으로 한국어를 우선 사용합니다.
 - 영어 표현이 꼭 필요할 때만 괄호로 병기합니다.
 - 구현으로 인해 아키텍처, API 계약, 핵심 데이터 모델 또는 워크플로우 가정이 변경되는 경우 관련 문서를 업데이트하세요 (`docs/CONTEXT.md`, `docs/TRD.md`, `docs/internal/status.md`).
+- 상세 계획의 source of truth는 `docs/implementation/active/`의 plan package입니다.
+- `TODO.md`와 `MILESTONE.md`는 자동 동기화되는 요약 인덱스이므로 긴 상세 계획을 직접 적지 마세요.
+- hook이 없는 에이전트는 `python3 scripts/implementation_docs.py save-plan ...`으로 계획을 직접 저장해야 합니다.
+- 구현 완료 후에는 `python3 scripts/implementation_docs.py archive-plan <plan_id>`로 archive하고, `python3 scripts/implementation_docs.py validate`를 통과시켜야 합니다.

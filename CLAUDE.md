@@ -25,6 +25,7 @@ AI Career Concierge — AI 기반 채용 매칭 PoC 시스템.
 .claude/rules/testing.md
 .claude/rules/api-contracts.md
 .claude/rules/config-env.md
+.claude/rules/implementation-docs.md
 
 ## 기술 스택
 
@@ -39,6 +40,7 @@ AI Career Concierge — AI 기반 채용 매칭 PoC 시스템.
 - [ ] `docs/internal/status.md` 업데이트 (운영 상태 변경 시)
 - [ ] API 계약 변경 시 스키마/문서/테스트 동시 업데이트
 - [ ] `.env.example` 업데이트 (환경 변수 추가/변경 시)
+- [ ] implementation 문서 구조 변경 시 `python3 scripts/implementation_docs.py validate`
 - [ ] 브레이킹 체인지는 명시적으로 언급
 
 ## 에이전트 작업 규범
@@ -47,6 +49,9 @@ AI Career Concierge — AI 기반 채용 매칭 PoC 시스템.
 - 사용자 요청 없이 현재 스택/아키텍처를 변경하지 않는다.
 - 불확실할 때는 엔드투엔드 PoC 작동, 낮은 LLM 비용, 추천 품질을 우선한다.
 - 의미 있는 작업 후 `docs/internal/status.md`를 업데이트한다.
+- 상세 계획은 `docs/implementation/active/`의 plan package에 저장한다.
+- `TODO.md`, `MILESTONE.md`에는 긴 상세 계획을 직접 누적하지 않는다.
+- hook이 저장하지 못한 경우 `python3 scripts/implementation_docs.py save-plan ...`을 직접 실행한다.
 
 ## 멀티 에이전트 Git / Worktree 규칙
 

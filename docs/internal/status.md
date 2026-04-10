@@ -20,6 +20,7 @@
 - LangGraph 워크플로우를 Agentic 구조로 모듈화 리팩터링 진행
 - 채용 플랫폼 사이트별 Scraper 로깅 한계 파악 및 에러 복구 제어 연구
 - Codex / Claude / Gemini 협업을 위한 `main` 기준 멀티 worktree 운영 표준 도입
+- implementation plan package 구조와 자동 저장 훅 기반 문서 운영 체계 도입
 
 ## 유저 및 제품 관점 (User & Product UX)
 
@@ -37,6 +38,7 @@
 - `main` 기준 멀티 에이전트 branch / worktree 규칙 문서화
 - 에이전트별 작업 시작 스크립트 및 integration worktree 시작 스크립트 추가
 - Claude 로컬 설정에 worktree 시작 규칙 안내 및 branch 가드 보강
+- `docs/implementation/active|archive` 기반 plan package 구조, `TODO.md`/`MILESTONE.md` 자동 인덱스, Claude/Gemini plan 저장 훅 도입
 
 ## 다음 action
 

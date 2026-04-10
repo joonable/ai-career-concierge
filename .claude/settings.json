@@ -43,9 +43,9 @@
           {
             "type": "command",
             "if": "Bash(git commit*)",
-            "command": "cd apps/web && npx tsc --noEmit 2>&1 | head -30 && poetry run pytest tests/unit -x -q --tb=short 2>&1 | tail -20",
+            "command": "python3 scripts/implementation_docs.py validate 2>&1 && cd apps/web && npx tsc --noEmit 2>&1 | head -30 && poetry run pytest tests/unit -x -q --tb=short 2>&1 | tail -20",
             "timeout": 120,
-            "statusMessage": "PreCommit: tsc + pytest 실행 중..."
+            "statusMessage": "PreCommit: docs validate + tsc + pytest 실행 중..."
           }
         ]
       }
@@ -62,6 +62,17 @@
           }
         ]
       }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/save-plan-stop.sh\"",
+            "statusMessage": "StopHook: plan package 저장 확인 중..."
+          }
+        ]
+      }
     ]
   },
   "permissions": {
@@ -73,6 +84,7 @@
       "Bash(poetry run eval-jobs*)",
       "Bash(cd apps/web && npm*)",
       "Bash(cd apps/web && npx*)",
+      "Bash(python3 scripts/implementation_docs.py*)",
       "Bash(git status*)",
       "Bash(git log*)",
       "Bash(git diff*)"
