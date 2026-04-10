@@ -1,11 +1,11 @@
 ---
 plan_id: 2026-04-10-harness-engineering-transition-gap-plan
 title: 하네스 엔지니어링 전환 보완 계획
-status: active
+status: archived
 milestone: Phase 2: 하네스 엔지니어링
 source_agent: manual
 created_at: 2026-04-10T09:00:00+09:00
-updated_at: 2026-04-10T09:00:00+09:00
+updated_at: 2026-04-10T15:28:52+09:00
 ---
 # 하네스 엔지니어링 전환 보완 계획
 
