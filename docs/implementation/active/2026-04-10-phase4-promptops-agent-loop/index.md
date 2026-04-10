@@ -15,6 +15,8 @@ updated_at: 2026-04-10T00:00:00+09:00
 에이전트(Claude)가 iteration 리포트를 읽고 구조화된 분석 JSON을 출력하는 CLI 도구를 만든다.
 이 도구가 있으면 에이전트가 실험 실행 → 리포트 분석 → 다음 액션 결정을 자율 루프로 실행할 수 있다.
 
+상위 방향 문서: [Existing Harness to Agentic Engineering Migration Plan](../2026-04-10-agentic-engineering-migration-plan/index.md)
+
 > **참고**: 에이전트 워크플로우 규칙(4-1)은 `.claude/rules/promptops.md`에 이미 완료됨. 이 plan은 4-2 구현에 집중.
 
 ## 에이전트 실행 프로토콜

@@ -14,10 +14,6 @@
 <!-- BEGIN MANAGED:MILESTONE_INDEX -->
 ## Active By Milestone
 
-### Phase 2: 하네스 엔지니어링
-
-- [Existing Harness to Agentic Engineering Migration Plan](docs/implementation/active/2026-04-10-agentic-engineering-migration-plan/index.md) — `2026-04-10T00:00:00+09:00`
-
 ### Phase 3: PromptOps 자동화 및 에이전트 운영 확장
 
 - [Phase 4: PromptOps 에이전트 분석 루프](docs/implementation/active/2026-04-10-phase4-promptops-agent-loop/index.md) — `2026-04-10T00:00:00+09:00`

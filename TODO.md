@@ -9,17 +9,17 @@
 - 완료 후 archive: `python3 scripts/implementation_docs.py archive-plan <plan_id>`
 - 인덱스 재동기화: `python3 scripts/implementation_docs.py sync-indexes`
 - 정합성 검증: `python3 scripts/implementation_docs.py validate`
+- `TODO.md`에는 `status: active`인 실행 plan만 노출합니다.
+- 상위 방향 정렬용 문서는 `docs/implementation/active/` 아래에 두더라도 `status: reference`로 관리하고 managed index에는 노출하지 않습니다.
 
 <!-- BEGIN MANAGED:IMPLEMENTATION_INDEX -->
 ## Active Plans
 
 - [Phase 5-1: Jobkorea 스크래퍼 (Agentic TDD)](docs/implementation/active/2026-04-10-phase5-1-jobkorea-scraper-agentic/index.md) — milestone: `Phase 5: 스크래퍼/데이터 계층 보강`, agent: `claude`, updated: `2026-04-10T00:00:00+09:00`
 - [Phase 4: PromptOps 에이전트 분석 루프](docs/implementation/active/2026-04-10-phase4-promptops-agent-loop/index.md) — milestone: `Phase 3: PromptOps 자동화 및 에이전트 운영 확장`, agent: `claude`, updated: `2026-04-10T00:00:00+09:00`
-- [Existing Harness to Agentic Engineering Migration Plan](docs/implementation/active/2026-04-10-agentic-engineering-migration-plan/index.md) — milestone: `Phase 2: 하네스 엔지니어링`, agent: `codex`, updated: `2026-04-10T00:00:00+09:00`
 
 ## Priority Snapshot
 
-- `Phase 2: 하네스 엔지니어링`: active 1건
 - `Phase 3: PromptOps 자동화 및 에이전트 운영 확장`: active 1건
 - `Phase 5: 스크래퍼/데이터 계층 보강`: active 1건
 

@@ -594,6 +594,8 @@ def validate(repo_root: Path) -> None:
 
         if package.status == "active":
             expected_prefix = repo_root / ACTIVE_ROOT
+        elif package.status == "reference":
+            expected_prefix = repo_root / ACTIVE_ROOT
         elif package.status == "archived":
             expected_prefix = repo_root / ARCHIVE_ROOT
         else:
