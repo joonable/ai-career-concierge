@@ -57,6 +57,7 @@
 - 루트 README, AGENTS, implementation guide를 기준으로 repo 구조와 멀티 에이전트 운영 절차 재정렬
 - `docs/internal/status.md` 링크 정합성 및 readiness 체크리스트 정리
 - Poetry package 목록에 `promptops` 누락 여부 반영
+- 문서 정합성 복구: onboarding schema refactor(설계 완료) 및 documentation-operations-rework(구현 완료) plan package archive 처리
 
 ## 다음 action
 

@@ -24,16 +24,12 @@ describe("internal docs parsing", () => {
     expect(result.updatedAt).toBe("2026-03-31 (Asia/Seoul)");
     expect(result.family).toBe("job-evaluation");
     expect(result.snapshotItems).toContain("현재 production tag: job-evaluation:latest");
-    expect(result.interpretation).toContain("최신 staging 프롬프트는 점수 밴드와 분류 일관성은 충분히 안정적인 편입니다.");
+    expect(result.interpretation).toContain("현재의 \"실패\"는 프롬프트의 논리적 오류보다는 평가 지표(Metric)와 모델 답변 간의 언어 불일치에서 기인한 것이 많습니다.");
     expect(result.usageNotes).toContain("compare 링크를 열어 baseline/candidate 차이를 본다.");
     expect(result.referenceLinks).toEqual([
       {
-        label: "직전 candidate vs 최신 staging 검증 compare: compare link",
-        url: "https://smith.langchain.com/o/a5f5f699-f384-58ec-9be0-2a39bb96969e/datasets/277c4ae5-c460-4be4-8895-732911768cd7/compare?selectedSessions=4906f684-12db-4c1a-88d0-782d25f5bbda&selectedSessions=91e3e1bf-e2a1-426c-a155-ce616568eabd",
-      },
-      {
-        label: "latest iteration report: job_evaluation_iteration_001.md",
-        url: "/internal/docs/iterations/job_evaluation_iteration_001.md",
+        label: "최신 자동화 실험 리포트: iteration_002-final.md",
+        url: "/internal/docs/iterations/iteration_002-final.md",
       },
       {
         label: "Notion backlog: PromptOps Backlog",

@@ -13,16 +13,14 @@
 <!-- BEGIN MANAGED:IMPLEMENTATION_INDEX -->
 ## Active Plans
 
-- [문서 운영 구조 재편 및 계획 자동 저장 체계](docs/implementation/active/2026-04-10-documentation-operations-rework/index.md) — milestone: `Phase 2: 하네스 엔지니어링`, agent: `codex`, updated: `2026-04-10T12:45:00+09:00`
-- [Onboarding Profile Schema Refactor](docs/implementation/active/2026-04-10-onboarding-profile-schema-refactor/index.md) — milestone: `Backlog`, agent: `manual`, updated: `2026-04-10T09:00:00+09:00`
 - [하네스 엔지니어링 전환 보완 계획](docs/implementation/active/2026-04-10-harness-engineering-transition-gap-plan/index.md) — milestone: `Phase 2: 하네스 엔지니어링`, agent: `manual`, updated: `2026-04-10T09:00:00+09:00`
 
 ## Priority Snapshot
 
-- `Phase 2: 하네스 엔지니어링`: active 2건
-- `Backlog`: active 1건
+- `Phase 2: 하네스 엔지니어링`: active 1건
 
 ## Recent Archive
 
-- 최근 archive 없음
+- [문서 운영 구조 재편 및 계획 자동 저장 체계](docs/implementation/archive/2026/2026-04-10-documentation-operations-rework/index.md) — `2026-04-10T15:12:15+09:00`
+- [Onboarding Profile Schema Refactor](docs/implementation/archive/2026/2026-04-10-onboarding-profile-schema-refactor/index.md) — `2026-04-10T15:11:59+09:00`
 <!-- END MANAGED:IMPLEMENTATION_INDEX -->
