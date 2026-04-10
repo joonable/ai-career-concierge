@@ -13,7 +13,8 @@ AI Career Concierge — AI 기반 채용 매칭 PoC 시스템.
 2. `docs/TRD.md` — 아키텍처 및 기술 계약
 3. `docs/PRD.md` — 제품 의도 및 비즈니스 목표
 4. `AGENTS.md` — 운영 계약 (사람과 에이전트 공용)
-5. `docs/internal/status.md` — 현재 운영 상태판
+5. `docs/internal/operations_panel.md` — 운영 패널 컴포넌트 정리
+6. `docs/internal/status.md` — 현재 운영 상태판
 
 ## 도메인별 규칙
 
