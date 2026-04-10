@@ -2,6 +2,17 @@
   "hooks": {
     "PreToolUse": [
       {
+        "matcher": "ExitPlanMode",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/codex-plan-review.sh\"",
+            "timeout": 300,
+            "statusMessage": "Codex plan review 실행 중..."
+          }
+        ]
+      },
+      {
         "matcher": "Bash",
         "hooks": [
           {
