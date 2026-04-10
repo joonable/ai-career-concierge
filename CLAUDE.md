@@ -43,6 +43,7 @@ AI Career Concierge — AI 기반 채용 매칭 PoC 시스템.
 - [ ] `.env.example` 업데이트 (환경 변수 추가/변경 시)
 - [ ] implementation 문서 구조 변경 시 `python3 scripts/implementation_docs.py validate`
 - [ ] 브레이킹 체인지는 명시적으로 언급
+- [ ] active plan의 모든 항목 완료 시 반드시 `python3 scripts/implementation_docs.py archive-plan <plan_id>` 후 `sync-indexes` 실행
 
 ## 에이전트 작업 규범
 
@@ -54,6 +55,7 @@ AI Career Concierge — AI 기반 채용 매칭 PoC 시스템.
 - `TODO.md`, `MILESTONE.md`에는 긴 상세 계획을 직접 누적하지 않는다.
 - hook이 저장하지 못한 경우 `python3 scripts/implementation_docs.py save-plan ...`을 직접 실행한다.
 - **계획 수립 후 즉시 실행하지 않는다.** plan package를 저장한 뒤 세션을 종료하고, 다음 세션 또는 worktree에서 saved plan을 읽고 실행한다.
+- **작업 완료 후 active plan을 반드시 archive한다.** `archive-plan` 없이 세션을 종료하지 않는다.
 
 ## 멀티 에이전트 Git / Worktree 규칙
 
