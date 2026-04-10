@@ -94,10 +94,10 @@ AGENTS.md의 도메인별 섹션을 개별 파일로 추출.
 - [ ] 2번째 스크래퍼 소스 구현 (잡코리아 등) → 레지스트리 패턴 검증
 
 ### 5-2. 데이터 접근 계층 정리
-- [ ] Supabase Data API vs SQLModel 이중 구조 정리 방향 결정 문서 작성
+- [x] Supabase Data API vs SQLModel 이중 구조 정리 방향 결정 문서 작성
 
 ### 5-3. 프론트엔드 경량화
-- [ ] Three.js / Framer Motion 의존성 제거 검토 및 실행
+- [x] Three.js / Framer Motion 의존성 제거 검토 및 실행
 
 ### 5-4. 멀티유저 확장 설계
-- [ ] 파이프라인 다중 사용자 확장 설계 문서 작성
+- [x] 파이프라인 다중 사용자 확장 설계 문서 작성

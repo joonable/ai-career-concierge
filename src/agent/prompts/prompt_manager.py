@@ -61,6 +61,7 @@ transferable skill 판단 규칙:
 출력 규칙:
 - 먼저 역할 정렬, must-have 충족 수준, deal-breaker 심각도, transferable skill 수준을 판단한 뒤 점수를 정하세요.
 - `summary`는 2~3줄 이내로, 왜 이 점수대인지와 핵심 추천 판단을 짧게 요약하세요.
+- `strengths`, `concerns`, `must_have_matches`, `deal_breaker_flags` 작성 시, 핵심 기술이나 조건명은 한글 설명 뒤에 반드시 괄호로 영문 키워드를 병기하세요. (예: "파이썬 숙련도(Python)", "계약직 전용(contract-only)", "오피스 출근(onsite-only)")
 - `strengths`는 추천 근거가 되는 강점만 짧은 bullet-style 문자열로 쓰세요.
 - `concerns`는 점수를 제한한 이유, 부족한 must-have, ownership 공백, deal-breaker 우려만 쓰세요.
 - `confidence`는 점수 자체와 별개로 판단 근거의 명확성을 나타냅니다. 낮은 점수여도 근거가 명확하면 `HIGH`가 가능하고, 높은 점수여도 정보가 모호하면 `MEDIUM` 또는 `LOW`가 가능합니다.

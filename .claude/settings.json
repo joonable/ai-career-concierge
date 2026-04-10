@@ -1,19 +1,30 @@
 {
   "hooks": {
-    "PreCommit": [
+    "PreToolUse": [
       {
-        "command": "cd apps/web && npx tsc --noEmit 2>&1 | head -30",
-        "description": "프론트엔드 타입 체크"
-      },
-      {
-        "command": "poetry run pytest tests/unit -x -q --tb=short 2>&1 | tail -20",
-        "description": "유닛 테스트 실행"
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "if": "Bash(git commit*)",
+            "command": "cd apps/web && npx tsc --noEmit 2>&1 | head -30 && poetry run pytest tests/unit -x -q --tb=short 2>&1 | tail -20",
+            "timeout": 120,
+            "statusMessage": "PreCommit: tsc + pytest 실행 중..."
+          }
+        ]
       }
     ],
-    "PostCommit": [
+    "PostToolUse": [
       {
-        "command": "echo 'docs/internal/status.md 업데이트 필요 여부를 확인하세요.'",
-        "description": "상태판 업데이트 리마인더"
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "if": "Bash(git commit*)",
+            "command": "echo 'docs/internal/status.md 업데이트 필요 여부를 확인하세요.'",
+            "statusMessage": "PostCommit: 상태판 업데이트 리마인더"
+          }
+        ]
       }
     ]
   },
