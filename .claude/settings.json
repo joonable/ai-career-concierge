@@ -30,9 +30,16 @@
           {
             "type": "command",
             "if": "Bash(git commit*)",
-            "command": "branch=$(git branch --show-current); case \"$branch\" in main|'') echo '[guard] Do not commit feature work on main. Start from scripts/start_agent_task.sh or scripts/start_integration_task.sh.' ;; codex/*|claude/*|gemini/*|integration/*) echo \"[guard] branch $branch\" ;; *) echo \"[guard] Non-standard branch $branch. Confirm this is intentional.\" ;; esac",
+            "command": "branch=$(git branch --show-current); case \"$branch\" in main|'') echo '[guard] BLOCKED: main에 직접 커밋 금지.' >&2; echo 'scripts/start_agent_task.sh --agent claude --task <slug> 으로 worktree를 먼저 만드세요.' >&2; exit 2 ;; codex/*|claude/*|gemini/*|integration/*) echo \"[guard] OK: branch $branch\" ;; *) echo \"[guard] WARNING: 비표준 브랜치 $branch. 의도적인 경우 계속 진행합니다.\" ;; esac",
             "timeout": 30,
             "statusMessage": "PreCommit: branch 규칙 점검 중..."
+          },
+          {
+            "type": "command",
+            "if": "Bash(git push*origin*main*)",
+            "command": "echo '[guard] BLOCKED: main에 직접 push 금지. PR을 통해 merge하세요.' >&2; exit 2",
+            "timeout": 10,
+            "statusMessage": "PrePush: main 직접 push 차단 중..."
           },
           {
             "type": "command",
