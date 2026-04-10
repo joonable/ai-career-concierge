@@ -19,6 +19,7 @@
 - PromptOps lineage / compare / review / iteration 동선 정리
 - 운영 패널에서 핵심 문서와 작업 보드를 직접 활용하는 방향으로 문서 계약 확장
 - LangGraph 워크플로우를 Agentic 구조로 모듈화 리팩터링 진행
+- assistant-neutral control plane, context router, capability pack, runner 구조로의 migration plan을 `docs/implementation/active/2026-04-10-agentic-engineering-migration-plan/`에 활성 계획으로 정리
 - 채용 플랫폼 사이트별 Scraper 로깅 한계 파악 및 에러 복구 제어 연구
 - Codex / Claude / Gemini 협업을 위한 `main` 기준 멀티 worktree 운영 표준 도입
 - implementation plan package 구조와 자동 저장 훅 기반 문서 운영 체계 도입
@@ -58,6 +59,8 @@
 - `docs/internal/status.md` 링크 정합성 및 readiness 체크리스트 정리
 - Poetry package 목록에 `promptops` 누락 여부 반영
 - 문서 정합성 복구: onboarding schema refactor(설계 완료) 및 documentation-operations-rework(구현 완료) plan package archive 처리
+- Phase 4 / Phase 5-1 plan을 Agentic Engineering 관점으로 재구성하고 기존 계획 2개를 archive 처리
+- Existing Harness to Agentic Engineering migration 초안을 active plan package로 승격하고 TODO 인덱스 반영 준비
 
 ## 다음 action
 
@@ -66,6 +69,7 @@
 - LangSmith 추적 (Tracing) 구조 및 ID 설정
 - 실제 협업 태스크에서 `codex/*`, `claude/*`, `gemini/*`, `integration/*` 흐름을 운영에 적용하고 충돌 사례를 보정하기
 - Codex 쪽 자동 guard / hook 보강이 필요한지 운영 경험을 바탕으로 판단하기
+- `.agents/` canonical control plane, capability registry, context bundle 도입을 별도 실행 plan으로 분해하기
 
 ## backlog
 

@@ -14,12 +14,24 @@
 <!-- BEGIN MANAGED:MILESTONE_INDEX -->
 ## Active By Milestone
 
-- 현재 active plan 없음
+### Phase 2: 하네스 엔지니어링
+
+- [Existing Harness to Agentic Engineering Migration Plan](docs/implementation/active/2026-04-10-agentic-engineering-migration-plan/index.md) — `2026-04-10T00:00:00+09:00`
+
+### Phase 3: PromptOps 자동화 및 에이전트 운영 확장
+
+- [Phase 4: PromptOps 에이전트 분석 루프](docs/implementation/active/2026-04-10-phase4-promptops-agent-loop/index.md) — `2026-04-10T00:00:00+09:00`
+
+### Phase 5: 스크래퍼/데이터 계층 보강
+
+- [Phase 5-1: Jobkorea 스크래퍼 (Agentic TDD)](docs/implementation/active/2026-04-10-phase5-1-jobkorea-scraper-agentic/index.md) — `2026-04-10T00:00:00+09:00`
 
 ## History Timeline
 
 ### 2026
 
+- [Phase 4: PromptOps 에이전트 통합 자동화](docs/implementation/archive/2026/2026-04-10-phase4-promptops-automation/index.md) — `Phase 3: PromptOps 자동화 및 에이전트 운영 확장` / `2026-04-10T16:04:31+09:00`
+- [Phase 5-1: Jobkorea 멀티소스 스크래퍼 확장](docs/implementation/archive/2026/2026-04-10-phase5-1-jobkorea-scraper/index.md) — `Phase 5: 스크래퍼/데이터 계층 보강` / `2026-04-10T16:04:31+09:00`
 - [하네스 엔지니어링 전환 보완 계획](docs/implementation/archive/2026/2026-04-10-harness-engineering-transition-gap-plan/index.md) — `Phase 2: 하네스 엔지니어링` / `2026-04-10T15:28:52+09:00`
 - [문서 운영 구조 재편 및 계획 자동 저장 체계](docs/implementation/archive/2026/2026-04-10-documentation-operations-rework/index.md) — `Phase 2: 하네스 엔지니어링` / `2026-04-10T15:12:15+09:00`
 - [Onboarding Profile Schema Refactor](docs/implementation/archive/2026/2026-04-10-onboarding-profile-schema-refactor/index.md) — `Backlog` / `2026-04-10T15:11:59+09:00`
