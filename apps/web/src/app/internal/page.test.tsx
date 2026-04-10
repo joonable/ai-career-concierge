@@ -39,7 +39,8 @@ describe("InternalHomePage", () => {
       status: "ready",
       internalStatus: {
         updatedAt: "2026-03-31 (Asia/Seoul)",
-        currentFocus: ["운영 허브 정보 구조 정리"],
+        operationsAgent: ["운영 허브 정보 구조 정리"],
+        userProductUX: [],
         milestones: ["internal 운영 허브: 진행 중"],
         actions: ["docs 기반 상태 카드 보강"],
         recentCompletions: ["운영 패널 문서 계약 정리"],

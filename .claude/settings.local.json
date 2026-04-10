@@ -8,7 +8,8 @@
       "Bash(.venv/bin/python3 --version)",
       "Bash(ls -la .venv/bin/python*)",
       "Bash(poetry env *)",
-      "Bash(git add *)"
+      "Bash(git add *)",
+      "Bash(git commit -m ':*)"
     ]
   }
 }

@@ -1,11 +1,11 @@
 ---
 plan_id: 2026-04-10-onboarding-profile-schema-refactor
 title: Onboarding Profile Schema Refactor
-status: active
+status: archived
 milestone: Backlog
 source_agent: manual
 created_at: 2026-04-10T09:00:00+09:00
-updated_at: 2026-04-10T09:00:00+09:00
+updated_at: 2026-04-10T15:11:59+09:00
 ---
 # Onboarding Profile Schema Refactor
 

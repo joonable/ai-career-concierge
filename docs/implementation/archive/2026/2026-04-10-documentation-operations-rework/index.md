@@ -1,11 +1,11 @@
 ---
 plan_id: 2026-04-10-documentation-operations-rework
 title: 문서 운영 구조 재편 및 계획 자동 저장 체계
-status: active
+status: archived
 milestone: Phase 2: 하네스 엔지니어링
 source_agent: codex
 created_at: 2026-04-10T12:45:00+09:00
-updated_at: 2026-04-10T12:45:00+09:00
+updated_at: 2026-04-10T15:12:15+09:00
 ---
 # 문서 운영 구조 재편 및 계획 자동 저장 체계
 
