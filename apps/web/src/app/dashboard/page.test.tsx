@@ -50,6 +50,15 @@ describe("DashboardPage", () => {
           years_of_experience: 6,
           title_keywords: [],
         },
+        preferences: {
+          work_modes: [],
+          locations: [],
+          team_contexts: [],
+          skills: { preset: [], custom: [] },
+          exclusions: { preset: [], custom: [] },
+          comparisons: {},
+          note: null,
+        },
         guidelines: {
           must_haves: [],
           deal_breakers: [],
@@ -85,6 +94,15 @@ describe("DashboardPage", () => {
           years_of_experience: 6,
           title_keywords: ["machine learning"],
         },
+        preferences: {
+          work_modes: [],
+          locations: [],
+          team_contexts: [],
+          skills: { preset: [], custom: [] },
+          exclusions: { preset: [], custom: [] },
+          comparisons: {},
+          note: null,
+        },
         guidelines: {
           must_haves: ["Python"],
           deal_breakers: ["contract-only"],
@@ -118,6 +136,15 @@ describe("DashboardPage", () => {
           role: "Machine Learning Engineer",
           years_of_experience: 6,
           title_keywords: ["machine learning"],
+        },
+        preferences: {
+          work_modes: [],
+          locations: [],
+          team_contexts: [],
+          skills: { preset: [], custom: [] },
+          exclusions: { preset: [], custom: [] },
+          comparisons: {},
+          note: null,
         },
         guidelines: {
           must_haves: ["Python"],
