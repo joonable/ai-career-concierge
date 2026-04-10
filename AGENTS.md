@@ -10,11 +10,13 @@
 
 이 저장소에서 작업할 때는 다음 순서로 문서를 참조하세요:
 
-1. [`docs/CONTEXT.md`](docs/CONTEXT.md)
-2. [`docs/TRD.md`](docs/TRD.md)
-3. [`docs/PRD.md`](docs/PRD.md)
-4. [`docs/internal/operations_panel.md`](docs/internal/operations_panel.md)
-5. [`docs/internal/status.md`](docs/internal/status.md)
+1. [`AGENTS.md`](AGENTS.md)
+2. [`docs/CONTEXT.md`](docs/CONTEXT.md)
+3. [`docs/TRD.md`](docs/TRD.md)
+4. [`docs/PRD.md`](docs/PRD.md)
+5. [`docs/internal/operations_panel.md`](docs/internal/operations_panel.md)
+6. [`docs/internal/status.md`](docs/internal/status.md)
+7. [`docs/implementation/README.md`](docs/implementation/README.md)
 
 충돌이 발생하는 경우 추측하지 말고 작업을 멈추고 명시적으로 해결하세요.
 
@@ -63,6 +65,7 @@ PoC는 다음 루프를 지원해야 합니다:
 - [테스트 규칙 및 완료 조건](.claude/rules/testing.md)
 - [API 계약 및 인증 경계](.claude/rules/api-contracts.md)
 - [설정 및 환경 변수 규칙](.claude/rules/config-env.md)
+- [Implementation 문서 규칙](.claude/rules/implementation-docs.md)
 
 ## 범위 가드레일 (Scope Guardrails)
 
@@ -82,6 +85,15 @@ PoC 루프가 작동하기 전에 다음 작업에 시간을 낭비하지 마세
 - 의미 있는 작업을 마치면 `docs/internal/status.md`를 업데이트하세요.
 - 불확실할 때에는 엔드투엔드 PoC 작동, 낮은 LLM 비용, 추천 품질을 가장 잘 지원하는 경로를 선택하세요.
 
+## 저장소 구조 해석 규칙
+
+- `apps/web`, `src/*`, `tests`는 제품 코드와 검증 코드입니다.
+- `docs/*`는 제품/운영/구현 문서의 canonical source입니다.
+- `scripts/*`는 worktree bootstrap, implementation docs 관리 같은 운영 보조 도구입니다.
+- 저장소 루트 worktree는 관리, 리뷰, 문서 정리에 우선 사용하고, 기능 구현은 새 agent worktree에서 시작하는 것을 기본값으로 합니다.
+- `.claude/worktrees/`, `.claude/sessions/`, `.gemini/plans/` 같은 경로는 로컬 에이전트 산출물 영역이며 제품 코드의 canonical source가 아닙니다.
+- 실제 Git worktree 작업 디렉터리는 `../ai-career-concierge-worktrees/<agent>/<task-slug>`를 canonical 경로로 간주합니다.
+
 ## 멀티 에이전트 Git / Worktree 운영 규칙
 
 Codex, Claude, Gemini가 같은 로컬 저장소를 병렬로 사용할 수 있으므로, Git 작업은 아래 규칙을 기본값으로 고정합니다.
@@ -98,6 +110,10 @@ Codex, Claude, Gemini가 같은 로컬 저장소를 병렬로 사용할 수 있�
 - 여러 에이전트 결과는 바로 `main`으로 합치지 않고, 먼저 `integration/<task-slug>`에서 merge 또는 cherry-pick으로 통합한 뒤 검증합니다.
 - 같은 작업에서 파일 충돌 가능성이 높으면 착수 전에 담당 범위를 명시적으로 분리합니다.
 - integration 검증 전에는 에이전트 branch끼리 임의 merge를 하지 않습니다.
+- Codex는 현재 Claude/Gemini보다 자동 hook이 약하므로 아래 수동 절차를 기본으로 따릅니다.
+  - 새 작업은 반드시 `scripts/start_agent_task.sh --agent codex --task <task-slug>`로 시작합니다.
+  - 루트 저장소에서 바로 기능 구현을 시작하지 않습니다.
+  - plan package 자동 저장이 없는 경우 `python3 scripts/implementation_docs.py save-plan ...`을 직접 실행합니다.
 
 ### 표준 시작 절차
 
@@ -114,8 +130,34 @@ scripts/start_integration_task.sh --task dashboard-filter
 - `--base`를 명시하지 않으면 항상 `main`을 사용합니다.
 - 통합 검증이 끝난 뒤에만 `main` 대상 PR 또는 최종 merge를 진행합니다.
 
+### 운영 readiness 기준
+
+멀티 에이전트 협업은 아래 기준을 만족할 때 ready로 판단합니다.
+
+- `main`에서 직접 기능 작업을 하지 않는다.
+- agent / integration worktree를 스크립트로 시작한다.
+- `docs/implementation/active/` plan package를 저장하고 `python3 scripts/implementation_docs.py validate`를 통과시킬 수 있다.
+- `docs/internal/status.md`에 현재 상태와 검증 경로를 남길 수 있다.
+- UI 확인 위치나 검증 커맨드를 작업 결과에 포함할 수 있다.
+
+현재 저장소 평가는 `partially ready`입니다.
+
+- 준비된 것
+  - worktree 시작 스크립트 존재
+  - Claude/Gemini plan 저장 hook 존재
+  - implementation docs validate 가능
+- 남은 갭
+  - Codex 쪽 자동 hook / guard는 문서 규율 의존도가 높음
+  - 운영 문서 링크 정합성은 계속 관리가 필요함
+  - 로컬 산출물과 canonical source의 경계를 계속 명확히 해야 함
+  - 실제 멀티 에이전트 실전 운영 기록이 더 쌓여야 함
+
 ## 문서화 규칙 (Documentation Rules)
 
 - 참조 문서와 운영 문서는 기본적으로 한국어를 우선 사용합니다.
 - 영어 표현이 꼭 필요할 때만 괄호로 병기합니다.
 - 구현으로 인해 아키텍처, API 계약, 핵심 데이터 모델 또는 워크플로우 가정이 변경되는 경우 관련 문서를 업데이트하세요 (`docs/CONTEXT.md`, `docs/TRD.md`, `docs/internal/status.md`).
+- 상세 계획의 source of truth는 `docs/implementation/active/`의 plan package입니다.
+- `TODO.md`와 `MILESTONE.md`는 자동 동기화되는 요약 인덱스이므로 긴 상세 계획을 직접 적지 마세요.
+- hook이 없는 에이전트는 `python3 scripts/implementation_docs.py save-plan ...`으로 계획을 직접 저장해야 합니다.
+- 구현 완료 후에는 `python3 scripts/implementation_docs.py archive-plan <plan_id>`로 archive하고, `python3 scripts/implementation_docs.py validate`를 통과시켜야 합니다.

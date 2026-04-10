@@ -7,11 +7,12 @@
 
 ## 핵심 문서 및 참고 링크
 
-- [AGENTS.md](../AGENTS.md)
-- [프로젝트 컨텍스트](./CONTEXT.md)
-- [초기 제품 요구사항 (PRD)](./PRD.md)
-- [기술 요구사항 결정 (TRD)](./TRD.md)
+- [AGENTS.md](../../AGENTS.md)
+- [프로젝트 컨텍스트](../CONTEXT.md)
+- [초기 제품 요구사항 (PRD)](../PRD.md)
+- [기술 요구사항 결정 (TRD)](../TRD.md)
 - [운영 패널 컴포넌트 정리](./operations_panel.md)
+- [Implementation 문서 가이드](../implementation/README.md)
 
 ## 시스템 및 에이전트 관점 (Operations & Agent)
 
@@ -20,6 +21,21 @@
 - LangGraph 워크플로우를 Agentic 구조로 모듈화 리팩터링 진행
 - 채용 플랫폼 사이트별 Scraper 로깅 한계 파악 및 에러 복구 제어 연구
 - Codex / Claude / Gemini 협업을 위한 `main` 기준 멀티 worktree 운영 표준 도입
+- implementation plan package 구조와 자동 저장 훅 기반 문서 운영 체계 도입
+
+## 현재 협업 readiness
+
+- 현재 판정: `partially ready`
+- 준비된 것
+  - `main` 기준 agent / integration worktree 스크립트 존재
+  - `python3 scripts/implementation_docs.py validate` 통과 가능
+  - plan package와 상태판 기반 운영 문서 흐름 존재
+  - `git worktree list` 기준 Codex / Claude / Gemini / integration 예시가 실제로 구성 가능
+- 남은 갭
+  - Codex 전용 자동 hook / guard는 Claude, Gemini보다 약함
+  - 운영 문서 링크와 canonical 문서 목록은 계속 정리 필요
+  - 로컬 산출물 경계와 root worktree 역할을 운영 문서로 계속 명확히 해야 함
+  - 실전 멀티 에이전트 태스크 운영 기록이 더 필요함
 
 ## 유저 및 제품 관점 (User & Product UX)
 
@@ -37,6 +53,10 @@
 - `main` 기준 멀티 에이전트 branch / worktree 규칙 문서화
 - 에이전트별 작업 시작 스크립트 및 integration worktree 시작 스크립트 추가
 - Claude 로컬 설정에 worktree 시작 규칙 안내 및 branch 가드 보강
+- `docs/implementation/active|archive` 기반 plan package 구조, `TODO.md`/`MILESTONE.md` 자동 인덱스, Claude/Gemini plan 저장 훅 도입
+- 루트 README, AGENTS, implementation guide를 기준으로 repo 구조와 멀티 에이전트 운영 절차 재정렬
+- `docs/internal/status.md` 링크 정합성 및 readiness 체크리스트 정리
+- Poetry package 목록에 `promptops` 누락 여부 반영
 
 ## 다음 action
 
@@ -44,6 +64,7 @@
 - Supabase Service Role 정책 적용을 백엔드 통합과 어떻게 분리할지 결정
 - LangSmith 추적 (Tracing) 구조 및 ID 설정
 - 실제 협업 태스크에서 `codex/*`, `claude/*`, `gemini/*`, `integration/*` 흐름을 운영에 적용하고 충돌 사례를 보정하기
+- Codex 쪽 자동 guard / hook 보강이 필요한지 운영 경험을 바탕으로 판단하기
 
 ## backlog
 
@@ -62,6 +83,8 @@
 - Next.js 로컬 구동 중 빌드 커맨드가 돌어갈 경우 `.next` 캐시가 날아가 스타일이 꺠질 수 있으니 재시작을 권장함.
 - 현재 영속성은 `SUPABASE_SERVICE_ROLE_KEY`를 주로 사용하고 있으며 추후 RLS 정책 반영을 미룸.
 - 멀티 에이전트 협업 시작은 저장소 루트에서 `scripts/start_agent_task.sh` 또는 `scripts/start_integration_task.sh`로 통일함.
+- 루트 worktree는 관리/리뷰/문서 정리 중심으로 사용하고, 기능 구현은 agent worktree에서 시작하는 것을 기본값으로 둠.
+- `.claude/worktrees/`, `.claude/sessions/`, `.gemini/plans/`는 로컬 에이전트 산출물 경로이며 제품 코드의 canonical source가 아님.
 
 ## UI 확인 위치
 

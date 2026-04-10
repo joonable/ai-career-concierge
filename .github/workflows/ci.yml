@@ -48,6 +48,9 @@ jobs:
       - name: Ruff format check
         run: poetry run ruff format --check src/ tests/
 
+      - name: Implementation docs validate
+        run: python3 scripts/implementation_docs.py validate
+
       - name: Unit tests
         run: poetry run pytest tests/unit -q
 

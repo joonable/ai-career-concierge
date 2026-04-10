@@ -40,6 +40,7 @@ packages = [
     { include = "agent", from = "src" },
     { include = "common", from = "src" },
     { include = "db", from = "src" },
+    { include = "promptops", from = "src" },
     { include = "scraper", from = "src" },
 ]
 
