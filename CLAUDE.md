@@ -47,3 +47,19 @@ AI Career Concierge — AI 기반 채용 매칭 PoC 시스템.
 - 사용자 요청 없이 현재 스택/아키텍처를 변경하지 않는다.
 - 불확실할 때는 엔드투엔드 PoC 작동, 낮은 LLM 비용, 추천 품질을 우선한다.
 - 의미 있는 작업 후 `docs/internal/status.md`를 업데이트한다.
+
+## 멀티 에이전트 Git / Worktree 규칙
+
+- 기본 base branch는 항상 `main`이다.
+- `main`에서 직접 기능 작업을 시작하거나 커밋하지 않는다.
+- 새 작업은 저장소 루트에서 스크립트로 시작한다.
+
+```bash
+scripts/start_agent_task.sh --agent claude --task <task-slug>
+scripts/start_integration_task.sh --task <task-slug>
+```
+
+- Claude branch는 항상 `claude/<task-slug>` 규칙을 따른다.
+- worktree 경로는 `../ai-career-concierge-worktrees/claude/<task-slug>` 규칙을 따른다.
+- Codex, Gemini와 협업하는 작업은 각자 전용 branch/worktree에서 진행하고, 결과는 먼저 `integration/<task-slug>`에서 통합 검증한다.
+- 충돌 가능성이 높은 파일은 작업 전에 담당 범위를 나눈다.

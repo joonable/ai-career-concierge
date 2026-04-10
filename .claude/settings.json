@@ -6,6 +6,42 @@
         "hooks": [
           {
             "type": "command",
+            "if": "Bash(git checkout*)",
+            "command": "echo 'Prefer scripts/start_agent_task.sh or scripts/start_integration_task.sh so branch/worktree rules stay aligned with main.'",
+            "statusMessage": "Git 시작 규칙 안내"
+          },
+          {
+            "type": "command",
+            "if": "Bash(git switch*)",
+            "command": "echo 'Prefer scripts/start_agent_task.sh or scripts/start_integration_task.sh so branch/worktree rules stay aligned with main.'",
+            "statusMessage": "Git 시작 규칙 안내"
+          },
+          {
+            "type": "command",
+            "if": "Bash(git commit*)",
+            "command": "branch=$(git branch --show-current); case \"$branch\" in main|'') echo '[guard] Do not commit feature work on main. Start from scripts/start_agent_task.sh or scripts/start_integration_task.sh.' ;; codex/*|claude/*|gemini/*|integration/*) echo \"[guard] branch $branch\" ;; *) echo \"[guard] Non-standard branch $branch. Confirm this is intentional.\" ;; esac",
+            "timeout": 30,
+            "statusMessage": "PreCommit: branch 규칙 점검 중..."
+          },
+          {
+            "type": "command",
+            "if": "Bash(scripts/start_agent_task.sh*)",
+            "command": "echo 'Using main-based agent worktree flow.'",
+            "statusMessage": "Agent worktree 시작"
+          },
+          {
+            "type": "command",
+            "if": "Bash(scripts/start_integration_task.sh*)",
+            "command": "echo 'Using main-based integration worktree flow.'",
+            "statusMessage": "Integration worktree 시작"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
             "if": "Bash(git commit*)",
             "command": "cd apps/web && npx tsc --noEmit 2>&1 | head -30 && poetry run pytest tests/unit -x -q --tb=short 2>&1 | tail -20",
             "timeout": 120,
@@ -30,6 +66,8 @@
   },
   "permissions": {
     "allow": [
+      "Bash(scripts/start_agent_task.sh*)",
+      "Bash(scripts/start_integration_task.sh*)",
       "Bash(poetry run pytest*)",
       "Bash(poetry run dev*)",
       "Bash(poetry run eval-jobs*)",

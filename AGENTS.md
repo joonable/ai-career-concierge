@@ -82,6 +82,38 @@ PoC 루프가 작동하기 전에 다음 작업에 시간을 낭비하지 마세
 - 의미 있는 작업을 마치면 `docs/internal/status.md`를 업데이트하세요.
 - 불확실할 때에는 엔드투엔드 PoC 작동, 낮은 LLM 비용, 추천 품질을 가장 잘 지원하는 경로를 선택하세요.
 
+## 멀티 에이전트 Git / Worktree 운영 규칙
+
+Codex, Claude, Gemini가 같은 로컬 저장소를 병렬로 사용할 수 있으므로, Git 작업은 아래 규칙을 기본값으로 고정합니다.
+
+- 기본 기준 브랜치(base branch)는 항상 `main`입니다.
+- 새 작업은 현재 체크아웃된 브랜치에서 바로 시작하지 않고, 항상 `main` 기준으로 새 branch + 새 worktree를 준비한 뒤 시작합니다.
+- `main`에서는 직접 기능 작업 커밋을 만들지 않습니다.
+- 에이전트 전용 branch prefix는 다음으로 고정합니다.
+  - Codex: `codex/<task-slug>`
+  - Claude: `claude/<task-slug>`
+  - Gemini: `gemini/<task-slug>`
+- 통합 branch prefix는 `integration/<task-slug>`로 고정합니다.
+- 에이전트별 worktree 경로는 `../ai-career-concierge-worktrees/<agent>/<task-slug>` 규칙을 사용합니다.
+- 여러 에이전트 결과는 바로 `main`으로 합치지 않고, 먼저 `integration/<task-slug>`에서 merge 또는 cherry-pick으로 통합한 뒤 검증합니다.
+- 같은 작업에서 파일 충돌 가능성이 높으면 착수 전에 담당 범위를 명시적으로 분리합니다.
+- integration 검증 전에는 에이전트 branch끼리 임의 merge를 하지 않습니다.
+
+### 표준 시작 절차
+
+저장소 루트에서 아래 스크립트를 사용해 작업 공간을 준비합니다.
+
+```bash
+scripts/start_agent_task.sh --agent codex --task dashboard-filter
+scripts/start_agent_task.sh --agent claude --task dashboard-filter
+scripts/start_agent_task.sh --agent gemini --task dashboard-filter
+scripts/start_integration_task.sh --task dashboard-filter
+```
+
+- 동일한 `task-slug`를 다시 실행하면 기존 branch/worktree를 우선 재사용합니다.
+- `--base`를 명시하지 않으면 항상 `main`을 사용합니다.
+- 통합 검증이 끝난 뒤에만 `main` 대상 PR 또는 최종 merge를 진행합니다.
+
 ## 문서화 규칙 (Documentation Rules)
 
 - 참조 문서와 운영 문서는 기본적으로 한국어를 우선 사용합니다.
