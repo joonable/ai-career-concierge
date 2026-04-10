@@ -19,6 +19,7 @@ AI Career Concierge는 단일 사용자 PoC 단계의 AI 기반 채용 매칭 �
 - `TODO.md`와 `MILESTONE.md`는 요약 인덱스이며 긴 체크리스트를 직접 적지 않습니다.
 - Plan Mode에서 정리한 계획은 `python3 scripts/implementation_docs.py save-plan ...` 또는 project hook으로 저장합니다.
 - 구현 완료 후에는 `python3 scripts/implementation_docs.py archive-plan <plan_id>`로 archive 합니다.
+- **계획 수립 후 즉시 실행하지 않습니다.** plan package를 저장한 뒤 세션을 종료하고, 다음 세션 또는 worktree에서 saved plan을 읽고 실행합니다.
 
 ## 멀티 에이전트 운영
 
