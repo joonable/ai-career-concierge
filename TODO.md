@@ -12,6 +12,17 @@
 - `TODO.md`에는 `status: active`인 실행 plan만 노출합니다.
 - 상위 방향 정렬용 문서는 `docs/implementation/active/` 아래에 두더라도 `status: reference`로 관리하고 managed index에는 노출하지 않습니다.
 
+## 현재 실행 우선순위
+
+harness + agent 전환을 현재 최상위 목표로 두고 active plan을 다음 순서로 해석합니다.
+
+1. `Phase 4: PromptOps 에이전트 분석 루프`
+   - 이유: iteration 리포트 분석과 다음 액션 결정을 에이전트 루프로 연결하는 첫 번째 직접 구현이기 때문입니다.
+2. `Phase 5-1: Jobkorea 스크래퍼 (Agentic TDD)`
+   - 이유: 새로운 scraper source를 추가하는 기능 작업이지만, 위 루프와 하네스를 실제 제품 코드에 적용해 검증하는 첫 번째 실전 사례이기 때문입니다.
+
+제품 기능 확장 자체보다 "하네스와 에이전트가 다음 행동을 정하고 검증까지 이어가는 구조"를 먼저 굳히는 것을 기본 원칙으로 둡니다.
+
 <!-- BEGIN MANAGED:IMPLEMENTATION_INDEX -->
 ## Active Plans
 

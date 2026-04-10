@@ -66,6 +66,8 @@ python3 scripts/implementation_docs.py validate
 - hook이 없는 에이전트는 `save-plan`을 직접 호출해야 합니다.
 - archive는 명시적 명령으로만 수행합니다. 코드 diff만 보고 자동 archive 하지 않습니다.
 - Codex는 현재 Claude/Gemini처럼 자동 저장 hook이 강하게 연결되어 있지 않을 수 있으므로, plan package 저장 여부를 직접 확인합니다.
+- harness + agent 전환이 현재 저장소의 운영 우선순위일 때는, 기능 확장 plan보다 agent loop / control plane / handoff contract를 먼저 안정화하는 plan을 선행합니다.
+- 기능 plan이 active여도, 그것이 harness + agent 운영 방식을 실제 제품 코드에서 검증하는 실전 적용인지, 아니면 단순 기능 확장인지 문서에 명시합니다.
 - 루트 저장소는 coordination 공간으로 보고, 실제 기능 구현은 `scripts/start_agent_task.sh --agent <agent> --task <slug>`로 만든 worktree에서 진행하는 것을 기본값으로 둡니다.
 - worktree 구조의 canonical 예시는 다음과 같습니다.
 

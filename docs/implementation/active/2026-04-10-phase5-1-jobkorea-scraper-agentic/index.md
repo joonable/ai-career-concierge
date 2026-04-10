@@ -15,6 +15,8 @@ updated_at: 2026-04-10T00:00:00+09:00
 `JobkoreaScraper` 구현 후 `ScraperRegistry`에 등록 → 멀티소스 레지스트리 패턴 검증.
 하네스(worktree, branch guard, Codex plan review hook)가 실제 기능 구현에서 동작하는 첫 번째 Agentic Engineering 사례.
 
+현재 harness + agent 전환 기준에서는 이 plan을 `Phase 4: PromptOps 에이전트 분석 루프` 다음의 실전 적용 단계로 해석한다. 즉, 이 작업의 핵심 가치는 scraper 기능 추가 자체보다, 앞선 agent loop와 하네스를 실제 제품 코드 변경과 integration 검증에 연결해보는 데 있다.
+
 상위 방향 문서: [Existing Harness to Agentic Engineering Migration Plan](../2026-04-10-agentic-engineering-migration-plan/index.md)
 
 ## 에이전트 실행 프로토콜

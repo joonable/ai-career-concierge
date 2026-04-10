@@ -20,6 +20,7 @@
 - 운영 패널에서 핵심 문서와 작업 보드를 직접 활용하는 방향으로 문서 계약 확장
 - LangGraph 워크플로우를 Agentic 구조로 모듈화 리팩터링 진행
 - assistant-neutral control plane, context router, capability pack, runner 구조로의 migration plan을 `docs/implementation/active/2026-04-10-agentic-engineering-migration-plan/`에 활성 계획으로 정리
+- 현재 active plan의 우선순위는 기능 확장보다 harness + agent 전환을 먼저 두며, `Phase 4: PromptOps 에이전트 분석 루프`를 `Phase 5-1: Jobkorea 스크래퍼 (Agentic TDD)`보다 선행 과제로 해석
 - 채용 플랫폼 사이트별 Scraper 로깅 한계 파악 및 에러 복구 제어 연구
 - Codex / Claude / Gemini 협업을 위한 `main` 기준 멀티 worktree 운영 표준 도입
 - implementation plan package 구조와 자동 저장 훅 기반 문서 운영 체계 도입
@@ -64,12 +65,14 @@
 
 ## 다음 action
 
+- `Phase 4: PromptOps 에이전트 분석 루프`를 먼저 실행해 iteration report → structured JSON → next action 결정까지 이어지는 최소 agent loop를 완성하기
+- 위 루프 구현 이후 `Phase 5-1: Jobkorea 스크래퍼 (Agentic TDD)`를 통해 scraper 도메인에 harness + agent 실행 흐름을 적용하고 회귀 패턴을 검증하기
+- 실제 협업 태스크에서 `codex/*`, `claude/*`, `gemini/*`, `integration/*` 흐름을 운영에 적용하고 충돌 사례를 보정하기
+- Codex 쪽 자동 guard / hook 보강이 필요한지 PromptOps/스크래퍼 실전 적용 경험을 바탕으로 판단하기
+- `.agents/` canonical control plane, capability registry, context bundle 도입을 별도 실행 plan으로 분해하기
 - docs 기반의 상태판 구조를 파싱하여 예쁘게 렌더링하는 Markdown 뷰어와 `react-markdown` 컴포넌트 작업 완료하기
 - Supabase Service Role 정책 적용을 백엔드 통합과 어떻게 분리할지 결정
 - LangSmith 추적 (Tracing) 구조 및 ID 설정
-- 실제 협업 태스크에서 `codex/*`, `claude/*`, `gemini/*`, `integration/*` 흐름을 운영에 적용하고 충돌 사례를 보정하기
-- Codex 쪽 자동 guard / hook 보강이 필요한지 운영 경험을 바탕으로 판단하기
-- `.agents/` canonical control plane, capability registry, context bundle 도입을 별도 실행 plan으로 분해하기
 
 ## backlog
 
