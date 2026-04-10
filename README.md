@@ -2,15 +2,20 @@
 
 AI Career Concierge is a PoC job-matching system that ingests job postings, filters them through a rule-based and LLM-assisted evaluation pipeline, and delivers high-fit results through Slack.
 
-## Docs
+## Start Here
 
 Read project guidance in this order:
 
-1. [`docs/README.md`](docs/README.md)
+1. [`AGENTS.md`](AGENTS.md)
 2. [`docs/CONTEXT.md`](docs/CONTEXT.md)
 3. [`docs/TRD.md`](docs/TRD.md)
 4. [`docs/PRD.md`](docs/PRD.md)
-5. [`AGENTS.md`](AGENTS.md)
+5. [`docs/internal/operations_panel.md`](docs/internal/operations_panel.md)
+6. [`docs/internal/status.md`](docs/internal/status.md)
+7. [`docs/implementation/README.md`](docs/implementation/README.md)
+8. [`docs/README.md`](docs/README.md)
+
+If these documents conflict, stop and reconcile the contract before changing code.
 
 ## Environment Setup
 
@@ -44,11 +49,41 @@ The current boilerplate keeps the backend in Python `src/*` modules and isolates
 apps/web          Next.js App Router frontend
 src/api           FastAPI routes, schemas, dependencies, services
 src/agent         LangGraph workflow, prompts, typed pipeline state
+src/promptops     PromptOps governance, experiments, review scaffolding
 src/scraper       Source-specific scraper interfaces and normalizers
 src/db            Legacy SQLModel models, repository history, and schema references
 src/common        Shared config, logging, telemetry, ids, errors
 tests             Unit, integration, contract, resilience coverage
+docs             Product, operations, promptops, and implementation docs
+scripts          Worktree bootstrap and implementation-doc helpers
 ```
+
+Quick ownership guide:
+
+- `apps/web` and `src/*` are product code.
+- `docs/*` is canonical documentation and workboard state.
+- `scripts/*` is repo operations tooling and should stay lightweight.
+- The repo root worktree is for review, docs maintenance, and coordination. Feature work should start in an agent worktree from `main`.
+
+## Multi-Agent Workflow
+
+The repo is set up for Codex, Claude, and Gemini to work in parallel, but only when everyone starts from the shared worktree scripts.
+
+```bash
+scripts/start_agent_task.sh --agent codex --task <task-slug>
+scripts/start_agent_task.sh --agent claude --task <task-slug>
+scripts/start_agent_task.sh --agent gemini --task <task-slug>
+scripts/start_integration_task.sh --task <task-slug>
+```
+
+Rules:
+
+- Always branch from `main`.
+- Do not start feature work directly from the current checked-out branch.
+- Do not commit feature work on `main`.
+- Treat the root worktree as a coordination space, not the default implementation space.
+- Merge or cherry-pick agent results into `integration/<task-slug>` first, then verify before opening a PR to `main`.
+- If an agent does not have an automatic plan hook, save plans manually with `python3 scripts/implementation_docs.py save-plan ...`.
 
 ## Local Commands
 
