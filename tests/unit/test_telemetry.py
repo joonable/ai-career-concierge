@@ -67,15 +67,17 @@ def test_langsmith_tracer_records_llm_error_metadata(monkeypatch):
 
     tracer = LangSmithTracer(enabled=True, project_name="proj", app_env="development", client=object())
 
-    with pytest.raises(ValueError, match="boom"):
-        with tracer.llm_run(
+    with (
+        pytest.raises(ValueError, match="boom"),
+        tracer.llm_run(
             name="gemini.evaluate",
             inputs={"prompt": "hello"},
             metadata={"job_id": "job-1"},
             tags=["llm_eval"],
-        ) as handle:
-            handle.add_metadata({"model": "gemini-2.0-flash"})
-            raise ValueError("boom")
+        ) as handle,
+    ):
+        handle.add_metadata({"model": "gemini-2.0-flash"})
+        raise ValueError("boom")
 
     child = parent_run.children[0]
     assert child.posted is True

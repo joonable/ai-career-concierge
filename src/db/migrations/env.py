@@ -10,9 +10,8 @@ from sqlmodel import SQLModel
 
 sys.path.append(str(Path(__file__).resolve().parents[2]))
 
-from common.config import get_settings  # noqa: E402
-from db import models  # noqa: F401,E402
-
+from common.config import get_settings
+from db import models  # noqa: F401
 
 config = context.config
 settings = get_settings()

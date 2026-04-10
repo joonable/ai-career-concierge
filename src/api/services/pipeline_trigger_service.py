@@ -14,7 +14,6 @@ from common.logging import get_logger
 from common.telemetry import start_trace_context
 from db.enums import LogLevel
 
-
 logger = get_logger(__name__)
 
 
@@ -108,9 +107,7 @@ class PipelineTriggerService:
                         system_log_store=self.system_log_store,
                     ),
                     deliver_node=DeliverNode(
-                        slack_notifier=NullSlackNotifier()
-                        if payload.dry_run
-                        else self.runtime.slack_notifier
+                        slack_notifier=NullSlackNotifier() if payload.dry_run else self.runtime.slack_notifier
                     ),
                 )
 
@@ -128,8 +125,7 @@ class PipelineTriggerService:
                 delivered = [
                     result
                     for result in final_state.get("evaluation_results", [])
-                    if result.fit_score
-                    >= int(user_context["notification_settings"].get("minimum_fit_score", 80))
+                    if result.fit_score >= int(user_context["notification_settings"].get("minimum_fit_score", 80))
                 ]
                 pipeline_trace.set_outputs(
                     {

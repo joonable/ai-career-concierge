@@ -20,8 +20,7 @@ class LLMEvaluator(Protocol):
         recent_memory: str,
         prompt_metadata: Optional[Dict[str, Any]] = None,
         evaluation_id: Optional[str] = None,
-    ) -> Dict[str, Any]:
-        ...
+    ) -> Dict[str, Any]: ...
 
 
 @dataclass(frozen=True)

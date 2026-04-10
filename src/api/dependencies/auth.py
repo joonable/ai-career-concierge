@@ -6,9 +6,9 @@ from uuid import UUID
 
 import jwt
 from fastapi import Header, HTTPException, status
-from pydantic import BaseModel
 from jwt import PyJWKClient
 from jwt.exceptions import InvalidTokenError
+from pydantic import BaseModel
 
 from common.config import Settings, get_settings
 

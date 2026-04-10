@@ -3,17 +3,16 @@ from __future__ import annotations
 """
 PromptOps Core Models
 
-프롬프트를 단순한 문자열이 아니라 추적 및 실험 가능한 "운영 자산(Asset)"으로 다루기 위한 
-공통 데이터 스키마(Pydantic Models) 모음입니다. 
+프롬프트를 단순한 문자열이 아니라 추적 및 실험 가능한 "운영 자산(Asset)"으로 다루기 위한
+공통 데이터 스키마(Pydantic Models) 모음입니다.
 - PromptFamily: 프롬프트 군(Group) 관리
 - ExperimentSpec: 오프라인 평가(실험) 명세
 - ReviewItem/FailureRecord: 프롬프트 응답 실패 종류(Taxonomy) 및 리뷰 기록
 """
 
-from typing import Dict, List, Literal
+from typing import Dict, List, Literal, Optional
 
 from pydantic import BaseModel, Field
-
 
 PromptStage = Literal["candidate", "staging", "production"]
 ReviewStatus = Literal["pending", "in_review", "approved", "rejected"]
@@ -62,11 +61,11 @@ class ExperimentSpec(BaseModel):
     evaluator_bundle: str = Field(min_length=1)
     fixture_path: str = Field(default="")
     experiment_prefix: str = Field(default="promptops")
-    model: str | None = None
+    model: Optional[str] = None
     backend: str = Field(default="langsmith")
     metadata: Dict[str, str] = Field(default_factory=dict)
-    candidate_revision_id: str | None = None
-    baseline_revision_id: str | None = None
+    candidate_revision_id: Optional[str] = None
+    baseline_revision_id: Optional[str] = None
 
 
 class IterationRecord(BaseModel):
@@ -75,9 +74,9 @@ class IterationRecord(BaseModel):
     prompt_family: str = Field(min_length=1)
     goal: str = Field(min_length=1)
     stage: PromptStage = "candidate"
-    prompt_revision_id: str | None = None
-    baseline_experiment_id: str | None = None
-    candidate_experiment_id: str | None = None
+    prompt_revision_id: Optional[str] = None
+    baseline_experiment_id: Optional[str] = None
+    candidate_experiment_id: Optional[str] = None
     failure_categories: List[FailureCategory] = Field(default_factory=list)
     summary: str = Field(default="")
 

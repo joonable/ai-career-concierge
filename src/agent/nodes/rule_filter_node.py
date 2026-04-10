@@ -28,10 +28,7 @@ def _experience_matches(job: PipelineJob, user_context: Dict[str, Any]) -> bool:
     if job.min_years_experience is not None and years < job.min_years_experience:
         return False
 
-    if job.max_years_experience is not None and years > job.max_years_experience:
-        return False
-
-    return True
+    return not (job.max_years_experience is not None and years > job.max_years_experience)
 
 
 def _location_matches(job: PipelineJob, user_context: Dict[str, Any]) -> bool:
@@ -93,8 +90,7 @@ def _work_mode_matches(job: PipelineJob, user_context: Dict[str, Any]) -> bool:
         "상주 출근": ["onsite", "on-site", "office", "출근", "상주"],
     }
     return any(
-        any(alias in work_mode_text for alias in aliases.get(mode, [mode.lower()]))
-        for mode in preferences.work_modes
+        any(alias in work_mode_text for alias in aliases.get(mode, [mode.lower()])) for mode in preferences.work_modes
     )
 
 
@@ -103,12 +99,13 @@ class RuleFilterNode:
     """
     LangGraph 파이프라인의 두 번째 단계입니다.
     LLM API 호출 비용을 획기적으로 낮추기 위해, 수집된 공고들을 대상으로 규칙 기반(Rule-based)의 1차 필터링을 수행합니다.
-    
+
     주요 역할:
     - 이미 평가된 이력이 있는 공고 제외
     - 사용자의 선호 조건과 직무명(title), 연차(experience), 최소/최대 근무지(location), 근무 형태(work_mode) 비교
     - 탈락한 공고는 DB에 'RULE_REJECTED' 상태 및 거절 사유와 함께 기록
     """
+
     evaluation_store: object
 
     async def run(self, state: Dict[str, Any]) -> Dict[str, Any]:

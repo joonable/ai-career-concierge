@@ -38,7 +38,7 @@ class ProfileData(BaseModel):
         return _normalize_string_list(value)
 
     @model_validator(mode="after")
-    def ensure_profile_identity_fields(self) -> "ProfileData":
+    def ensure_profile_identity_fields(self) -> ProfileData:
         if not self.roles and self.primary_role:
             self.roles = [self.primary_role]
         if self.roles and not self.primary_role:
@@ -176,7 +176,7 @@ class UserProfileBody(BaseModel):
     notification_settings: NotificationSettings = Field(default_factory=NotificationSettings)
 
     @model_validator(mode="after")
-    def apply_structured_compatibility_defaults(self) -> "UserProfileBody":
+    def apply_structured_compatibility_defaults(self) -> UserProfileBody:
         if self.preferences.has_content():
             self.guidelines = _build_legacy_guidelines_from_preferences(self.preferences)
         return self
@@ -184,7 +184,7 @@ class UserProfileBody(BaseModel):
 
 class UserProfilePayload(UserProfileBody):
     @model_validator(mode="after")
-    def validate_required_onboarding_fields(self) -> "UserProfilePayload":
+    def validate_required_onboarding_fields(self) -> UserProfilePayload:
         if not self.profile_data.role:
             raise ValueError("Role must not be empty.")
         return self

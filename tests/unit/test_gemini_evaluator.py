@@ -57,11 +57,7 @@ async def test_gemini_evaluator_rejects_non_json_text():
         del request
         return httpx.Response(
             200,
-            json={
-                "candidates": [
-                    {"content": {"parts": [{"text": "not json"}]}}
-                ]
-            },
+            json={"candidates": [{"content": {"parts": [{"text": "not json"}]}}]},
         )
 
     client = httpx.AsyncClient(transport=httpx.MockTransport(handler))

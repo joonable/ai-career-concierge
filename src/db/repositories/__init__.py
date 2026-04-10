@@ -4,8 +4,8 @@ from db.repositories.system_log_repository import SystemLogRepository
 from db.repositories.user_repository import UserRepository
 
 __all__ = [
-    "UserRepository",
-    "JobRepository",
     "EvaluationRepository",
+    "JobRepository",
     "SystemLogRepository",
+    "UserRepository",
 ]

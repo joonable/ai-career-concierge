@@ -9,15 +9,14 @@ from uuid import uuid4
 from langsmith import Client
 from langsmith.evaluation import aevaluate
 
-from agent.evaluation_service import evaluate_job
 from agent.evals.dataset_workflow import ensure_dataset, load_curated_examples, sync_examples
 from agent.evals.rule_based_evaluators import RULE_BASED_EVALUATORS
+from agent.evaluation_service import evaluate_job
 from agent.prompts import PromptManager
 from agent.schemas.pipeline_job import PipelineJob
 from api.services.gemini_evaluator import GeminiEvaluator
 from common.config import get_settings
 from common.telemetry import LangSmithTracer
-
 
 DEFAULT_FIXTURE_PATH = Path(__file__).resolve().parent / "fixtures" / "job_eval_gold.json"
 
@@ -36,7 +35,9 @@ def main() -> None:
     run_parser.add_argument("--model", default=None)
     run_parser.add_argument("--experiment-prefix", default="eval-prompt")
 
-    promote_parser = subparsers.add_parser("promote-trace", help="Create a dataset-ready candidate from a production trace.")
+    promote_parser = subparsers.add_parser(
+        "promote-trace", help="Create a dataset-ready candidate from a production trace."
+    )
     promote_parser.add_argument("--run-id", required=True)
     promote_parser.add_argument("--dataset-name", default=None)
     promote_parser.add_argument("--approve", action="store_true")
@@ -48,7 +49,9 @@ def main() -> None:
     if args.command == "sync-dataset":
         dataset_name = args.dataset_name or settings.langsmith_eval_dataset_name
         examples = load_curated_examples(args.fixture_path)
-        ensure_dataset(client, dataset_name=dataset_name, description="Curated gold set for job evaluation experiments.")
+        ensure_dataset(
+            client, dataset_name=dataset_name, description="Curated gold set for job evaluation experiments."
+        )
         sync_examples(client, dataset_name=dataset_name, examples=examples)
         print(json.dumps({"dataset_name": dataset_name, "example_count": len(examples)}, indent=2))
         return
@@ -56,7 +59,9 @@ def main() -> None:
     if args.command == "run-experiment":
         dataset_name = args.dataset_name or settings.langsmith_eval_dataset_name
         examples = load_curated_examples(args.fixture_path)
-        ensure_dataset(client, dataset_name=dataset_name, description="Curated gold set for job evaluation experiments.")
+        ensure_dataset(
+            client, dataset_name=dataset_name, description="Curated gold set for job evaluation experiments."
+        )
         sync_examples(client, dataset_name=dataset_name, examples=examples)
         asyncio.run(
             _run_experiment(
@@ -78,6 +83,7 @@ def main() -> None:
                 approve=args.approve,
             )
         )
+
 
 async def _run_experiment(*, client, dataset_name: str, model: str, experiment_prefix: str) -> None:
     settings = get_settings()

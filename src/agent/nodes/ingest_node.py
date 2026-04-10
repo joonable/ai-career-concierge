@@ -7,10 +7,8 @@ from uuid import UUID
 from agent.schemas.pipeline_job import PipelineJob
 from common.logging import get_logger
 from db.enums import LogLevel
-from scraper.normalizers.job_normalizer import InvalidScrapedJobError
-from scraper.normalizers.job_normalizer import normalize_scraped_job
+from scraper.normalizers.job_normalizer import InvalidScrapedJobError, normalize_scraped_job
 from scraper.registry import ScraperRegistry
-
 
 logger = get_logger(__name__)
 
@@ -23,6 +21,7 @@ class IngestNode:
     동일한 형식으로 정규화(Normalization)하여 중복을 거르고 데이터베이스에 저장(upsert)합니다.
     스크래퍼에서 장애가 발생해도 파이프라인을 멈추지 않고(Graceful Degradation) System_Log에 에러를 기록한 후 건너뜁니다.
     """
+
     scraper_registry: ScraperRegistry
     job_store: object
     system_log_store: object

@@ -237,9 +237,7 @@ def test_memory_summary_render_returns_metadata():
 
 
 def test_curated_dataset_fixture_and_rule_based_evaluators():
-    examples = load_curated_examples(
-        Path("src/agent/evals/fixtures/job_eval_gold.json")
-    )
+    examples = load_curated_examples(Path("src/agent/evals/fixtures/job_eval_gold.json"))
     assert len(examples) >= 15
     assert examples[0]["metadata"]["scenario_family"]
     assert examples[0]["outputs"]["scoring_note"]
@@ -285,9 +283,7 @@ def test_curated_dataset_fixture_and_rule_based_evaluators():
 
 
 def test_score_policy_alignment_flags_hard_reject_penalty_failures():
-    examples = load_curated_examples(
-        Path("src/agent/evals/fixtures/job_eval_gold.json")
-    )
+    examples = load_curated_examples(Path("src/agent/evals/fixtures/job_eval_gold.json"))
 
     hard_reject_example = next(
         example for example in examples if example["outputs"]["expected_deal_breaker_severity"] == "HARD"

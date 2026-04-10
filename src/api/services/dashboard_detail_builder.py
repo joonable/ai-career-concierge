@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from typing import Any, Iterable
+from collections.abc import Iterable
+from typing import Any
 
 from api.schemas.users import UserProfileResponse
 from common.user_preferences import build_normalized_stored_preferences
@@ -124,9 +125,7 @@ def build_dashboard_detail_fields(*, row, user: UserProfileResponse, minimum_fit
 
     preferred_requirements = _extract_list_metadata(row.source_metadata, "preferred_requirements")
     if not preferred_requirements and row.fit_score is not None and row.fit_score >= minimum_fit_score:
-        preferred_requirements = _unique_non_empty(
-            [f"{item} 심화 경험" for item in matched_must_haves[1:3]]
-        )
+        preferred_requirements = _unique_non_empty([f"{item} 심화 경험" for item in matched_must_haves[1:3]])
 
     return {
         "decision_summary": decision_summary,
@@ -247,9 +246,7 @@ def _matches_experience(*, years: int, minimum: int | None, maximum: int | None)
         return None
     if minimum is not None and years < minimum:
         return False
-    if maximum is not None and years > maximum:
-        return False
-    return True
+    return not (maximum is not None and years > maximum)
 
 
 def _format_rule_reason(value: str | None) -> str:

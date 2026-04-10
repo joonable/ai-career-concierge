@@ -1,7 +1,7 @@
 from functools import lru_cache
 
-from common.config import get_settings
 from api.services.runtime import RuntimeServices, build_default_runtime
+from common.config import get_settings
 
 
 @lru_cache(maxsize=1)

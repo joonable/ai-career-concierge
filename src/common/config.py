@@ -138,7 +138,7 @@ class Settings(BaseSettings):
         return f"{self.supabase_url.rstrip('/')}/auth/v1"
 
     @model_validator(mode="after")
-    def validate_environment(self) -> "Settings":
+    def validate_environment(self) -> Settings:
         if self.app_env == AppEnv.PRODUCTION:
             required = {
                 "SUPABASE_URL": self.supabase_url,
@@ -151,19 +151,11 @@ class Settings(BaseSettings):
             }
             missing = [key for key, value in required.items() if not value]
             if missing:
-                raise ValueError(
-                    "Production settings are missing required variables: "
-                    + ", ".join(sorted(missing))
-                )
+                raise ValueError("Production settings are missing required variables: " + ", ".join(sorted(missing)))
 
-        if (
-            self.pipeline_enabled
-            and self.app_env != AppEnv.PRODUCTION
-            and not self.allow_dev_schedule
-        ):
+        if self.pipeline_enabled and self.app_env != AppEnv.PRODUCTION and not self.allow_dev_schedule:
             raise ValueError(
-                "PIPELINE_ENABLED cannot be true outside production unless "
-                "ALLOW_DEV_SCHEDULE is also true."
+                "PIPELINE_ENABLED cannot be true outside production unless ALLOW_DEV_SCHEDULE is also true."
             )
 
         if self.scraper_timeout_ms <= 0:
@@ -178,7 +170,7 @@ class Settings(BaseSettings):
         return self
 
     @classmethod
-    def from_env_file(cls, env_file: Optional[str] = None) -> "Settings":
+    def from_env_file(cls, env_file: Optional[str] = None) -> Settings:
         return cls(_env_file=env_file)
 
 

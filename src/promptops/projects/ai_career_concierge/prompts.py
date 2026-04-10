@@ -3,7 +3,6 @@
 from promptops.core.models import PromptFamily, PromptMetadata
 from promptops.projects.ai_career_concierge import PROJECT_KEY
 
-
 PROMPT_FAMILIES = [
     PromptFamily(
         key="job-evaluation",

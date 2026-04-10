@@ -6,9 +6,9 @@ from uuid import uuid4
 from langsmith import Client
 from langsmith.evaluation import aevaluate
 
-from agent.evaluation_service import evaluate_job
 from agent.evals.dataset_workflow import ensure_dataset, load_curated_examples, sync_examples
 from agent.evals.rule_based_evaluators import RULE_BASED_EVALUATORS
+from agent.evaluation_service import evaluate_job
 from agent.prompts import PromptManager
 from agent.schemas.pipeline_job import PipelineJob
 from api.services.gemini_evaluator import GeminiEvaluator
@@ -104,9 +104,7 @@ class LangSmithPromptOpsAdapter:
         )
 
     def build_compare_link(self, *, dataset_id: str, session_ids: list[str]) -> str:
-        session_params = "&".join(
-            f"selectedSessions={session_id}" for session_id in session_ids if session_id
-        )
+        session_params = "&".join(f"selectedSessions={session_id}" for session_id in session_ids if session_id)
         base = self.endpoint
         if self.workspace_id:
             base = f"{base}/o/{self.workspace_id}"
@@ -222,11 +220,7 @@ async def _run_langsmith_experiment(
         blocking=True,
         max_concurrency=1,
     )
-    experiment_name = str(
-        getattr(results, "experiment_name", "")
-        or getattr(results, "project_name", "")
-        or ""
-    )
+    experiment_name = str(getattr(results, "experiment_name", "") or getattr(results, "project_name", "") or "")
     session_id = _extract_session_id(results, client=client, experiment_name=experiment_name)
     dataset_id = _extract_dataset_id(results)
     return {

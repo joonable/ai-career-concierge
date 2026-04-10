@@ -5,14 +5,12 @@ from typing import Any
 
 from agent.prompts import PromptManager
 from api.services.gemini_evaluator import GeminiEvaluator
-from api.services.mock_llm_evaluator import MockGeminiEvaluator
 from api.services.slack_notifier import LoggingSlackNotifier
 from api.services.slack_signature_service import SlackSignatureService
 from common.config import Settings
 from common.telemetry import LangSmithTracer
 from scraper.registry import ScraperRegistry
 from scraper.sources.incruit import IncruitScraper
-from scraper.sources.mock_platform import MockPlatformScraper
 
 
 @dataclass(frozen=True)

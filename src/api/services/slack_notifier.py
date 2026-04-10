@@ -4,7 +4,6 @@ from typing import Any, Dict, List
 
 from common.logging import get_logger
 
-
 logger = get_logger(__name__)
 
 

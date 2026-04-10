@@ -3,17 +3,17 @@ from __future__ import annotations
 import hashlib
 import hmac
 import json
+from collections.abc import Iterable
 from pathlib import Path
-from typing import Iterable, List, Optional
+from typing import List, Optional
 
 import pytest
 from httpx import ASGITransport, AsyncClient
 from sqlmodel import Session, SQLModel, create_engine
 
-from agent.schemas.pipeline_job import PipelineJob
 from agent.prompts import PromptManager
+from agent.schemas.pipeline_job import PipelineJob
 from api.schemas.users import build_user_profile_response, serialize_user_profile_sections
-from api.services.gemini_evaluator import GeminiEvaluator
 from api.services.mock_llm_evaluator import MockGeminiEvaluator
 from api.services.runtime import RuntimeServices
 from api.services.slack_notifier import LoggingSlackNotifier
@@ -364,7 +364,18 @@ class FakeSystemLogStore:
     def __init__(self, session: Session):
         self.repo = SystemLogRepository(session)
 
-    def create(self, *, run_id, event_type, message, level=LogLevel.INFO, user_id=None, job_id=None, platform=None, metadata=None):
+    def create(
+        self,
+        *,
+        run_id,
+        event_type,
+        message,
+        level=LogLevel.INFO,
+        user_id=None,
+        job_id=None,
+        platform=None,
+        metadata=None,
+    ):
         return self.repo.create(
             run_id=run_id,
             event_type=event_type,
@@ -433,14 +444,14 @@ def runtime():
 @pytest.fixture
 def app(test_env, runtime):
     import api.dependencies.auth as auth_module
+    from api.dependencies.database import get_session
+    from api.dependencies.runtime import get_runtime
     from api.dependencies.supabase_store import (
         get_evaluation_store,
         get_job_store,
         get_system_log_store,
         get_user_store,
     )
-    from api.dependencies.database import get_session
-    from api.dependencies.runtime import get_runtime
     from api.main import create_app
 
     settings = get_settings()

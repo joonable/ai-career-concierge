@@ -1,6 +1,6 @@
 from promptops.core.failures import FAILURE_TAXONOMY, build_failure_record
-from promptops.projects.ai_career_concierge.backlog_rules import build_backlog_candidates_from_review
 from promptops.core.models import ReviewFeedbackRecord
+from promptops.projects.ai_career_concierge.backlog_rules import build_backlog_candidates_from_review
 
 
 def test_failure_taxonomy_is_defined_for_promptops_routing():

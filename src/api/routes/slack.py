@@ -10,7 +10,6 @@ from api.dependencies.supabase_store import get_evaluation_store, get_user_store
 from api.schemas.slack import SlackWebhookResponse
 from api.services.feedback_service import FeedbackService
 
-
 router = APIRouter(prefix="/api/v1/slack", tags=["slack"])
 
 

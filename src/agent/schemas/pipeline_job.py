@@ -21,7 +21,7 @@ class PipelineJob(BaseModel):
     source_metadata: Dict[str, Any] = Field(default_factory=dict)
 
     @classmethod
-    def from_job_model(cls, job: Job) -> "PipelineJob":
+    def from_job_model(cls, job: Job) -> PipelineJob:
         return cls(
             job_id=job.id,
             platform=job.platform,

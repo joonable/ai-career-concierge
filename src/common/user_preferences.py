@@ -4,7 +4,6 @@ from typing import Any
 
 from pydantic import BaseModel, Field
 
-
 WORK_MODE_LABELS = {
     "remote": "원격",
     "hybrid": "하이브리드",
@@ -94,9 +93,7 @@ def build_normalized_stored_preferences(user_context: dict[str, Any] | Any) -> N
     preferences = payload.get("preferences", {}) if isinstance(payload.get("preferences"), dict) else {}
     guidelines = payload.get("guidelines", {}) if isinstance(payload.get("guidelines"), dict) else {}
     notification_settings = (
-        payload.get("notification_settings", {})
-        if isinstance(payload.get("notification_settings"), dict)
-        else {}
+        payload.get("notification_settings", {}) if isinstance(payload.get("notification_settings"), dict) else {}
     )
 
     roles = _normalize_string_list(profile_data.get("roles"))
@@ -117,9 +114,7 @@ def build_normalized_stored_preferences(user_context: dict[str, Any] | Any) -> N
     )
 
     skills = preferences.get("skills", {}) if isinstance(preferences.get("skills"), dict) else {}
-    exclusions = (
-        preferences.get("exclusions", {}) if isinstance(preferences.get("exclusions"), dict) else {}
-    )
+    exclusions = preferences.get("exclusions", {}) if isinstance(preferences.get("exclusions"), dict) else {}
     structured_skills = [
         *_expand_ids(_normalize_string_list(skills.get("preset")), SKILL_LABELS),
         *_normalize_string_list(skills.get("custom")),

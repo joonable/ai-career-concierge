@@ -1,7 +1,7 @@
 from promptops.adapters.langsmith import LangSmithPromptOpsAdapter
 from promptops.core.failures import is_borderline_case, is_failure_case
-from promptops.core.reviews import create_feedback_record, create_review_item, queue_supports_item
 from promptops.core.models import ReviewQueueSpec
+from promptops.core.reviews import create_feedback_record, create_review_item, queue_supports_item
 from promptops.projects.ai_career_concierge.backlog_rules import build_backlog_candidates_from_review
 from promptops.projects.ai_career_concierge.review_rubric import DEFAULT_REVIEW_QUEUE, HUMAN_REVIEW_RUBRIC
 

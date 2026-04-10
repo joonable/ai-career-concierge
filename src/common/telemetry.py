@@ -1,9 +1,10 @@
 from __future__ import annotations
 
+from collections.abc import Generator
 from contextlib import contextmanager
 from dataclasses import dataclass
 from datetime import datetime, timezone
-from typing import Any, Dict, Generator, Optional
+from typing import Any, Dict, Optional
 
 from common.ids import generate_run_id
 
@@ -83,11 +84,11 @@ class LangSmithTracer:
         self.client = client
 
     @classmethod
-    def disabled(cls) -> "LangSmithTracer":
+    def disabled(cls) -> LangSmithTracer:
         return cls(enabled=False)
 
     @classmethod
-    def from_settings(cls, settings: Any) -> "LangSmithTracer":
+    def from_settings(cls, settings: Any) -> LangSmithTracer:
         if not settings.langsmith_api_key or Client is None or RunTree is None or tracing_context is None:
             return cls.disabled()
 

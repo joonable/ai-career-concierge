@@ -1,12 +1,14 @@
 from datetime import datetime, timedelta, timezone
 
-from common.config import get_settings
 from tests.conftest import auth_headers
+
+from common.config import get_settings
 
 
 async def test_profile_get_and_update_round_trip(client, db_session):
-    from db.models import User
     from uuid import UUID
+
+    from db.models import User
 
     get_response = await client.get(
         "/api/v1/users/me/profile",
@@ -144,8 +146,9 @@ async def test_profile_normalizes_whitespace_and_duplicates(client):
 
 
 async def test_profile_update_derives_internal_defaults_for_onboarding_fields(client, db_session):
-    from db.models import User
     from uuid import UUID
+
+    from db.models import User
 
     response = await client.put(
         "/api/v1/users/me/profile",
@@ -268,7 +271,10 @@ async def test_feedback_and_dashboard_api(client, db_session):
     assert recommendation["source_metadata"] == {}
     assert recommendation["fit_score"] is None
     assert recommendation["reasoning"] is None
-    assert recommendation["decision_summary"] == "규칙 필터는 통과했지만 아직 LLM 정밀 평가가 끝나지 않아 추가 확인이 필요합니다."
+    assert (
+        recommendation["decision_summary"]
+        == "규칙 필터는 통과했지만 아직 LLM 정밀 평가가 끝나지 않아 추가 확인이 필요합니다."
+    )
     assert "필수 조건 일치: Python" in recommendation["match_highlights"]
     assert "필수 조건 일치: SQL" in recommendation["match_highlights"]
     assert "직무 키워드가 공고 제목과 일치합니다." in recommendation["match_highlights"]
@@ -305,8 +311,9 @@ async def test_dashboard_returns_empty_recommendations_for_new_user(client):
 
 
 async def test_dashboard_only_returns_rows_for_the_current_user(client, db_session):
-    from db.models import Evaluation, Job
     from tests.conftest import seed_user
+
+    from db.models import Evaluation, Job
 
     current_user = seed_user(db_session, email="scaffold-user@example.com")
     other_user = seed_user(db_session, email="other-user@example.com")
@@ -356,8 +363,9 @@ async def test_dashboard_only_returns_rows_for_the_current_user(client, db_sessi
 
 
 async def test_dashboard_returns_recommendations_in_updated_order(client, db_session):
-    from db.models import Evaluation, Job
     from tests.conftest import seed_user
+
+    from db.models import Evaluation, Job
 
     user = seed_user(db_session)
     first_job = Job(
@@ -412,8 +420,9 @@ async def test_dashboard_returns_recommendations_in_updated_order(client, db_ses
 
 
 async def test_profile_requires_real_bearer_token(client, monkeypatch):
-    import api.dependencies.auth as auth_module
     from fastapi import HTTPException, status
+
+    import api.dependencies.auth as auth_module
 
     class RejectingVerifier:
         def verify_access_token(self, token: str):

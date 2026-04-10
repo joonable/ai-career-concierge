@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 from common.logging import get_logger
 from scraper.base import ScrapedJob
@@ -12,7 +12,6 @@ from scraper.sources.incruit.parsers import (
     parse_listing_page,
 )
 from scraper.sources.incruit.selectors import DEFAULT_BASE_URL, SOURCE_NAME, build_search_url
-
 
 logger = get_logger(__name__)
 
@@ -130,9 +129,7 @@ class IncruitScraper:
         profile_data = user_context.get("profile_data") or {}
         title_keywords = profile_data.get("title_keywords") or []
         normalized_keywords = [
-            str(keyword).strip()
-            for keyword in title_keywords
-            if isinstance(keyword, str) and str(keyword).strip()
+            str(keyword).strip() for keyword in title_keywords if isinstance(keyword, str) and str(keyword).strip()
         ]
         if normalized_keywords:
             return normalized_keywords
