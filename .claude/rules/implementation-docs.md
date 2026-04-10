@@ -15,6 +15,16 @@
 - 문서가 길면 동일 디렉토리에 `01-summary.md`, `02-implementation.md`, `03-test-plan.md`처럼 분할한다.
 - hook이 없는 에이전트나 수동 작업은 `python3 scripts/implementation_docs.py save-plan ...`을 직접 호출해 저장한다.
 
+## 실행 흐름 규칙
+
+- **계획 수립과 실행을 분리한다.** 계획 수립 세션에서 즉시 실행하지 않고, plan package를 저장한 뒤 세션을 종료한다.
+- 다음 세션 또는 worktree에서 `docs/implementation/active/`의 saved plan을 읽고 실행한다.
+- 이 흐름은 다음 순서를 따른다:
+  1. 계획 수립 (plan 모드 또는 대화)
+  2. `python3 scripts/implementation_docs.py save-plan ...`으로 plan package 저장
+  3. 세션 종료 (Stop hook이 백업 저장)
+  4. 다음 세션: saved plan 확인 후 worktree에서 실행
+
 ## 아카이브 규칙
 
 - 구현 완료 뒤에만 `python3 scripts/implementation_docs.py archive-plan <plan_id>`로 archive 한다.

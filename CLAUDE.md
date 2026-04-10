@@ -53,6 +53,7 @@ AI Career Concierge — AI 기반 채용 매칭 PoC 시스템.
 - 상세 계획은 `docs/implementation/active/`의 plan package에 저장한다.
 - `TODO.md`, `MILESTONE.md`에는 긴 상세 계획을 직접 누적하지 않는다.
 - hook이 저장하지 못한 경우 `python3 scripts/implementation_docs.py save-plan ...`을 직접 실행한다.
+- **계획 수립 후 즉시 실행하지 않는다.** plan package를 저장한 뒤 세션을 종료하고, 다음 세션 또는 worktree에서 saved plan을 읽고 실행한다.
 
 ## 멀티 에이전트 Git / Worktree 규칙
 

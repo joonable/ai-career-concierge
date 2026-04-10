@@ -12,6 +12,24 @@
 4. 구현이 완료된 뒤에만 `python3 scripts/implementation_docs.py archive-plan <plan_id>`로 `archive/<YYYY>/` 아래로 이동합니다.
 5. `TODO.md`와 `MILESTONE.md`는 이 디렉토리를 스캔해 자동 생성된 인덱스를 노출합니다.
 
+## 계획-실행 분리 원칙
+
+계획 수립과 실행은 반드시 다른 세션에서 진행합니다.
+
+```
+[계획 세션]
+  → 계획 수립 (plan 모드 또는 대화)
+  → python3 scripts/implementation_docs.py save-plan ... 으로 저장
+  → 세션 종료
+
+[실행 세션]
+  → docs/implementation/active/ 에서 saved plan 확인
+  → scripts/start_agent_task.sh --agent claude --task <slug> 로 worktree 준비
+  → 실행
+```
+
+계획 세션에서 즉시 실행하지 않습니다. "실행할래?" 프롬프트가 나오면 저장 후 종료를 선택합니다.
+
 ## Directory Layout
 
 - `docs/implementation/active/`
