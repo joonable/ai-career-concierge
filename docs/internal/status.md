@@ -3,7 +3,7 @@
 이 문서는 개발팀과 운영팀이 실시간으로 공유하는 상황판(Single Source of Truth)입니다.
 웹 대시보드의 `/internal` 패널에서 이 파일을 파싱하여 렌더링하므로 형식을 준수해야 합니다.
 
-## 날짜: 2026-04-10 (Asia/Seoul)
+## 날짜: 2026-04-12 (Asia/Seoul)
 
 ## 핵심 문서 및 참고 링크
 
@@ -19,6 +19,10 @@
 - PromptOps lineage / compare / review / iteration 동선 정리
 - 운영 패널에서 핵심 문서와 작업 보드를 직접 활용하는 방향으로 문서 계약 확장
 - LangGraph 워크플로우를 Agentic 구조로 모듈화 리팩터링 진행
+- assistant-neutral control plane, context router, capability pack, runner 구조로의 migration plan을 `docs/implementation/active/2026-04-10-agentic-engineering-migration-plan/`에 활성 계획으로 정리
+- 현재 active plan의 우선순위는 기능 확장보다 harness + agent 전환을 먼저 두며, `Phase 4: PromptOps 에이전트 분석 루프`를 `Phase 5-1: Jobkorea 스크래퍼 (Agentic TDD)`보다 선행 과제로 해석
+- PromptOps 운영 가시성 정비를 위해 한국어 실험 기준 전환, 운영 패널 정보구조 개선, 평가 지표 가이드 노출을 별도 active plan 3개로 분리 저장
+- canonical 문서(`docs/`, `TODO.md`, `MILESTONE.md`, `docs/internal/status.md`, `docs/implementation/active/`)는 루트 저장소에서 관리하고 agent worktree는 실행 전용으로 구분하는 정책을 문서와 스크립트에 반영
 - 채용 플랫폼 사이트별 Scraper 로깅 한계 파악 및 에러 복구 제어 연구
 - Codex / Claude / Gemini 협업을 위한 `main` 기준 멀티 worktree 운영 표준 도입
 - implementation plan package 구조와 자동 저장 훅 기반 문서 운영 체계 도입
@@ -58,14 +62,24 @@
 - `docs/internal/status.md` 링크 정합성 및 readiness 체크리스트 정리
 - Poetry package 목록에 `promptops` 누락 여부 반영
 - 문서 정합성 복구: onboarding schema refactor(설계 완료) 및 documentation-operations-rework(구현 완료) plan package archive 처리
+- Phase 4 / Phase 5-1 plan을 Agentic Engineering 관점으로 재구성하고 기존 계획 2개를 archive 처리
+- Existing Harness to Agentic Engineering migration 초안을 active plan package로 승격하고 TODO 인덱스 반영 준비
+- PromptOps 운영 가시성 정비 계획을 `Phase 4-1/4-2/4-3` active plan으로 분리 저장
+- root coordination worktree와 agent execution worktree의 역할 분리를 AGENTS / docs guide / implementation rule / worktree bootstrap 출력에 반영
 
 ## 다음 action
 
+- `Phase 4-1: PromptOps 한국어 실험 기준 전환`을 먼저 실행해 fixture/dataset, evaluator 해석, iteration 문서를 한국어 서비스 기준으로 정렬하기
+- 이어서 `Phase 4-2: PromptOps 운영 패널 정보구조 개선`으로 `/internal/prompts`에서 실험/비교 추적과 후속 액션 추적을 명확히 구분하기
+- 그 다음 `Phase 4-3: PromptOps 평가 지표 가이드 및 현재 사용 지표 노출`로 metric 의미와 현재 사용 지표를 관리자 화면에서 이해 가능하게 만들기
+- 위 정비 이후 `Phase 4: PromptOps 에이전트 분석 루프`를 확장해 iteration report → structured JSON → next action 결정 루프를 운영 가능한 수준으로 고도화하기
+- PromptOps 운영 해석층 정비 이후 `Phase 5-1: Jobkorea 스크래퍼 (Agentic TDD)`를 통해 scraper 도메인에 harness + agent 실행 흐름을 적용하고 회귀 패턴을 검증하기
+- 실제 협업 태스크에서 `codex/*`, `claude/*`, `gemini/*`, `integration/*` 흐름을 운영에 적용하고 충돌 사례를 보정하기
+- Codex 쪽 자동 guard / hook 보강이 필요한지 PromptOps/스크래퍼 실전 적용 경험을 바탕으로 판단하기
+- `.agents/` canonical control plane, capability registry, context bundle 도입을 별도 실행 plan으로 분해하기
 - docs 기반의 상태판 구조를 파싱하여 예쁘게 렌더링하는 Markdown 뷰어와 `react-markdown` 컴포넌트 작업 완료하기
 - Supabase Service Role 정책 적용을 백엔드 통합과 어떻게 분리할지 결정
 - LangSmith 추적 (Tracing) 구조 및 ID 설정
-- 실제 협업 태스크에서 `codex/*`, `claude/*`, `gemini/*`, `integration/*` 흐름을 운영에 적용하고 충돌 사례를 보정하기
-- Codex 쪽 자동 guard / hook 보강이 필요한지 운영 경험을 바탕으로 판단하기
 
 ## backlog
 
