@@ -2,6 +2,10 @@ import { notFound } from "next/navigation";
 
 import { createSupabaseServerClient } from "@/lib/supabase_auth_server";
 
+function isPromptOpsDevBypassEnabled(): boolean {
+  return process.env.NODE_ENV !== "production" && process.env.PROMPTOPS_DEV_BYPASS === "true";
+}
+
 function getAllowedPromptOpsEmails(): string[] {
   const raw = process.env.PROMPTOPS_ADMIN_EMAILS ?? "";
   return raw
@@ -11,6 +15,10 @@ function getAllowedPromptOpsEmails(): string[] {
 }
 
 export async function ensurePromptOpsAdminAccess(): Promise<void> {
+  if (isPromptOpsDevBypassEnabled()) {
+    return;
+  }
+
   const allowedEmails = getAllowedPromptOpsEmails();
   if (allowedEmails.length === 0) {
     notFound();

@@ -53,6 +53,22 @@ export async function loadInternalPageData(): Promise<InternalPageData> {
       },
     };
   } catch (error) {
+    if (shouldUsePromptOpsDevMock(error)) {
+      const [internalStatus, promptDocs] = await Promise.all([
+        loadInternalStatusDocument(),
+        loadPromptOpsDocumentSummary(),
+      ]);
+
+      return {
+        status: "ready",
+        internalStatus,
+        promptSummary: {
+          docs: promptDocs,
+          snapshot: createPromptOpsDevMockSnapshot(),
+        },
+      };
+    }
+
     return {
       status: "error",
       message: normalizeInternalErrorMessage(error),
@@ -73,6 +89,16 @@ export async function loadPromptOpsWorkspaceData(): Promise<PromptOpsWorkspaceDa
       snapshot,
     };
   } catch (error) {
+    if (shouldUsePromptOpsDevMock(error)) {
+      const docs = await loadPromptOpsDocumentSummary();
+
+      return {
+        status: "ready",
+        docs,
+        snapshot: createPromptOpsDevMockSnapshot(),
+      };
+    }
+
     return {
       status: "error",
       message: normalizeInternalErrorMessage(error),
@@ -90,4 +116,34 @@ function normalizeInternalErrorMessage(error: unknown) {
   }
 
   return "내부 운영 상태를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.";
+}
+
+function shouldUsePromptOpsDevMock(error: unknown) {
+  return (
+    process.env.NODE_ENV !== "production" &&
+    process.env.PROMPTOPS_DEV_BYPASS === "true" &&
+    error instanceof Error &&
+    error.message.includes("No active Supabase session.")
+  );
+}
+
+function createPromptOpsDevMockSnapshot(): PromptOpsStatusResponse {
+  return {
+    prompt_family: "job-evaluation",
+    production_identifier: "job-evaluation:latest",
+    staging_identifier: "job-evaluation:staging",
+    candidate_identifier: "job-evaluation · local-dev-preview",
+    latest_decision: "dev preview 모드: 문서/fixture 기반으로 운영 화면만 확인 중",
+    compare_url: "",
+    review_queue_name: "job-evaluation-review",
+    review_queue_url: "",
+    notion_backlog_url: "",
+    latest_iteration_title: "Job Evaluation Iteration 001",
+    latest_iteration_url: "/internal/prompts/iterations/job-evaluation-001",
+    latest_summary: [
+      "현재 세션이 없으므로 PromptOps 운영 화면은 문서와 fixture 기준 mock snapshot으로 렌더링됩니다.",
+      "실제 compare/review/backlog 링크는 로그인 후 runtime snapshot에서 확인할 수 있습니다.",
+    ],
+    next_backlog_items: [],
+  };
 }

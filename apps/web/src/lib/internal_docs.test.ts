@@ -9,7 +9,7 @@ describe("internal docs parsing", () => {
     expect(result.operationsAgent[0]).toContain("PromptOps lineage");
     expect(result.userProductUX[0]).toContain("수직 슬라이스");
     expect(result.recentCompletions[0]).toContain("리디자인");
-    expect(result.actions[0]).toContain("Markdown 뷰어");
+    expect(result.actions[0]).toContain("Phase 4-1");
     expect(result.backlog[0]).toContain("Scraper 상태를 모니터링");
     expect(result.notes[0]).toContain("캐시");
     expect(result.references).toEqual(expect.arrayContaining([

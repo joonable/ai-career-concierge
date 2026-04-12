@@ -1,4 +1,5 @@
 {
+  "_comment": "이 값은 root worktree(main 직접 실행) 기준 참고값입니다. 각 agent worktree의 실제 포트는 .env.development.local이 source of truth입니다. (Next.js: codex=31xx, claude=32xx, gemini=33xx, integration=34xx / FastAPI: codex=81xx, claude=82xx, gemini=83xx, integration=84xx)",
   "version": "0.0.1",
   "configurations": [
     {

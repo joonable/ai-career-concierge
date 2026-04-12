@@ -21,11 +21,14 @@ vi.mock("@/lib/supabase_auth_server", () => ({
 
 describe("promptops access", () => {
   const originalEnv = process.env.PROMPTOPS_ADMIN_EMAILS;
+  const originalBypass = process.env.PROMPTOPS_DEV_BYPASS;
 
   beforeEach(() => {
     getSession.mockReset();
     notFound.mockClear();
     process.env.PROMPTOPS_ADMIN_EMAILS = originalEnv;
+    process.env.PROMPTOPS_DEV_BYPASS = originalBypass;
+    vi.unstubAllEnvs();
   });
 
   it("normalizes env allowlist entries", () => {
@@ -53,6 +56,14 @@ describe("promptops access", () => {
         },
       },
     });
+
+    await expect(ensurePromptOpsAdminAccess()).resolves.toBeUndefined();
+  });
+
+  it("allows local development bypass when explicitly enabled", async () => {
+    delete process.env.PROMPTOPS_ADMIN_EMAILS;
+    process.env.PROMPTOPS_DEV_BYPASS = "true";
+    vi.stubEnv("NODE_ENV", "development");
 
     await expect(ensurePromptOpsAdminAccess()).resolves.toBeUndefined();
   });
