@@ -31,4 +31,5 @@
 - 구현 계획과 리팩터링 메모는 `docs/implementation/active/YYYY-MM-DD-<slug>/` package로 저장합니다.
 - 완료된 plan package는 `docs/implementation/archive/<YYYY>/`로 이동합니다.
 - `TODO.md`와 `MILESTONE.md`는 `docs/implementation/`을 가리키는 요약 인덱스로만 유지합니다.
+- `docs/`, `TODO.md`, `MILESTONE.md` 같은 canonical 문서는 루트 저장소에서 관리하고, agent worktree는 제품 코드 실행/검증을 위한 공간으로 구분합니다.
 - 새 문서를 추가할 때는 기존 문서와 역할이 겹치면 새 파일을 늘리기보다 같은 디렉토리 안에서 합치거나 확장하는 것을 먼저 검토합니다.

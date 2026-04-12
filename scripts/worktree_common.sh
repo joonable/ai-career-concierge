@@ -95,12 +95,20 @@ print_result() {
   local base_branch="$1"
   local target_branch="$2"
   local worktree_path="$3"
+  local root
+  root="$(repo_root)"
 
   cat <<EOF
 base_branch=${base_branch}
 target_branch=${target_branch}
 worktree_path=${worktree_path}
 next_command=cd ${worktree_path}
+EOF
+
+  cat >&2 <<EOF
+notice=execution_worktree_ready
+coordination_root=${root}
+canonical_docs_policy=edit_docs_in_root_repo
 EOF
 }
 

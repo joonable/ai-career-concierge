@@ -22,6 +22,7 @@
 - assistant-neutral control plane, context router, capability pack, runner 구조로의 migration plan을 `docs/implementation/active/2026-04-10-agentic-engineering-migration-plan/`에 활성 계획으로 정리
 - 현재 active plan의 우선순위는 기능 확장보다 harness + agent 전환을 먼저 두며, `Phase 4: PromptOps 에이전트 분석 루프`를 `Phase 5-1: Jobkorea 스크래퍼 (Agentic TDD)`보다 선행 과제로 해석
 - PromptOps 운영 가시성 정비를 위해 한국어 실험 기준 전환, 운영 패널 정보구조 개선, 평가 지표 가이드 노출을 별도 active plan 3개로 분리 저장
+- canonical 문서(`docs/`, `TODO.md`, `MILESTONE.md`, `docs/internal/status.md`, `docs/implementation/active/`)는 루트 저장소에서 관리하고 agent worktree는 실행 전용으로 구분하는 정책을 문서와 스크립트에 반영
 - 채용 플랫폼 사이트별 Scraper 로깅 한계 파악 및 에러 복구 제어 연구
 - Codex / Claude / Gemini 협업을 위한 `main` 기준 멀티 worktree 운영 표준 도입
 - implementation plan package 구조와 자동 저장 훅 기반 문서 운영 체계 도입
@@ -64,6 +65,7 @@
 - Phase 4 / Phase 5-1 plan을 Agentic Engineering 관점으로 재구성하고 기존 계획 2개를 archive 처리
 - Existing Harness to Agentic Engineering migration 초안을 active plan package로 승격하고 TODO 인덱스 반영 준비
 - PromptOps 운영 가시성 정비 계획을 `Phase 4-1/4-2/4-3` active plan으로 분리 저장
+- root coordination worktree와 agent execution worktree의 역할 분리를 AGENTS / docs guide / implementation rule / worktree bootstrap 출력에 반영
 
 ## 다음 action
 

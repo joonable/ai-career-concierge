@@ -19,7 +19,7 @@
 ```
 [계획 세션]
   → 계획 수립 (plan 모드 또는 대화)
-  → python3 scripts/implementation_docs.py save-plan ... 으로 저장
+  → 루트 저장소에서 python3 scripts/implementation_docs.py save-plan ... 으로 저장
   → 세션 종료
 
 [실행 세션]
@@ -69,6 +69,8 @@ python3 scripts/implementation_docs.py validate
 - harness + agent 전환이 현재 저장소의 운영 우선순위일 때는, 기능 확장 plan보다 agent loop / control plane / handoff contract를 먼저 안정화하는 plan을 선행합니다.
 - 기능 plan이 active여도, 그것이 harness + agent 운영 방식을 실제 제품 코드에서 검증하는 실전 적용인지, 아니면 단순 기능 확장인지 문서에 명시합니다.
 - 루트 저장소는 coordination 공간으로 보고, 실제 기능 구현은 `scripts/start_agent_task.sh --agent <agent> --task <slug>`로 만든 worktree에서 진행하는 것을 기본값으로 둡니다.
+- canonical 문서(`docs/`, `TODO.md`, `MILESTONE.md`, `docs/internal/status.md`, `docs/implementation/active/`)는 루트 저장소에서 관리하고, agent / integration worktree는 실행 전용으로 구분합니다.
+- agent worktree에서 문서 초안이나 실행 메모를 만들더라도, 최종 canonical 반영은 루트 저장소에서 정리한 뒤 sync/validate 합니다.
 - worktree 구조의 canonical 예시는 다음과 같습니다.
 
 ```text

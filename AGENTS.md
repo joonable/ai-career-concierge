@@ -92,6 +92,8 @@ PoC 루프가 작동하기 전에 다음 작업에 시간을 낭비하지 마세
 - `docs/*`는 제품/운영/구현 문서의 canonical source입니다.
 - `scripts/*`는 worktree bootstrap, implementation docs 관리 같은 운영 보조 도구입니다.
 - 저장소 루트 worktree는 관리, 리뷰, 문서 정리에 우선 사용하고, 기능 구현은 새 agent worktree에서 시작하는 것을 기본값으로 합니다.
+- `docs/`, `TODO.md`, `MILESTONE.md`, `docs/internal/status.md`, `docs/implementation/active/` 같은 canonical 문서는 루트 저장소에서 관리하는 것을 기본값으로 합니다.
+- agent / integration worktree는 실행 전용 공간으로 간주하며, canonical 문서 편집은 문서 작업이 명시적으로 목적일 때만 루트 저장소에서 수행합니다.
 - `.claude/worktrees/`, `.claude/sessions/`, `.gemini/plans/` 같은 경로는 로컬 에이전트 산출물 영역이며 제품 코드의 canonical source가 아닙니다.
 - 실제 Git worktree 작업 디렉터리는 `../ai-career-concierge-worktrees/<agent>/<task-slug>`를 canonical 경로로 간주합니다.
 
@@ -115,6 +117,7 @@ Codex, Claude, Gemini가 같은 로컬 저장소를 병렬로 사용할 수 있�
   - 새 작업은 반드시 `scripts/start_agent_task.sh --agent codex --task <task-slug>`로 시작합니다.
   - 루트 저장소에서 바로 기능 구현을 시작하지 않습니다.
   - plan package 자동 저장이 없는 경우 `python3 scripts/implementation_docs.py save-plan ...`을 직접 실행합니다.
+  - canonical 문서 작업은 agent worktree가 아니라 루트 저장소에서 정리하고 커밋합니다.
 
 ### 표준 시작 절차
 
@@ -159,6 +162,7 @@ scripts/start_integration_task.sh --task dashboard-filter
 - 영어 표현이 꼭 필요할 때만 괄호로 병기합니다.
 - 구현으로 인해 아키텍처, API 계약, 핵심 데이터 모델 또는 워크플로우 가정이 변경되는 경우 관련 문서를 업데이트하세요 (`docs/CONTEXT.md`, `docs/TRD.md`, `docs/internal/status.md`).
 - 상세 계획의 source of truth는 `docs/implementation/active/`의 plan package입니다.
+- canonical 문서 업데이트는 루트 저장소에서 수행하는 것을 원칙으로 하며, agent worktree에서 문서 초안을 만들었더라도 최종 반영은 루트 저장소 기준으로 정리합니다.
 - `TODO.md`와 `MILESTONE.md`는 자동 동기화되는 요약 인덱스이므로 긴 상세 계획을 직접 적지 마세요.
 - hook이 없는 에이전트는 `python3 scripts/implementation_docs.py save-plan ...`으로 계획을 직접 저장해야 합니다.
 - 구현 완료 후에는 `python3 scripts/implementation_docs.py archive-plan <plan_id>`로 archive하고, `python3 scripts/implementation_docs.py validate`를 통과시켜야 합니다.
