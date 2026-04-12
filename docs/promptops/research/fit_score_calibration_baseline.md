@@ -1,8 +1,8 @@
-# Fit Score Calibration Baseline
+# Fit Score 보정 기준선
 
-Date: 2026-03-31 (Asia/Seoul)
+Date: 2026-04-12 (Asia/Seoul)
 
-## Scope checked
+## 확인 범위
 
 - Prompt/schema/eval flow
   - `/Users/joon/PycharmProjects/ai-career-concierge/src/agent/schemas/evaluation_result.py`
@@ -18,7 +18,7 @@ Date: 2026-03-31 (Asia/Seoul)
   - `/Users/joon/PycharmProjects/ai-career-concierge/tests/contract/test_llm_schema.py`
   - `/Users/joon/PycharmProjects/ai-career-concierge/tests/contract/test_slack_payload.py`
 
-## Current repo baseline
+## 현재 저장소 기준선
 
 - `LLMEvaluationResult` is on structured output v2 with:
   - `fit_score`, `summary`, `strengths`, `concerns`
@@ -31,7 +31,7 @@ Date: 2026-03-31 (Asia/Seoul)
 - Default configured memory prompt identifier is `memory-summary:staging`.
 - Default configured eval dataset name is `job-eval-gold-dev`.
 
-## Gold fixture baseline
+## 골드 fixture 기준선
 
 - Current curated fixture size: `5` examples.
 - Current scenarios present:
@@ -56,7 +56,7 @@ Date: 2026-03-31 (Asia/Seoul)
   - `expected_deal_breaker_severity`
   - `expected_transferable_skills`
 
-## Evaluator baseline
+## 평가기 기준선
 
 - Current rule-based evaluators:
   - `classification_match`
@@ -113,21 +113,19 @@ Prompt/tag status to carry forward:
 - `job-evaluation:staging` is reported to still point to an older commit.
 - Target follow-up action: move `staging` to latest commit `1a2cd973...` in LangSmith UI before the next staged experiment run.
 
-## Calibration problem statement
+## 보정 문제 정의
 
-- The known failing policy area is borderline calibration for adjacent roles.
-- The concrete example called out is `Data Engineer for ML Platform`.
-- Current gold expectation for that case is `40~79`.
-- Reported model output for that case was `30`.
-- Working hypothesis: the instability is less about explanation quality and more about missing explicit score policy for:
-  - adjacent-role credit
-  - must-have gap penalty
-  - transferable-skill credit
-  - deal-breaker severity handling
+- 현재 반복적으로 흔들리는 정책 영역은 인접 직무의 경계 점수 보정입니다.
+- 대표 사례는 `ML 플랫폼 데이터 엔지니어` 계열이며, 한국어 운영 문맥에서는 "인접하지만 추천 상단으로 올리면 안 되는 역할"로 해석돼야 합니다.
+- 핵심 가설은 설명 품질 자체보다, 아래 정책 축이 한국어 서비스 기준으로 충분히 명시되지 않았다는 점입니다.
+  - 인접 직무 가점 범위
+  - 필수요건 공백 페널티
+  - 전이 가능한 역량 인정 범위
+  - 딜브레이커 강도 처리
 
-## Recommended next step
+## 권장 다음 단계
 
-- Start with score-policy documentation and borderline gold dataset expansion before changing the scoring prompt again.
+- 점수 프롬프트를 다시 바꾸기 전에, 한국어 기준의 score-policy 문서화와 borderline gold dataset 정리를 먼저 진행합니다.
 
 ## Phase 12 decision: post-processing calibration
 

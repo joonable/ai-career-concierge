@@ -1,8 +1,8 @@
-# Borderline Dataset Draft
+# 경계 사례 데이터셋 초안
 
-Date: 2026-03-31 (Asia/Seoul)
+Date: 2026-04-12 (Asia/Seoul)
 
-## Purpose
+## 목적
 
 이 문서는 `fit_score` calibration을 위한 borderline 골드 데이터셋(gold dataset) 초안입니다. 아직 fixture에 반영하기 전의 정책 설계 단계이며, 각 예시는 이후 [`src/agent/evals/fixtures/job_eval_gold.json`](/Users/joon/PycharmProjects/ai-career-concierge/src/agent/evals/fixtures/job_eval_gold.json)로 옮기기 쉬운 형태로 정리합니다.
 
@@ -14,7 +14,7 @@ Date: 2026-03-31 (Asia/Seoul)
 - Deal-breakers: `contract-only`, `onsite-only`
 - Notification threshold: `80`
 
-## Scenario families
+## 시나리오 계열
 
 - `ml_adjacent_data_engineer`
 - `backend_model_serving`
@@ -23,7 +23,7 @@ Date: 2026-03-31 (Asia/Seoul)
 - `mlops_heavy_weak_modeling`
 - `title_mismatch_skill_overlap`
 
-## Draft examples
+## 초안 예시
 
 ### 1. ML-adjacent data engineer
 
@@ -233,7 +233,7 @@ Date: 2026-03-31 (Asia/Seoul)
 - Scoring note:
   - Although the title is not classic MLE, the practical overlap with ML workflows and platform tooling is high enough to justify human review.
 
-## Coverage summary
+## 커버리지 요약
 
 - Total draft examples: `10`
 - Distribution by expected band:
@@ -247,7 +247,7 @@ Date: 2026-03-31 (Asia/Seoul)
   - `mlops_heavy_weak_modeling`: 1
   - `title_mismatch_skill_overlap`: 2
 
-## Notes for next phase
+## 다음 단계 메모
 
 - These examples are intentionally practical and close to realistic hiring-market ambiguity.
 - The next step is to encode these drafts into fixture schema fields such as:
