@@ -1,13 +1,13 @@
 ---
-plan_id: 2026-04-12-phase4-2-promptops-ops-ui-clarity
-title: Phase 4-2: PromptOps 운영 패널 정보구조 개선
-status: active
+plan_id: 2026-04-12-phase4-1-promptops-korean-experiment-migration
+title: Phase 4-1: PromptOps 한국어 실험 기준 전환
+status: archived
 milestone: Phase 3: PromptOps 자동화 및 에이전트 운영 확장
 source_agent: codex
 created_at: 2026-04-12T12:16:37+09:00
-updated_at: 2026-04-12T12:16:37+09:00
+updated_at: 2026-04-12T13:52:33+09:00
 ---
-# Phase 4-2: PromptOps 운영 패널 정보구조 개선
+# Phase 4-1: PromptOps 한국어 실험 기준 전환
 
 ## 문서 구성
 

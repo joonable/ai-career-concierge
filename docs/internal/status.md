@@ -22,6 +22,7 @@
 - assistant-neutral control plane, context router, capability pack, runner 구조로의 migration plan을 `docs/implementation/active/2026-04-10-agentic-engineering-migration-plan/`에 활성 계획으로 정리
 - 현재 active plan의 우선순위는 기능 확장보다 harness + agent 전환을 먼저 두며, `Phase 4: PromptOps 에이전트 분석 루프`를 `Phase 5-1: Jobkorea 스크래퍼 (Agentic TDD)`보다 선행 과제로 해석
 - PromptOps 운영 가시성 정비를 위해 한국어 실험 기준 전환, 운영 패널 정보구조 개선, 평가 지표 가이드 노출을 별도 active plan 3개로 분리 저장
+- `/internal/prompts`를 현재 상태, 실험/비교 추적, 후속 액션 추적, golden dataset 기준 흐름으로 재구성해 운영 판단 동선을 명확히 정리
 - canonical 문서(`docs/`, `TODO.md`, `MILESTONE.md`, `docs/internal/status.md`, `docs/implementation/active/`)는 루트 저장소에서 관리하고 agent worktree는 실행 전용으로 구분하는 정책을 문서와 스크립트에 반영
 - 채용 플랫폼 사이트별 Scraper 로깅 한계 파악 및 에러 복구 제어 연구
 - Codex / Claude / Gemini 협업을 위한 `main` 기준 멀티 worktree 운영 표준 도입
@@ -54,6 +55,7 @@
 - 로컬 웹서버 Next.js 캐싱 깨짐 이슈 안내 및 복구 완료
 - 로그인 / 온보딩 / 대시보드 기초 공사 완료
 - PromptOps 운영 패널 초안 구축 및 문서 단일화 정리 완료
+- Phase 4-1 PromptOps 한국어 실험 기준 전환 (docs only): 상태/연구 문서, iteration TEMPLATE을 한국어 서비스 기준으로 정렬 (fixture/evaluator 코드 보완은 별도 plan으로 재개)
 - `main` 기준 멀티 에이전트 branch / worktree 규칙 문서화
 - 에이전트별 작업 시작 스크립트 및 integration worktree 시작 스크립트 추가
 - Claude 로컬 설정에 worktree 시작 규칙 안내 및 branch 가드 보강
@@ -71,9 +73,10 @@
 
 ## 다음 action
 
-- `Phase 4-1: PromptOps 한국어 실험 기준 전환`을 먼저 실행해 fixture/dataset, evaluator 해석, iteration 문서를 한국어 서비스 기준으로 정렬하기
-- 이어서 `Phase 4-2: PromptOps 운영 패널 정보구조 개선`으로 `/internal/prompts`에서 실험/비교 추적과 후속 액션 추적을 명확히 구분하기
-- 그 다음 `Phase 4-3: PromptOps 평가 지표 가이드 및 현재 사용 지표 노출`로 metric 의미와 현재 사용 지표를 관리자 화면에서 이해 가능하게 만들기
+- `Phase 4-1 보완`: `job_eval_gold.json` 한국어 공고 기준 정렬 및 evaluator expectation 코드 정렬
+- `Phase 4-2 재개`: `/internal/prompts` UI 4개 섹션 재구성 및 golden dataset 로더 구현
+- `worktree port policy 버그 수정`: FastAPI 포트 충돌, api_base_url 버그, launch.json 구식 수정 후 main 머지
+- `Phase 4-3: PromptOps 평가 지표 가이드 및 현재 사용 지표 노출`로 metric 의미와 현재 사용 지표를 관리자 화면에서 이해 가능하게 만들기
 - 위 정비 이후 `Phase 4: PromptOps 에이전트 분석 루프`를 확장해 iteration report → structured JSON → next action 결정 루프를 운영 가능한 수준으로 고도화하기
 - PromptOps 운영 해석층 정비 이후 `Phase 5-1: Jobkorea 스크래퍼 (Agentic TDD)`를 통해 scraper 도메인에 harness + agent 실행 흐름을 적용하고 회귀 패턴을 검증하기
 - 실제 협업 태스크에서 `codex/*`, `claude/*`, `gemini/*`, `integration/*` 흐름을 운영에 적용하고 충돌 사례를 보정하기
@@ -108,7 +111,7 @@
 
 - `/internal`
   - 운영 허브 대시보드 (리디자인 됨)
-  - 프롬프트 운영 패널 (`/internal/prompts`)
+  - 프롬프트 운영 패널 (`/internal/prompts`) - 상태/실험/액션/golden dataset 기준 흐름 반영
   - [NEW] 마크다운 문서 뷰어 서브라우트 (`/internal/docs`)
 - 문서 원문
   - `docs/internal/status.md`

@@ -139,6 +139,14 @@ dataset sync, experiment, compare, review queue 연동은 adapter 계층을 통�
 - failure taxonomy key
 - backlog 생성 규칙의 최소 로직
 
+### Local Golden Dataset
+
+`src/agent/evals/fixtures/job_eval_gold.json`은 `job-evaluation` PromptOps의 local canonical golden dataset입니다.
+
+- source of truth는 Git-tracked local JSON으로 유지합니다.
+- LangSmith dataset은 이 fixture를 실험 backend로 sync한 결과이며, golden truth 자체를 대체하지 않습니다.
+- `/internal/prompts`에서는 이 fixture를 read-only snapshot으로 보여주고, 편집은 UI가 아니라 repo/PR에서만 진행합니다.
+
 ### LangSmith가 맡는 것
 
 LangSmith는 운영 truth를 맡습니다.
