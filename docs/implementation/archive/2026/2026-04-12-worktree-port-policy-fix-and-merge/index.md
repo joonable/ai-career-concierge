@@ -1,11 +1,11 @@
 ---
 plan_id: 2026-04-12-worktree-port-policy-fix-and-merge
 title: worktree port policy 버그 수정 및 main 머지
-status: active
+status: archived
 milestone: Phase 2: 하네스 엔지니어링
 source_agent: claude
 created_at: 2026-04-12T18:00:00+09:00
-updated_at: 2026-04-12T18:00:00+09:00
+updated_at: 2026-04-12T16:50:16+09:00
 ---
 # worktree port policy 버그 수정 및 main 머지
 

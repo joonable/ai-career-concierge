@@ -40,7 +40,6 @@ harness + agent 전환을 현재 최상위 목표로 두되, PromptOps를 실제
 <!-- BEGIN MANAGED:IMPLEMENTATION_INDEX -->
 ## Active Plans
 
-- [worktree port policy 버그 수정 및 main 머지](docs/implementation/active/2026-04-12-worktree-port-policy-fix-and-merge/index.md) — milestone: `Phase 2: 하네스 엔지니어링`, agent: `claude`, updated: `2026-04-12T18:00:00+09:00`
 - [Phase 4-1 보완: job_eval_gold.json 한국어 공고 기준 정렬](docs/implementation/active/2026-04-12-phase4-1-fixture-evaluator-alignment/index.md) — milestone: `Phase 3: PromptOps 자동화 및 에이전트 운영 확장`, agent: `claude`, updated: `2026-04-12T18:00:00+09:00`
 - [Phase 4-2 재개: /internal/prompts UI 구현 및 golden dataset 로더](docs/implementation/active/2026-04-12-phase4-2-promptops-ops-ui-implementation/index.md) — milestone: `Phase 3: PromptOps 자동화 및 에이전트 운영 확장`, agent: `claude`, updated: `2026-04-12T18:00:00+09:00`
 - [Phase 4-3: PromptOps 평가 지표 가이드 및 현재 사용 지표 노출](docs/implementation/active/2026-04-12-phase4-3-promptops-metric-glossary/index.md) — milestone: `Phase 3: PromptOps 자동화 및 에이전트 운영 확장`, agent: `codex`, updated: `2026-04-12T12:16:37+09:00`
@@ -49,15 +48,14 @@ harness + agent 전환을 현재 최상위 목표로 두되, PromptOps를 실제
 
 ## Priority Snapshot
 
-- `Phase 2: 하네스 엔지니어링`: active 1건
 - `Phase 3: PromptOps 자동화 및 에이전트 운영 확장`: active 4건
 - `Phase 5: 스크래퍼/데이터 계층 보강`: active 1건
 
 ## Recent Archive
 
+- [worktree port policy 버그 수정 및 main 머지](docs/implementation/archive/2026/2026-04-12-worktree-port-policy-fix-and-merge/index.md) — `2026-04-12T16:50:16+09:00`
 - [Phase 4-2: PromptOps 운영 패널 정보구조 개선](docs/implementation/archive/2026/2026-04-12-phase4-2-promptops-ops-ui-clarity/index.md) — `2026-04-12T14:30:30+09:00`
 - [Phase 4-1: PromptOps 한국어 실험 기준 전환](docs/implementation/archive/2026/2026-04-12-phase4-1-promptops-korean-experiment-migration/index.md) — `2026-04-12T13:52:33+09:00`
 - [Phase 4: PromptOps 에이전트 통합 자동화](docs/implementation/archive/2026/2026-04-10-phase4-promptops-automation/index.md) — `2026-04-10T16:04:31+09:00`
 - [Phase 5-1: Jobkorea 멀티소스 스크래퍼 확장](docs/implementation/archive/2026/2026-04-10-phase5-1-jobkorea-scraper/index.md) — `2026-04-10T16:04:31+09:00`
-- [하네스 엔지니어링 전환 보완 계획](docs/implementation/archive/2026/2026-04-10-harness-engineering-transition-gap-plan/index.md) — `2026-04-10T15:28:52+09:00`
 <!-- END MANAGED:IMPLEMENTATION_INDEX -->

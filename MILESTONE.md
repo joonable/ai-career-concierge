@@ -14,10 +14,6 @@
 <!-- BEGIN MANAGED:MILESTONE_INDEX -->
 ## Active By Milestone
 
-### Phase 2: 하네스 엔지니어링
-
-- [worktree port policy 버그 수정 및 main 머지](docs/implementation/active/2026-04-12-worktree-port-policy-fix-and-merge/index.md) — `2026-04-12T18:00:00+09:00`
-
 ### Phase 3: PromptOps 자동화 및 에이전트 운영 확장
 
 - [Phase 4-1 보완: job_eval_gold.json 한국어 공고 기준 정렬](docs/implementation/active/2026-04-12-phase4-1-fixture-evaluator-alignment/index.md) — `2026-04-12T18:00:00+09:00`
@@ -33,6 +29,7 @@
 
 ### 2026
 
+- [worktree port policy 버그 수정 및 main 머지](docs/implementation/archive/2026/2026-04-12-worktree-port-policy-fix-and-merge/index.md) — `Phase 2: 하네스 엔지니어링` / `2026-04-12T16:50:16+09:00`
 - [Phase 4-2: PromptOps 운영 패널 정보구조 개선](docs/implementation/archive/2026/2026-04-12-phase4-2-promptops-ops-ui-clarity/index.md) — `Phase 3: PromptOps 자동화 및 에이전트 운영 확장` / `2026-04-12T14:30:30+09:00`
 - [Phase 4-1: PromptOps 한국어 실험 기준 전환](docs/implementation/archive/2026/2026-04-12-phase4-1-promptops-korean-experiment-migration/index.md) — `Phase 3: PromptOps 자동화 및 에이전트 운영 확장` / `2026-04-12T13:52:33+09:00`
 - [Phase 4: PromptOps 에이전트 통합 자동화](docs/implementation/archive/2026/2026-04-10-phase4-promptops-automation/index.md) — `Phase 3: PromptOps 자동화 및 에이전트 운영 확장` / `2026-04-10T16:04:31+09:00`
