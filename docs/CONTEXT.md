@@ -383,6 +383,11 @@ confidence 정책:
 - `DATABASE_URL`은 필수 런타임 의존성이 아닌, 직접적인 Postgres 툴링 전용의 추가적인 도구용 레거시 설정입니다.
 - `ALLOW_DEV_SCHEDULE=false`로 설정하여 명시적으로 활성화하지 않는 한 비프로덕션 스케줄링이 비활성화되도록 합니다.
 - 웹 앱은 `NEXT_PUBLIC_API_BASE_URL`, `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`를 읽습니다.
+- 멀티 worktree 로컬 개발은 `scripts/start_agent_task.sh` 또는 `scripts/start_integration_task.sh`로만 시작하는 것을 기본 정책으로 둡니다.
+- 위 스크립트는 Codex, Claude, Gemini, integration worktree 모두에 대해 `apps/web/.env.development.local`을 자동 bootstrap하고 worktree 전용 `PORT`를 할당해야 합니다.
+- 웹 앱은 공개 env가 누락되면 fallback 값으로 계속 진행하지 말고 즉시 실패해 원인을 드러내야 합니다.
+- `PROMPTOPS_DEV_BYPASS=true`는 로컬 개발 전용 예외이며 production에서는 허용하지 않습니다.
+- bypass가 활성화된 개발 환경에서는 PromptOps 운영 UI가 세션 없이도 문서/fixture 기반 mock snapshot으로 렌더될 수 있지만, 이는 runtime snapshot을 대체하지 않습니다.
 
 ## 향후 작업을 위한 가드레일 (Guardrails For Future Work)
 

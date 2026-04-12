@@ -47,3 +47,4 @@ branch_name="$(branch_name_for_integration "${task_slug}")"
 worktree_path="$(worktree_path_for_kind "integration" "${task_slug}")"
 
 create_or_reuse_worktree "${branch_name}" "${worktree_path}" "${base_branch}"
+bootstrap_web_env_for_worktree "${worktree_path}" "integration" "${task_slug}"

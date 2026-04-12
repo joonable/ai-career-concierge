@@ -31,6 +31,28 @@
 - 운영 링크
   - PromptOps, iteration 기록, backlog 문서 같은 운영 링크를 카드 또는 섹션으로 묶어 보여줍니다.
 
+## 멀티 에이전트 개발 진입 정책
+
+- `scripts/start_agent_task.sh`와 `scripts/start_integration_task.sh`를 worktree 시작의 공통 진입점으로 사용합니다.
+- Codex, Claude, Gemini, integration worktree는 모두 동일한 bootstrap 규칙을 따라 `apps/web/.env.development.local`을 자동 생성해야 합니다.
+- bootstrap 산출물은 최소한 다음 값을 포함해야 합니다:
+  - worktree 전용 `PORT`
+  - `NEXT_PUBLIC_API_BASE_URL`
+  - `NEXT_PUBLIC_SUPABASE_URL`
+  - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+  - `PROMPTOPS_ADMIN_EMAILS`
+  - `PROMPTOPS_DEV_BYPASS`
+- 로컬 `npm run dev`는 env에 기록된 `PORT`를 실제 Next.js dev server 포트로 사용해야 합니다.
+- 공개 env가 비어 있으면 fallback 값으로 조용히 진행하지 말고, 개발자가 즉시 원인을 알 수 있게 fail-fast 해야 합니다.
+
+## PromptOps dev bypass 규칙
+
+- `PROMPTOPS_DEV_BYPASS`는 로컬 개발에서 운영 UI 구조를 확인하기 위한 dev-only 예외입니다.
+- 이 bypass는 `NODE_ENV != production`일 때만 허용합니다.
+- bypass가 켜져 있어도 production 인증 경로를 대체해서는 안 됩니다.
+- bypass가 켜진 상태에서 세션이 없으면 `/internal`, `/internal/prompts`는 문서 + fixture 기반 mock snapshot으로 렌더할 수 있습니다.
+- mock snapshot은 운영 화면 확인 용도이며, 실제 compare/review/backlog 링크와 runtime snapshot 해석을 대신하지 않습니다.
+
 ## 편집 기능 방향
 
 - 운영 패널은 장기적으로 다음 문서의 수정 동선을 제공하는 것을 목표로 합니다:

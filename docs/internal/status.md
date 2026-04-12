@@ -66,6 +66,8 @@
 - Existing Harness to Agentic Engineering migration 초안을 active plan package로 승격하고 TODO 인덱스 반영 준비
 - PromptOps 운영 가시성 정비 계획을 `Phase 4-1/4-2/4-3` active plan으로 분리 저장
 - root coordination worktree와 agent execution worktree의 역할 분리를 AGENTS / docs guide / implementation rule / worktree bootstrap 출력에 반영
+- 멀티 에이전트 공통 worktree bootstrap 정책 정리: agent/integration 시작 스크립트 모두 web env 자동 생성과 전용 포트 할당을 수행하도록 보강
+- PromptOps dev bypass를 로컬 개발 전용 예외로 정의하고 운영 패널 문서 계약 및 컨텍스트 문서에 명시
 
 ## 다음 action
 
@@ -76,6 +78,7 @@
 - PromptOps 운영 해석층 정비 이후 `Phase 5-1: Jobkorea 스크래퍼 (Agentic TDD)`를 통해 scraper 도메인에 harness + agent 실행 흐름을 적용하고 회귀 패턴을 검증하기
 - 실제 협업 태스크에서 `codex/*`, `claude/*`, `gemini/*`, `integration/*` 흐름을 운영에 적용하고 충돌 사례를 보정하기
 - Codex 쪽 자동 guard / hook 보강이 필요한지 PromptOps/스크래퍼 실전 적용 경험을 바탕으로 판단하기
+- Claude/Gemini/integration 경로까지 포함한 bootstrap 정책이 실제 실전 태스크에서 안정적으로 동작하는지 추가 검증하기
 - `.agents/` canonical control plane, capability registry, context bundle 도입을 별도 실행 plan으로 분해하기
 - docs 기반의 상태판 구조를 파싱하여 예쁘게 렌더링하는 Markdown 뷰어와 `react-markdown` 컴포넌트 작업 완료하기
 - Supabase Service Role 정책 적용을 백엔드 통합과 어떻게 분리할지 결정
