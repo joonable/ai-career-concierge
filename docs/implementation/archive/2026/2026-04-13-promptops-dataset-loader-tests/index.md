@@ -1,11 +1,11 @@
 ---
 plan_id: 2026-04-13-promptops-dataset-loader-tests
 title: PromptOps prompt dataset loader tests
-status: active
+status: archived
 milestone: Phase 3: PromptOps 자동화 및 에이전트 운영 확장
 source_agent: codex
 created_at: 2026-04-13T14:48:46+09:00
-updated_at: 2026-04-13T14:48:46+09:00
+updated_at: 2026-04-13T15:51:40+09:00
 ---
 # PromptOps prompt dataset loader tests
 

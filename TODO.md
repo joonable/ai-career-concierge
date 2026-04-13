@@ -104,14 +104,14 @@ harness + agent 전환을 현재 최상위 목표로 두되, broad phase가 아�
 <!-- BEGIN MANAGED:IMPLEMENTATION_INDEX -->
 ## Priority Snapshot
 
-- `Phase 3: PromptOps 자동화 및 에이전트 운영 확장`: active 9건
+- `Phase 3: PromptOps 자동화 및 에이전트 운영 확장`: active 7건
 - `Phase 5: 스크래퍼/데이터 계층 보강`: active 8건
 
 ## Recent Archive
 
+- [PromptOps prompt dataset loader tests](docs/implementation/archive/2026/2026-04-13-promptops-dataset-loader-tests/index.md) — `2026-04-13T15:51:40+09:00`
+- [PromptOps prompt dataset list rendering](docs/implementation/archive/2026/2026-04-13-promptops-dataset-list-rendering/index.md) — `2026-04-13T15:48:49+09:00`
 - [PromptOps golden dataset loader](docs/implementation/archive/2026/2026-04-13-promptops-golden-dataset-loader/index.md) — `2026-04-13T15:39:15+09:00`
 - [PromptOps /internal/prompts route shell](docs/implementation/archive/2026/2026-04-13-promptops-internal-prompts-route-shell/index.md) — `2026-04-13T15:33:22+09:00`
 - [Phase 4-1 보완: job_eval_gold.json 한국어 공고 기준 정렬](docs/implementation/archive/2026/2026-04-12-phase4-1-fixture-evaluator-alignment/index.md) — `2026-04-13T14:12:49+09:00`
-- [worktree port policy 버그 수정 및 main 머지](docs/implementation/archive/2026/2026-04-12-worktree-port-policy-fix-and-merge/index.md) — `2026-04-12T16:50:16+09:00`
-- [Phase 4-2: PromptOps 운영 패널 정보구조 개선](docs/implementation/archive/2026/2026-04-12-phase4-2-promptops-ops-ui-clarity/index.md) — `2026-04-12T14:30:30+09:00`
 <!-- END MANAGED:IMPLEMENTATION_INDEX -->

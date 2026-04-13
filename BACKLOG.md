@@ -53,6 +53,11 @@
   - 관찰 포인트: OAuth callback, 세션 저장, redirect 타이밍, onboarding/dashboard 진입 조건
   - 기대 산출물: 재현 조건 정리, 원인 분석, fix plan, 사용자 확인 경로
 
+- `/internal/prompts` Golden Dataset 15개 렌더링 검증 및 재구현
+  - 목적: fixture path 버그 수정 후 실제 15개 항목이 화면에 정상 표시되는지 확인하고, 렌더링 구현 품질 점검
+  - 관찰 포인트: PASS/REJECT 배지, scenario type/difficulty 태그, fit score 범위 표시, 빈 상태 처리
+  - 기대 산출물: 브라우저 확인 완료 + 필요 시 UI 보완 커밋
+
 - 실제 공고 내용으로 테스트셋 구성
   - 목적: synthetic fixture 중심 검증을 넘어 실제 한국어 채용 공고 본문 기반 회귀셋 확보
   - 관찰 포인트: 데이터 수집 기준, 민감정보/저작권 취급 원칙, evaluator expectation 형식, platform coverage
