@@ -21,7 +21,7 @@ export default async function InternalPromptsPage() {
     );
   }
 
-  const { docs, snapshot } = pageData;
+  const { docs, snapshot, dataset } = pageData;
   const lineageItems = [
     { label: "Production", value: snapshot.production_identifier || FALLBACK_VALUE },
     { label: "Staging", value: snapshot.staging_identifier || FALLBACK_VALUE },
@@ -210,6 +210,44 @@ export default async function InternalPromptsPage() {
               <p className="promptops-empty">{FALLBACK_VALUE}</p>
             )}
           </article>
+        </section>
+
+        <section className="dashboard-card promptops-card dashboard-card--full">
+          <div className="dashboard-section__header">
+            <div>
+              <span className="dashboard-kicker">Golden Dataset</span>
+              <h2 className="dashboard-section__title">평가 기준 데이터셋</h2>
+            </div>
+            {dataset && <span className="dashboard-pill">{dataset.total}개</span>}
+          </div>
+          {dataset ? (
+            <ul className="promptops-dataset-list">
+              {dataset.items.map((item) => (
+                <li className="promptops-dataset-item" key={item.id}>
+                  <div className="promptops-dataset-item__meta">
+                    <span
+                      className={`promptops-dataset-badge ${item.should_pass ? "promptops-dataset-badge--pass" : "promptops-dataset-badge--reject"}`}
+                    >
+                      {item.should_pass ? "PASS" : "REJECT"}
+                    </span>
+                    <span className="promptops-dataset-item__id">{item.id}</span>
+                  </div>
+                  <strong className="promptops-dataset-item__title">{item.job_title}</strong>
+                  <div className="promptops-dataset-item__tags">
+                    <span className="promptops-dataset-tag">{item.scenario_type}</span>
+                    <span className="promptops-dataset-tag">{item.difficulty}</span>
+                    {item.fit_score_max > 0 && (
+                      <span className="promptops-dataset-tag">
+                        fit {item.fit_score_min}–{item.fit_score_max}
+                      </span>
+                    )}
+                  </div>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="promptops-empty">데이터셋을 불러오지 못했습니다. 백엔드 서버가 실행 중인지 확인하세요.</p>
+          )}
         </section>
 
         <section className="dashboard-card promptops-card">

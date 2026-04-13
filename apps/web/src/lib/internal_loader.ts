@@ -5,8 +5,8 @@ import {
   type InternalStatusDocument,
   type PromptOpsDocumentSummary,
 } from "@/lib/internal_docs";
-import { getPromptOpsStatusSnapshot } from "@/lib/api_client_server";
-import type { PromptOpsStatusResponse } from "@/lib/promptops_types";
+import { getPromptOpsDatasetSnapshot, getPromptOpsStatusSnapshot } from "@/lib/api_client_server";
+import type { PromptOpsDatasetResponse, PromptOpsStatusResponse } from "@/lib/promptops_types";
 
 type InternalPageDataSuccess = {
   status: "ready";
@@ -26,6 +26,7 @@ type PromptOpsWorkspaceDataSuccess = {
   status: "ready";
   docs: PromptOpsDocumentSummary;
   snapshot: PromptOpsStatusResponse;
+  dataset: PromptOpsDatasetResponse | null;
 };
 
 type PromptOpsWorkspaceDataFailure = {
@@ -83,10 +84,18 @@ export async function loadPromptOpsWorkspaceData(): Promise<PromptOpsWorkspaceDa
       getPromptOpsStatusSnapshot(),
     ]);
 
+    let dataset: PromptOpsDatasetResponse | null = null;
+    try {
+      dataset = await getPromptOpsDatasetSnapshot();
+    } catch {
+      // dataset은 선택적 컨텍스트 - fetch 실패 시 null로 처리
+    }
+
     return {
       status: "ready",
       docs,
       snapshot,
+      dataset,
     };
   } catch (error) {
     if (shouldUsePromptOpsDevMock(error)) {
@@ -96,6 +105,7 @@ export async function loadPromptOpsWorkspaceData(): Promise<PromptOpsWorkspaceDa
         status: "ready",
         docs,
         snapshot: createPromptOpsDevMockSnapshot(),
+        dataset: createPromptOpsDevMockDataset(),
       };
     }
 
@@ -145,5 +155,46 @@ function createPromptOpsDevMockSnapshot(): PromptOpsStatusResponse {
       "실제 compare/review/backlog 링크는 로그인 후 runtime snapshot에서 확인할 수 있습니다.",
     ],
     next_backlog_items: [],
+  };
+}
+
+function createPromptOpsDevMockDataset(): PromptOpsDatasetResponse {
+  return {
+    total: 3,
+    items: [
+      {
+        id: "gold-001",
+        scenario_type: "강한_일치",
+        scenario_family: "직접_mle_일치",
+        difficulty: "쉬움",
+        should_pass: true,
+        fit_score_min: 80,
+        fit_score_max: 100,
+        scoring_note: "직접적인 역할 일치 (dev mock)",
+        job_title: "시니어 머신러닝 엔지니어",
+      },
+      {
+        id: "gold-002",
+        scenario_type: "딜브레이커",
+        scenario_family: "계약직_전용",
+        difficulty: "쉬움",
+        should_pass: false,
+        fit_score_min: 0,
+        fit_score_max: 0,
+        scoring_note: "딜브레이커 트리거 (dev mock)",
+        job_title: "데이터 사이언티스트 (계약직)",
+      },
+      {
+        id: "gold-003",
+        scenario_type: "경계_사례",
+        scenario_family: "인접_분석_인프라",
+        difficulty: "보통",
+        should_pass: false,
+        fit_score_min: 40,
+        fit_score_max: 59,
+        scoring_note: "borderline 경계 사례 (dev mock)",
+        job_title: "데이터 엔지니어",
+      },
+    ],
   };
 }
