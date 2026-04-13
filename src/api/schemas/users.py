@@ -254,6 +254,23 @@ class PromptOpsStatusResponse(BaseModel):
     next_backlog_items: List[PromptOpsBacklogItem] = Field(default_factory=list)
 
 
+class PromptOpsDatasetItem(BaseModel):
+    id: str
+    scenario_type: str
+    scenario_family: str
+    difficulty: str
+    should_pass: bool
+    fit_score_min: int
+    fit_score_max: int
+    scoring_note: str
+    job_title: str
+
+
+class PromptOpsDatasetResponse(BaseModel):
+    total: int
+    items: List[PromptOpsDatasetItem] = Field(default_factory=list)
+
+
 def build_user_profile_response(
     *,
     user_id: UUID,

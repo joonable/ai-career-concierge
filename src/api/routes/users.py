@@ -6,12 +6,14 @@ from api.dependencies.auth import UserIdentity, get_current_user_identity
 from api.dependencies.supabase_store import get_evaluation_store, get_user_store
 from api.schemas.users import (
     DashboardResponse,
+    PromptOpsDatasetResponse,
     PromptOpsStatusResponse,
     UserProfilePayload,
     UserProfileResponse,
 )
 from api.services.dashboard_service import DashboardService
 from api.services.profile_service import ProfileService
+from api.services.promptops_dataset_service import PromptOpsDatasetService
 from api.services.promptops_status_service import PromptOpsStatusService
 
 router = APIRouter(prefix="/api/v1/users", tags=["users"])
@@ -64,3 +66,11 @@ def get_my_promptops_status(
 ) -> PromptOpsStatusResponse:
     service = PromptOpsStatusService()
     return service.get_status(identity)
+
+
+@router.get("/me/promptops-dataset", response_model=PromptOpsDatasetResponse)
+def get_my_promptops_dataset(
+    identity: UserIdentity = Depends(get_current_user_identity),
+) -> PromptOpsDatasetResponse:
+    PromptOpsStatusService().ensure_access(identity)
+    return PromptOpsDatasetService().get_dataset()
