@@ -8,7 +8,7 @@ import { createSupabaseServerClient } from "@/lib/supabase_auth_server";
 import { DashboardDataError } from "@/lib/dashboard_errors";
 import type { DashboardResponse } from "@/lib/dashboard_types";
 import { webEnv } from "@/lib/env";
-import type { PromptOpsStatusResponse } from "@/lib/promptops_types";
+import type { PromptOpsDatasetResponse, PromptOpsStatusResponse } from "@/lib/promptops_types";
 import type { UserProfileResponse } from "@/lib/profile_types";
 
 async function getAccessToken(): Promise<string> {
@@ -94,6 +94,24 @@ export async function getPromptOpsStatusSnapshot(): Promise<PromptOpsStatusRespo
   if (!response.ok) {
     throw new DashboardDataError(
       await readErrorMessage(response, "PromptOps 운영 상태를 불러오지 못했습니다."),
+    );
+  }
+
+  return response.json();
+}
+
+export async function getPromptOpsDatasetSnapshot(): Promise<PromptOpsDatasetResponse> {
+  const accessToken = await getAccessToken();
+  const response = await fetch(`${webEnv.apiBaseUrl}/api/v1/users/me/promptops-dataset`, {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+    cache: "no-store",
+  });
+
+  if (!response.ok) {
+    throw new DashboardDataError(
+      await readErrorMessage(response, "PromptOps dataset을 불러오지 못했습니다."),
     );
   }
 
