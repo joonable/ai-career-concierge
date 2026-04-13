@@ -325,18 +325,7 @@ def build_todo_managed_block(
         key=lambda package: parse_datetime_sort_key(package.updated_at),
         reverse=True,
     )
-    lines = ["## Active Plans", ""]
-    if active_packages:
-        for package in active_packages:
-            rel = relative_to_root(package.index_path, repo_root)
-            lines.append(
-                f"- [{package.title}]({rel})"
-                f" — milestone: `{package.milestone}`, agent: `{package.source_agent}`, updated: `{package.updated_at}`"
-            )
-    else:
-        lines.append("- 현재 활성 plan package 없음")
-
-    lines.extend(["", "## Priority Snapshot", ""])
+    lines = ["## Priority Snapshot", ""]
     counter = Counter(package.milestone for package in active_packages)
     if counter:
         for milestone, count in sorted(counter.items(), key=lambda item: milestone_sort_key(item[0])):
