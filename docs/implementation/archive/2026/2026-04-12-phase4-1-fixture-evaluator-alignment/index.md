@@ -1,11 +1,11 @@
 ---
 plan_id: 2026-04-12-phase4-1-fixture-evaluator-alignment
 title: Phase 4-1 보완: job_eval_gold.json 한국어 공고 기준 정렬
-status: active
+status: archived
 milestone: Phase 3: PromptOps 자동화 및 에이전트 운영 확장
 source_agent: claude
 created_at: 2026-04-12T18:00:00+09:00
-updated_at: 2026-04-12T18:00:00+09:00
+updated_at: 2026-04-13T14:12:49+09:00
 ---
 # Phase 4-1 보완: job_eval_gold.json 한국어 공고 기준 정렬
 

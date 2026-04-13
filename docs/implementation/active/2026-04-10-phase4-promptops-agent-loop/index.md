@@ -1,7 +1,7 @@
 ---
 plan_id: 2026-04-10-phase4-promptops-agent-loop
 title: Phase 4: PromptOps 에이전트 분석 루프
-status: active
+status: reference
 milestone: Phase 3: PromptOps 자동화 및 에이전트 운영 확장
 source_agent: claude
 created_at: 2026-04-10T00:00:00+09:00

@@ -1,7 +1,7 @@
 ---
 plan_id: 2026-04-10-phase5-1-jobkorea-scraper-agentic
 title: Phase 5-1: Jobkorea 스크래퍼 (Agentic TDD)
-status: active
+status: reference
 milestone: Phase 5: 스크래퍼/데이터 계층 보강
 source_agent: claude
 created_at: 2026-04-10T00:00:00+09:00

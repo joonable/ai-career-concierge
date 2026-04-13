@@ -9,26 +9,42 @@
 - `Phase 1`: 단일 사용자 수직 슬라이스 PoC 구현
 - `Phase 2`: 하네스 엔지니어링과 멀티 에이전트 운영 표준화
 - `Phase 3`: PromptOps 자동화 및 에이전트 운영 확장
-- `Phase 4`: 스크래퍼/데이터 계층/멀티유저 기반 보강
+- `Phase 4`: PromptOps 운영 루프와 평가 해석 계층 고도화
+- `Phase 5`: 스크래퍼/데이터 계층/멀티유저 기반 보강
 
 <!-- BEGIN MANAGED:MILESTONE_INDEX -->
 ## Active By Milestone
 
 ### Phase 3: PromptOps 자동화 및 에이전트 운영 확장
 
-- [Phase 4-1 보완: job_eval_gold.json 한국어 공고 기준 정렬](docs/implementation/active/2026-04-12-phase4-1-fixture-evaluator-alignment/index.md) — `2026-04-12T18:00:00+09:00`
-- [Phase 4-2 재개: /internal/prompts UI 구현 및 golden dataset 로더](docs/implementation/active/2026-04-12-phase4-2-promptops-ops-ui-implementation/index.md) — `2026-04-12T18:00:00+09:00`
-- [Phase 4-3: PromptOps 평가 지표 가이드 및 현재 사용 지표 노출](docs/implementation/active/2026-04-12-phase4-3-promptops-metric-glossary/index.md) — `2026-04-12T12:16:37+09:00`
-- [Phase 4: PromptOps 에이전트 분석 루프](docs/implementation/active/2026-04-10-phase4-promptops-agent-loop/index.md) — `2026-04-10T00:00:00+09:00`
+- [PromptOps analyze_iteration CLI output](docs/implementation/active/2026-04-13-promptops-analyze-iteration-cli-output/index.md) — `2026-04-13T14:48:47+09:00`
+- [PromptOps analyze_iteration smoke run](docs/implementation/active/2026-04-13-promptops-analyze-iteration-smoke-run/index.md) — `2026-04-13T14:48:47+09:00`
+- [PromptOps analyze_iteration tests](docs/implementation/active/2026-04-13-promptops-analyze-iteration-tests/index.md) — `2026-04-13T14:48:47+09:00`
+- [PromptOps /internal/prompts route shell](docs/implementation/active/2026-04-13-promptops-internal-prompts-route-shell/index.md) — `2026-04-13T14:48:46+09:00`
+- [PromptOps metric glossary document](docs/implementation/active/2026-04-13-promptops-metric-glossary-document/index.md) — `2026-04-13T14:48:46+09:00`
+- [PromptOps prompt dataset loader tests](docs/implementation/active/2026-04-13-promptops-dataset-loader-tests/index.md) — `2026-04-13T14:48:46+09:00`
+- [PromptOps metric terminology alignment](docs/implementation/active/2026-04-13-promptops-metric-terminology-alignment/index.md) — `2026-04-13T14:48:46+09:00`
+- [PromptOps prompt dataset list rendering](docs/implementation/active/2026-04-13-promptops-dataset-list-rendering/index.md) — `2026-04-13T14:48:46+09:00`
+- [PromptOps golden dataset loader](docs/implementation/active/2026-04-13-promptops-golden-dataset-loader/index.md) — `2026-04-13T14:48:46+09:00`
+- [PromptOps current metrics UI exposure](docs/implementation/active/2026-04-13-promptops-current-metrics-ui-exposure/index.md) — `2026-04-13T14:48:46+09:00`
+- [PromptOps iteration report parsing contract](docs/implementation/active/2026-04-13-promptops-iteration-report-parsing-contract/index.md) — `2026-04-13T14:48:46+09:00`
 
 ### Phase 5: 스크래퍼/데이터 계층 보강
 
-- [Phase 5-1: Jobkorea 스크래퍼 (Agentic TDD)](docs/implementation/active/2026-04-10-phase5-1-jobkorea-scraper-agentic/index.md) — `2026-04-10T00:00:00+09:00`
+- [Jobkorea listing parser](docs/implementation/active/2026-04-13-jobkorea-listing-parser/index.md) — `2026-04-13T14:48:47+09:00`
+- [Jobkorea config field](docs/implementation/active/2026-04-13-jobkorea-config-field/index.md) — `2026-04-13T14:48:47+09:00`
+- [Jobkorea normalizer wiring](docs/implementation/active/2026-04-13-jobkorea-normalizer-wiring/index.md) — `2026-04-13T14:48:47+09:00`
+- [Jobkorea detail parser](docs/implementation/active/2026-04-13-jobkorea-detail-parser/index.md) — `2026-04-13T14:48:47+09:00`
+- [Jobkorea ingest integration](docs/implementation/active/2026-04-13-jobkorea-ingest-integration/index.md) — `2026-04-13T14:48:47+09:00`
+- [Jobkorea fixture pack](docs/implementation/active/2026-04-13-jobkorea-fixture-pack/index.md) — `2026-04-13T14:48:47+09:00`
+- [Jobkorea scraper registry registration](docs/implementation/active/2026-04-13-jobkorea-scraper-registry-registration/index.md) — `2026-04-13T14:48:47+09:00`
+- [Multi-source ingest regression](docs/implementation/active/2026-04-13-multi-source-ingest-regression/index.md) — `2026-04-13T14:48:47+09:00`
 
 ## History Timeline
 
 ### 2026
 
+- [Phase 4-1 보완: job_eval_gold.json 한국어 공고 기준 정렬](docs/implementation/archive/2026/2026-04-12-phase4-1-fixture-evaluator-alignment/index.md) — `Phase 3: PromptOps 자동화 및 에이전트 운영 확장` / `2026-04-13T14:12:49+09:00`
 - [worktree port policy 버그 수정 및 main 머지](docs/implementation/archive/2026/2026-04-12-worktree-port-policy-fix-and-merge/index.md) — `Phase 2: 하네스 엔지니어링` / `2026-04-12T16:50:16+09:00`
 - [Phase 4-2: PromptOps 운영 패널 정보구조 개선](docs/implementation/archive/2026/2026-04-12-phase4-2-promptops-ops-ui-clarity/index.md) — `Phase 3: PromptOps 자동화 및 에이전트 운영 확장` / `2026-04-12T14:30:30+09:00`
 - [Phase 4-1: PromptOps 한국어 실험 기준 전환](docs/implementation/archive/2026/2026-04-12-phase4-1-promptops-korean-experiment-migration/index.md) — `Phase 3: PromptOps 자동화 및 에이전트 운영 확장` / `2026-04-12T13:52:33+09:00`
