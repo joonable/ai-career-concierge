@@ -50,6 +50,7 @@
 
 ## 최근 완료 작업 (Done)
 
+- PromptOps 평가 지표 glossary 문서 추가: 운영자가 `Pass Rate`, evaluator key, failure taxonomy를 같은 기준으로 읽을 수 있게 기준서 정리
 - `/internal` 대시보드를 비대칭형 레이아웃으로 전면 리디자인 완료
 - 문서 뷰어 라우트 신설 및 404 오류 제거
 - 로컬 웹서버 Next.js 캐싱 깨짐 이슈 안내 및 복구 완료
@@ -116,3 +117,4 @@
 - 문서 원문
   - `docs/internal/status.md`
   - `docs/internal/operations_panel.md`
+  - `docs/promptops/metric_glossary.md`
