@@ -7,7 +7,7 @@ from agent.evals.dataset_workflow import load_curated_examples
 from api.schemas.users import PromptOpsDatasetItem, PromptOpsDatasetResponse
 
 DEFAULT_FIXTURE_PATH = (
-    Path(__file__).parents[3] / "agent" / "evals" / "fixtures" / "job_eval_gold.json"
+    Path(__file__).parents[2] / "agent" / "evals" / "fixtures" / "job_eval_gold.json"
 )
 
 

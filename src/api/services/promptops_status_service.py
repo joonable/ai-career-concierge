@@ -14,7 +14,7 @@ LANGSMITH_WORKSPACE_ID = "a5f5f699-f384-58ec-9be0-2a39bb96969e"
 LANGSMITH_BASE_URL = "https://smith.langchain.com"
 PROMPTOPS_REVIEW_QUEUE_ID = "a1438ae9-2449-4798-94f1-0243ab9b1e18"
 PROMPTOPS_REVIEW_QUEUE_NAME = "job-evaluation-review"
-PROMPTOPS_NOTION_BACKLOG_URL = "https://www.notion.so/c5fb7393ece54107b445e90bdabab642"
+PROMPTOPS_BACKLOG_URL = "/internal/docs/BACKLOG.md"
 PROMPTOPS_COMPARE_URL = (
     "https://smith.langchain.com/o/a5f5f699-f384-58ec-9be0-2a39bb96969e/"
     "datasets/277c4ae5-c460-4be4-8895-732911768cd7/compare"
@@ -63,7 +63,7 @@ class PromptOpsStatusService:
             compare_url=PROMPTOPS_COMPARE_URL,
             review_queue_name=PROMPTOPS_REVIEW_QUEUE_NAME,
             review_queue_url=self._build_review_queue_url(),
-            notion_backlog_url=PROMPTOPS_NOTION_BACKLOG_URL,
+            notion_backlog_url=PROMPTOPS_BACKLOG_URL,
             latest_iteration_title=PROMPTOPS_LATEST_ITERATION_TITLE,
             latest_iteration_url=PROMPTOPS_LATEST_ITERATION_URL,
             latest_summary=PROMPTOPS_LATEST_SUMMARY,

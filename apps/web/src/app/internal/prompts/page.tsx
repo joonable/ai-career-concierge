@@ -42,9 +42,9 @@ export default async function InternalPromptsPage() {
     },
     {
       href: snapshot.notion_backlog_url,
-      title: "Notion Backlog 열기",
+      title: "Backlog 열기",
       description: "현재 prompt 후속 작업의 canonical backlog를 확인합니다.",
-      external: true,
+      external: false,
     },
     {
       href: snapshot.latest_iteration_url,
