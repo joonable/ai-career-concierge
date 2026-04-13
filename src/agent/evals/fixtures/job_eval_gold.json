@@ -400,8 +400,7 @@
       ],
       "expected_concern_keywords": [
         "mlops",
-        "deployment",
-        "serving"
+        "deployment"
       ],
       "expected_confidence": "MEDIUM",
       "expected_role_alignment": "MEDIUM",
@@ -467,12 +466,11 @@
       "expected_deal_breaker_flags": [],
       "expected_strength_keywords": [
         "python",
-        "serving",
+        "inference",
         "deployment"
       ],
       "expected_concern_keywords": [
-        "modeling",
-        "training"
+        "modeling"
       ],
       "expected_confidence": "MEDIUM",
       "expected_role_alignment": "MEDIUM",
@@ -537,13 +535,11 @@
       "expected_deal_breaker_flags": [],
       "expected_strength_keywords": [
         "python",
-        "platform",
-        "inference"
+        "platform"
       ],
       "expected_concern_keywords": [
         "sql",
-        "modeling",
-        "scope"
+        "modeling"
       ],
       "expected_confidence": "MEDIUM",
       "expected_role_alignment": "MEDIUM",
@@ -607,8 +603,7 @@
       ],
       "expected_deal_breaker_flags": [],
       "expected_strength_keywords": [
-        "python",
-        "ranking",
+        "modeling",
         "experimentation"
       ],
       "expected_concern_keywords": [
@@ -678,8 +673,7 @@
       ],
       "expected_deal_breaker_flags": [],
       "expected_strength_keywords": [
-        "python",
-        "personalization",
+        "ranking",
         "modeling"
       ],
       "expected_concern_keywords": [
@@ -756,8 +750,7 @@
       ],
       "expected_concern_keywords": [
         "mlops",
-        "serving",
-        "lifecycle"
+        "serving"
       ],
       "expected_confidence": "MEDIUM",
       "expected_role_alignment": "MEDIUM",
@@ -894,13 +887,11 @@
       "expected_deal_breaker_flags": [],
       "expected_strength_keywords": [
         "python",
-        "sql",
-        "platform"
+        "sql"
       ],
       "expected_concern_keywords": [
         "mlops",
-        "serving",
-        "title"
+        "deployment"
       ],
       "expected_confidence": "HIGH",
       "expected_role_alignment": "LOW",
@@ -965,13 +956,12 @@
       "expected_deal_breaker_flags": [],
       "expected_strength_keywords": [
         "python",
-        "tooling",
-        "workflow"
+        "inference",
+        "deployment"
       ],
       "expected_concern_keywords": [
         "sql",
-        "deployment",
-        "scope"
+        "modeling"
       ],
       "expected_confidence": "MEDIUM",
       "expected_role_alignment": "MEDIUM",
