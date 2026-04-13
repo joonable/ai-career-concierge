@@ -293,6 +293,7 @@ PromptOps 관련 문서는 아래 네 축만 유지합니다.
 
 - 상위 기준서: [`README.md`](./README.md)
 - 현재 상태판: [`status.md`](./status.md)
+- 평가 지표 기준서: [`metric_glossary.md`](./metric_glossary.md)
 - 실제 iteration 기록: `docs/promptops/iterations/`
 
 문서 수를 늘리지 않기 위해, 세부 설계 메모나 migration 중간 판단은 장기 문서로 유지하지 않습니다.
@@ -323,4 +324,5 @@ PromptOps는 지금 이 저장소 안에 있지만, 나중에 일부는 별도 �
 - 제품/기술 컨텍스트: [`CONTEXT.md`](./CONTEXT.md)
 - 기술 설계: [`TRD.md`](./TRD.md)
 - 현재 상태판: [`status.md`](./status.md)
+- 평가 지표 기준서: [`metric_glossary.md`](./metric_glossary.md)
 - iteration 기록: `docs/promptops/iterations/`

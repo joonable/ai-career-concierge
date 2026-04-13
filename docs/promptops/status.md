@@ -6,6 +6,7 @@
 
 웹 운영 패널에서는 `/internal/prompts`에서 같은 상태를 카드 형태로 확인할 수 있습니다.
 운영 패널에 보이는 golden dataset 기준은 local fixture `src/agent/evals/fixtures/job_eval_gold.json`을 read-only snapshot으로 노출한 것입니다.
+평가 지표의 의미와 해석 기준은 [`metric_glossary.md`](./metric_glossary.md)에서 확인합니다.
 
 ## `job-evaluation`
 
@@ -65,3 +66,4 @@
 ## 참고 문서
 
 - 상위 기준서: [`README.md`](./README.md)
+- 평가 지표 기준서: [`metric_glossary.md`](./metric_glossary.md)

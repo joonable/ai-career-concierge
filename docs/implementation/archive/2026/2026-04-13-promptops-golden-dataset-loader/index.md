@@ -1,11 +1,11 @@
 ---
 plan_id: 2026-04-13-promptops-golden-dataset-loader
 title: PromptOps golden dataset loader
-status: active
+status: archived
 milestone: Phase 3: PromptOps 자동화 및 에이전트 운영 확장
 source_agent: codex
 created_at: 2026-04-13T14:48:46+09:00
-updated_at: 2026-04-13T14:48:46+09:00
+updated_at: 2026-04-13T15:39:15+09:00
 ---
 # PromptOps golden dataset loader
 
