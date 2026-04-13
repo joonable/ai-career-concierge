@@ -50,43 +50,40 @@
 
 ## 최근 완료 작업 (Done)
 
-- PromptOps 평가 지표 glossary 문서 추가: 운영자가 `Pass Rate`, evaluator key, failure taxonomy를 같은 기준으로 읽을 수 있게 기준서 정리
-- `/internal` 대시보드를 비대칭형 레이아웃으로 전면 리디자인 완료
-- 문서 뷰어 라우트 신설 및 404 오류 제거
-- 로컬 웹서버 Next.js 캐싱 깨짐 이슈 안내 및 복구 완료
-- 로그인 / 온보딩 / 대시보드 기초 공사 완료
-- PromptOps 운영 패널 초안 구축 및 문서 단일화 정리 완료
-- Phase 4-1 PromptOps 한국어 실험 기준 전환 (docs only): 상태/연구 문서, iteration TEMPLATE을 한국어 서비스 기준으로 정렬 (fixture/evaluator 코드 보완은 별도 plan으로 재개)
-- `main` 기준 멀티 에이전트 branch / worktree 규칙 문서화
-- 에이전트별 작업 시작 스크립트 및 integration worktree 시작 스크립트 추가
-- Claude 로컬 설정에 worktree 시작 규칙 안내 및 branch 가드 보강
-- `docs/implementation/active|archive` 기반 plan package 구조, `TODO.md`/`MILESTONE.md` 자동 인덱스, Claude/Gemini plan 저장 훅 도입
-- 루트 README, AGENTS, implementation guide를 기준으로 repo 구조와 멀티 에이전트 운영 절차 재정렬
-- `docs/internal/status.md` 링크 정합성 및 readiness 체크리스트 정리
-- Poetry package 목록에 `promptops` 누락 여부 반영
-- 문서 정합성 복구: onboarding schema refactor(설계 완료) 및 documentation-operations-rework(구현 완료) plan package archive 처리
-- Phase 4 / Phase 5-1 plan을 Agentic Engineering 관점으로 재구성하고 기존 계획 2개를 archive 처리
-- Existing Harness to Agentic Engineering migration 초안을 active plan package로 승격하고 TODO 인덱스 반영 준비
-- PromptOps 운영 가시성 정비 계획을 `Phase 4-1/4-2/4-3` active plan으로 분리 저장
-- root coordination worktree와 agent execution worktree의 역할 분리를 AGENTS / docs guide / implementation rule / worktree bootstrap 출력에 반영
-- 멀티 에이전트 공통 worktree bootstrap 정책 정리: agent/integration 시작 스크립트 모두 web env 자동 생성과 전용 포트 할당을 수행하도록 보강
-- PromptOps dev bypass를 로컬 개발 전용 예외로 정의하고 운영 패널 문서 계약 및 컨텍스트 문서에 명시
+<!-- BEGIN MANAGED:STATUS_DONE -->
+- [PromptOps golden dataset loader](docs/implementation/archive/2026/2026-04-13-promptops-golden-dataset-loader/index.md) — `Phase 3: PromptOps 자동화 및 에이전트 운영 확장` / `2026-04-13T15:39:15+09:00`
+- [PromptOps /internal/prompts route shell](docs/implementation/archive/2026/2026-04-13-promptops-internal-prompts-route-shell/index.md) — `Phase 3: PromptOps 자동화 및 에이전트 운영 확장` / `2026-04-13T15:33:22+09:00`
+- [Phase 4-1 보완: job_eval_gold.json 한국어 공고 기준 정렬](docs/implementation/archive/2026/2026-04-12-phase4-1-fixture-evaluator-alignment/index.md) — `Phase 3: PromptOps 자동화 및 에이전트 운영 확장` / `2026-04-13T14:12:49+09:00`
+- [worktree port policy 버그 수정 및 main 머지](docs/implementation/archive/2026/2026-04-12-worktree-port-policy-fix-and-merge/index.md) — `Phase 2: 하네스 엔지니어링` / `2026-04-12T16:50:16+09:00`
+- [Phase 4-2: PromptOps 운영 패널 정보구조 개선](docs/implementation/archive/2026/2026-04-12-phase4-2-promptops-ops-ui-clarity/index.md) — `Phase 3: PromptOps 자동화 및 에이전트 운영 확장` / `2026-04-12T14:30:30+09:00`
+- [Phase 4-1: PromptOps 한국어 실험 기준 전환](docs/implementation/archive/2026/2026-04-12-phase4-1-promptops-korean-experiment-migration/index.md) — `Phase 3: PromptOps 자동화 및 에이전트 운영 확장` / `2026-04-12T13:52:33+09:00`
+- [Phase 4: PromptOps 에이전트 통합 자동화](docs/implementation/archive/2026/2026-04-10-phase4-promptops-automation/index.md) — `Phase 3: PromptOps 자동화 및 에이전트 운영 확장` / `2026-04-10T16:04:31+09:00`
+- [Phase 5-1: Jobkorea 멀티소스 스크래퍼 확장](docs/implementation/archive/2026/2026-04-10-phase5-1-jobkorea-scraper/index.md) — `Phase 5: 스크래퍼/데이터 계층 보강` / `2026-04-10T16:04:31+09:00`
+- [하네스 엔지니어링 전환 보완 계획](docs/implementation/archive/2026/2026-04-10-harness-engineering-transition-gap-plan/index.md) — `Phase 2: 하네스 엔지니어링` / `2026-04-10T15:28:52+09:00`
+- [문서 운영 구조 재편 및 계획 자동 저장 체계](docs/implementation/archive/2026/2026-04-10-documentation-operations-rework/index.md) — `Phase 2: 하네스 엔지니어링` / `2026-04-10T15:12:15+09:00`
+<!-- END MANAGED:STATUS_DONE -->
 
 ## 다음 action
 
-- `Phase 4-1 보완`: `job_eval_gold.json` 한국어 공고 기준 정렬 및 evaluator expectation 코드 정렬
-- `Phase 4-2 재개`: `/internal/prompts` UI 4개 섹션 재구성 및 golden dataset 로더 구현
-- `worktree port policy 버그 수정`: FastAPI 포트 충돌, api_base_url 버그, launch.json 구식 수정 후 main 머지
-- `Phase 4-3: PromptOps 평가 지표 가이드 및 현재 사용 지표 노출`로 metric 의미와 현재 사용 지표를 관리자 화면에서 이해 가능하게 만들기
-- 위 정비 이후 `Phase 4: PromptOps 에이전트 분석 루프`를 확장해 iteration report → structured JSON → next action 결정 루프를 운영 가능한 수준으로 고도화하기
-- PromptOps 운영 해석층 정비 이후 `Phase 5-1: Jobkorea 스크래퍼 (Agentic TDD)`를 통해 scraper 도메인에 harness + agent 실행 흐름을 적용하고 회귀 패턴을 검증하기
-- 실제 협업 태스크에서 `codex/*`, `claude/*`, `gemini/*`, `integration/*` 흐름을 운영에 적용하고 충돌 사례를 보정하기
-- Codex 쪽 자동 guard / hook 보강이 필요한지 PromptOps/스크래퍼 실전 적용 경험을 바탕으로 판단하기
-- Claude/Gemini/integration 경로까지 포함한 bootstrap 정책이 실제 실전 태스크에서 안정적으로 동작하는지 추가 검증하기
-- `.agents/` canonical control plane, capability registry, context bundle 도입을 별도 실행 plan으로 분해하기
-- docs 기반의 상태판 구조를 파싱하여 예쁘게 렌더링하는 Markdown 뷰어와 `react-markdown` 컴포넌트 작업 완료하기
-- Supabase Service Role 정책 적용을 백엔드 통합과 어떻게 분리할지 결정
-- LangSmith 추적 (Tracing) 구조 및 ID 설정
+<!-- BEGIN MANAGED:STATUS_NEXT_ACTIONS -->
+- [PromptOps analyze_iteration CLI output](docs/implementation/active/2026-04-13-promptops-analyze-iteration-cli-output/index.md) — `2026-04-13T14:48:47+09:00`
+- [Jobkorea listing parser](docs/implementation/active/2026-04-13-jobkorea-listing-parser/index.md) — `2026-04-13T14:48:47+09:00`
+- [PromptOps analyze_iteration smoke run](docs/implementation/active/2026-04-13-promptops-analyze-iteration-smoke-run/index.md) — `2026-04-13T14:48:47+09:00`
+- [Jobkorea config field](docs/implementation/active/2026-04-13-jobkorea-config-field/index.md) — `2026-04-13T14:48:47+09:00`
+- [Jobkorea normalizer wiring](docs/implementation/active/2026-04-13-jobkorea-normalizer-wiring/index.md) — `2026-04-13T14:48:47+09:00`
+- [Jobkorea detail parser](docs/implementation/active/2026-04-13-jobkorea-detail-parser/index.md) — `2026-04-13T14:48:47+09:00`
+- [PromptOps analyze_iteration tests](docs/implementation/active/2026-04-13-promptops-analyze-iteration-tests/index.md) — `2026-04-13T14:48:47+09:00`
+- [Jobkorea ingest integration](docs/implementation/active/2026-04-13-jobkorea-ingest-integration/index.md) — `2026-04-13T14:48:47+09:00`
+- [Jobkorea fixture pack](docs/implementation/active/2026-04-13-jobkorea-fixture-pack/index.md) — `2026-04-13T14:48:47+09:00`
+- [Jobkorea scraper registry registration](docs/implementation/active/2026-04-13-jobkorea-scraper-registry-registration/index.md) — `2026-04-13T14:48:47+09:00`
+- [Multi-source ingest regression](docs/implementation/active/2026-04-13-multi-source-ingest-regression/index.md) — `2026-04-13T14:48:47+09:00`
+- [PromptOps metric glossary document](docs/implementation/active/2026-04-13-promptops-metric-glossary-document/index.md) — `2026-04-13T14:48:46+09:00`
+- [PromptOps prompt dataset loader tests](docs/implementation/active/2026-04-13-promptops-dataset-loader-tests/index.md) — `2026-04-13T14:48:46+09:00`
+- [PromptOps metric terminology alignment](docs/implementation/active/2026-04-13-promptops-metric-terminology-alignment/index.md) — `2026-04-13T14:48:46+09:00`
+- [PromptOps prompt dataset list rendering](docs/implementation/active/2026-04-13-promptops-dataset-list-rendering/index.md) — `2026-04-13T14:48:46+09:00`
+- [PromptOps current metrics UI exposure](docs/implementation/active/2026-04-13-promptops-current-metrics-ui-exposure/index.md) — `2026-04-13T14:48:46+09:00`
+- [PromptOps iteration report parsing contract](docs/implementation/active/2026-04-13-promptops-iteration-report-parsing-contract/index.md) — `2026-04-13T14:48:46+09:00`
+<!-- END MANAGED:STATUS_NEXT_ACTIONS -->
 
 ## backlog
 

@@ -6,7 +6,8 @@
 ## 운영 원칙
 
 - 새 계획 저장: `python3 scripts/implementation_docs.py save-plan --agent <agent> --milestone "<milestone>" --stdin-markdown`
-- 완료 후 archive: `python3 scripts/implementation_docs.py archive-plan <plan_id>`
+- closeout 점검: `python3 scripts/implementation_docs.py closeout-check <plan_id>`
+- 완료 후 기본 closeout: `python3 scripts/implementation_docs.py closeout-plan <plan_id>`
 - 인덱스 재동기화: `python3 scripts/implementation_docs.py sync-indexes`
 - 정합성 검증: `python3 scripts/implementation_docs.py validate`
 - `TODO.md`는 active한 세션 단위 task 인덱스만 노출합니다.

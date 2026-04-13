@@ -22,12 +22,29 @@ placeholder
 <!-- END MANAGED:MILESTONE_INDEX -->
 """
 
+STATUS_TEMPLATE = """# 내부 대시보드 상태판
+
+## 최근 완료 작업 (Done)
+
+<!-- BEGIN MANAGED:STATUS_DONE -->
+placeholder
+<!-- END MANAGED:STATUS_DONE -->
+
+## 다음 action
+
+<!-- BEGIN MANAGED:STATUS_NEXT_ACTIONS -->
+placeholder
+<!-- END MANAGED:STATUS_NEXT_ACTIONS -->
+"""
+
 
 def bootstrap_repo(tmp_path: Path) -> None:
     (tmp_path / "docs" / "implementation" / "active").mkdir(parents=True)
     (tmp_path / "docs" / "implementation" / "archive").mkdir(parents=True)
+    (tmp_path / "docs" / "internal").mkdir(parents=True)
     (tmp_path / "TODO.md").write_text(TODO_TEMPLATE, encoding="utf-8")
     (tmp_path / "MILESTONE.md").write_text(MILESTONE_TEMPLATE, encoding="utf-8")
+    (tmp_path / "docs" / "internal" / "status.md").write_text(STATUS_TEMPLATE, encoding="utf-8")
 
 
 def run_cli(tmp_path: Path, *args: str, stdin: str | None = None) -> subprocess.CompletedProcess[str]:
@@ -85,8 +102,10 @@ implementation
 
     todo_text = (tmp_path / "TODO.md").read_text(encoding="utf-8")
     milestone_text = (tmp_path / "MILESTONE.md").read_text(encoding="utf-8")
-    assert "현재 활성 plan package 없음" in todo_text
+    status_text = (tmp_path / "docs" / "internal" / "status.md").read_text(encoding="utf-8")
+    assert "active plan 없음" in todo_text
     assert "docs/implementation/archive/2026/2026-04-10-hook-saved-plan/index.md" in milestone_text
+    assert "Hook Saved Plan" in status_text
 
 
 def test_hook_smoke_save_plan_from_stdin_json(tmp_path: Path):
@@ -115,3 +134,88 @@ def test_hook_smoke_save_plan_from_stdin_json(tmp_path: Path):
 
     index_path = tmp_path / "docs" / "implementation" / "active" / "2026-04-10-smoke-plan" / "index.md"
     assert index_path.exists()
+
+
+def test_closeout_check_reports_stale_tracking_surfaces(tmp_path: Path):
+    bootstrap_repo(tmp_path)
+    markdown = """# Closeout Plan
+
+## Summary
+
+summary
+"""
+
+    run_cli(
+        tmp_path,
+        "save-plan",
+        "--agent",
+        "codex",
+        "--milestone",
+        "Backlog",
+        "--created-at",
+        "2026-04-10T09:00:00+09:00",
+        "--updated-at",
+        "2026-04-10T09:00:00+09:00",
+        "--stdin-markdown",
+        stdin=markdown,
+    )
+
+    # Force a stale status surface without changing plan packages.
+    (tmp_path / "docs" / "internal" / "status.md").write_text(STATUS_TEMPLATE, encoding="utf-8")
+
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(SCRIPT_PATH),
+            "--repo-root",
+            str(tmp_path),
+            "closeout-check",
+            "2026-04-10-closeout-plan",
+        ],
+        text=True,
+        capture_output=True,
+    )
+
+    assert result.returncode == 1
+    assert "docs/internal/status.md managed block stale" in result.stderr
+
+
+def test_closeout_plan_archives_without_double_sync_and_validates(tmp_path: Path):
+    bootstrap_repo(tmp_path)
+    markdown = """# Closeout Target
+
+## Summary
+
+summary
+"""
+
+    run_cli(
+        tmp_path,
+        "save-plan",
+        "--agent",
+        "codex",
+        "--milestone",
+        "Backlog",
+        "--created-at",
+        "2026-04-10T09:00:00+09:00",
+        "--updated-at",
+        "2026-04-10T09:00:00+09:00",
+        "--stdin-markdown",
+        stdin=markdown,
+    )
+
+    result = run_cli(
+        tmp_path,
+        "closeout-plan",
+        "2026-04-10-closeout-target",
+        "--updated-at",
+        "2026-04-11T09:00:00+09:00",
+    )
+
+    archived_index = (
+        tmp_path / "docs" / "implementation" / "archive" / "2026" / "2026-04-10-closeout-target" / "index.md"
+    )
+    assert archived_index.exists()
+    assert "2026-04-10-closeout-target" in result.stdout
+    validate_result = run_cli(tmp_path, "validate")
+    assert validate_result.stdout.strip() == "ok"

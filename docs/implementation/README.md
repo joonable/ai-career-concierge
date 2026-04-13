@@ -2,15 +2,15 @@
 
 `docs/implementation/`은 구현 메모, 에이전트 계획, 후속 실행 맥락을 plan package 단위로 관리하는 canonical 공간입니다.
 
-이 디렉토리는 제품 코드가 아니라 협업 실행 맥락의 source of truth입니다. `TODO.md`, `MILESTONE.md`보다 상세 계획이 우선하며, 멀티 에이전트 작업에서는 각 worktree 결과를 통합하기 전에도 plan package를 통해 의도를 공유해야 합니다.
+이 디렉토리는 제품 코드가 아니라 협업 실행 맥락의 source of truth입니다. `TODO.md`, `MILESTONE.md`, `BACKLOG.md`보다 상세 계획이 우선하며, 멀티 에이전트 작업에서는 각 worktree 결과를 통합하기 전에도 plan package를 통해 의도를 공유해야 합니다.
 
 ## Lifecycle
 
 1. 새 계획 또는 구현 메모는 `docs/implementation/active/YYYY-MM-DD-<slug>/` 아래에 저장합니다.
 2. package의 기준 파일은 항상 `index.md`이며, 기계가 읽는 frontmatter를 포함합니다.
 3. 문서가 길어지면 같은 디렉토리 안에 `01-summary.md`, `02-implementation.md`, `03-test-plan.md`처럼 분할합니다.
-4. 구현이 완료된 뒤에만 `python3 scripts/implementation_docs.py archive-plan <plan_id>`로 `archive/<YYYY>/` 아래로 이동합니다.
-5. `TODO.md`와 `MILESTONE.md`는 이 디렉토리를 스캔해 자동 생성된 인덱스를 노출합니다.
+4. 구현이 완료된 뒤 기본 closeout 경로는 `python3 scripts/implementation_docs.py closeout-plan <plan_id>`이며, 이 명령이 archive + sync + validate를 한 번에 처리합니다.
+5. `TODO.md`, `MILESTONE.md`, `docs/internal/status.md`는 이 디렉토리를 스캔해 자동 생성된 managed block을 노출합니다.
 
 ## 계획-실행 분리 원칙
 
@@ -55,6 +55,8 @@
 
 ```bash
 python3 scripts/implementation_docs.py save-plan --agent codex --milestone "Phase 2: 하네스 엔지니어링" --stdin-markdown
+python3 scripts/implementation_docs.py closeout-check 2026-04-10-example-plan
+python3 scripts/implementation_docs.py closeout-plan 2026-04-10-example-plan
 python3 scripts/implementation_docs.py archive-plan 2026-04-10-example-plan
 python3 scripts/implementation_docs.py sync-indexes
 python3 scripts/implementation_docs.py validate
@@ -64,15 +66,17 @@ python3 scripts/implementation_docs.py validate
 
 - 상세 계획의 source of truth는 `docs/implementation/active/`입니다.
 - `TODO.md`와 `MILESTONE.md`에는 긴 체크리스트를 직접 적지 않고 package 링크만 유지합니다.
+- `BACKLOG.md`는 아직 active plan으로 분해하지 않은 후속 과제와 보류 항목을 모아두는 canonical backlog입니다.
+- `docs/internal/status.md`의 managed block도 plan package 집합에서 자동 생성되므로 수동으로 목록을 유지하지 않습니다.
 - broad phase/epic 성격 문서는 active 실행 항목이 아니라 `status: reference` 문서로 관리합니다.
 - hook이 없는 에이전트는 `save-plan`을 직접 호출해야 합니다.
-- archive는 명시적 명령으로만 수행합니다. 코드 diff만 보고 자동 archive 하지 않습니다.
+- closeout 기본 경로는 `closeout-plan`이며, archive는 코드 diff나 추정 상태만으로 자동 결정하지 않습니다.
 - Codex는 현재 Claude/Gemini처럼 자동 저장 hook이 강하게 연결되어 있지 않을 수 있으므로, plan package 저장 여부를 직접 확인합니다.
 - harness + agent 전환이 현재 저장소의 운영 우선순위일 때는, 기능 확장 plan보다 agent loop / control plane / handoff contract를 먼저 안정화하는 plan을 선행합니다.
 - 기능 plan이 active여도, 그것이 harness + agent 운영 방식을 실제 제품 코드에서 검증하는 실전 적용인지, 아니면 단순 기능 확장인지 문서에 명시합니다.
 - 각 task plan에는 명확한 산출물과 사용자가 직접 확인할 수 있는 UI/CLI/테스트 검증 경로를 포함합니다.
 - 루트 저장소는 coordination 공간으로 보고, 실제 기능 구현은 `scripts/start_agent_task.sh --agent <agent> --task <slug>`로 만든 worktree에서 진행하는 것을 기본값으로 둡니다.
-- canonical 문서(`docs/`, `TODO.md`, `MILESTONE.md`, `docs/internal/status.md`, `docs/implementation/active/`)는 루트 저장소에서 관리하고, agent / integration worktree는 실행 전용으로 구분합니다.
+- canonical 문서(`docs/`, `TODO.md`, `MILESTONE.md`, `BACKLOG.md`, `docs/internal/status.md`, `docs/implementation/active/`)는 루트 저장소에서 관리하고, agent / integration worktree는 실행 전용으로 구분합니다.
 - agent worktree에서 문서 초안이나 실행 메모를 만들더라도, 최종 canonical 반영은 루트 저장소에서 정리한 뒤 sync/validate 합니다.
 - worktree 구조의 canonical 예시는 다음과 같습니다.
 
