@@ -19,6 +19,7 @@ ACTIVE_ROOT = Path("docs/implementation/active")
 ARCHIVE_ROOT = Path("docs/implementation/archive")
 TODO_PATH = Path("TODO.md")
 MILESTONE_PATH = Path("MILESTONE.md")
+STATUS_PATH = Path("docs/internal/status.md")
 PROPOSED_PLAN_RE = re.compile(r"<proposed_plan>\s*(.*?)\s*</proposed_plan>", re.DOTALL)
 DIRNAME_RE = re.compile(r"^\d{4}-\d{2}-\d{2}-[0-9a-z가-힣-]+$")
 FRONTMATTER_RE = re.compile(r"\A---\n(.*?)\n---\n?", re.DOTALL)
@@ -403,6 +404,38 @@ def build_milestone_managed_block(
     return "\n".join(lines).rstrip()
 
 
+def build_status_done_managed_block(repo_root: Path, archived_packages: list[PlanPackage]) -> str:
+    archived_sorted = sorted(
+        archived_packages,
+        key=lambda package: parse_datetime_sort_key(package.updated_at),
+        reverse=True,
+    )
+    if not archived_sorted:
+        return "- 최근 완료 작업 없음"
+
+    lines: list[str] = []
+    for package in archived_sorted[:10]:
+        rel = relative_to_root(package.index_path, repo_root)
+        lines.append(f"- [{package.title}]({rel}) — `{package.milestone}` / `{package.updated_at}`")
+    return "\n".join(lines)
+
+
+def build_status_next_actions_managed_block(repo_root: Path, active_packages: list[PlanPackage]) -> str:
+    active_sorted = sorted(
+        active_packages,
+        key=lambda package: parse_datetime_sort_key(package.updated_at),
+        reverse=True,
+    )
+    if not active_sorted:
+        return "- 현재 active plan 없음"
+
+    lines: list[str] = []
+    for package in active_sorted:
+        rel = relative_to_root(package.index_path, repo_root)
+        lines.append(f"- [{package.title}]({rel}) — `{package.updated_at}`")
+    return "\n".join(lines)
+
+
 def replace_managed_block(text: str, name: str, content: str) -> str:
     pattern = re.compile(MANAGED_BLOCK_RE_TEMPLATE.format(name=re.escape(name)), re.DOTALL)
     replacement = rf"\1{content}\3"
@@ -412,8 +445,7 @@ def replace_managed_block(text: str, name: str, content: str) -> str:
     return updated
 
 
-def sync_indexes(repo_root: Path) -> None:
-    packages = scan_plan_packages(repo_root)
+def classify_packages(packages: list[PlanPackage]) -> tuple[list[PlanPackage], list[PlanPackage]]:
     active_packages = sorted(
         [package for package in packages if package.status == "active"],
         key=lambda package: parse_datetime_sort_key(package.updated_at),
@@ -424,17 +456,106 @@ def sync_indexes(repo_root: Path) -> None:
         key=lambda package: parse_datetime_sort_key(package.updated_at),
         reverse=True,
     )
+    return active_packages, archived_packages
+
+
+def render_tracking_surfaces(repo_root: Path, packages: list[PlanPackage] | None = None) -> dict[Path, str]:
+    packages = packages or scan_plan_packages(repo_root)
+    active_packages, archived_packages = classify_packages(packages)
 
     todo_content = build_todo_managed_block(repo_root, active_packages, archived_packages)
     milestone_content = build_milestone_managed_block(repo_root, active_packages, archived_packages)
+    status_done_content = build_status_done_managed_block(repo_root, archived_packages)
+    status_next_actions_content = build_status_next_actions_managed_block(repo_root, active_packages)
 
     todo_path = repo_root / TODO_PATH
     milestone_path = repo_root / MILESTONE_PATH
-    write_text(todo_path, replace_managed_block(read_text(todo_path), "IMPLEMENTATION_INDEX", todo_content))
-    write_text(
-        milestone_path,
-        replace_managed_block(read_text(milestone_path), "MILESTONE_INDEX", milestone_content),
+    status_path = repo_root / STATUS_PATH
+    return {
+        todo_path: replace_managed_block(read_text(todo_path), "IMPLEMENTATION_INDEX", todo_content),
+        milestone_path: replace_managed_block(read_text(milestone_path), "MILESTONE_INDEX", milestone_content),
+        status_path: replace_managed_block(
+            replace_managed_block(read_text(status_path), "STATUS_DONE", status_done_content),
+            "STATUS_NEXT_ACTIONS",
+            status_next_actions_content,
+        ),
+    }
+
+
+def sync_indexes(repo_root: Path) -> None:
+    rendered = render_tracking_surfaces(repo_root)
+    for path, content in rendered.items():
+        write_text(path, content)
+
+
+def collect_closeout_issues(repo_root: Path, identifier: str) -> list[str]:
+    issues: list[str] = []
+    packages = scan_plan_packages(repo_root)
+    active_packages, archived_packages = classify_packages(packages)
+
+    package = next(
+        (
+            candidate
+            for candidate in active_packages
+            if identifier in {candidate.plan_id, candidate.package_dir.name, candidate.title}
+        ),
+        None,
     )
+    if package is None:
+        archived_match = next(
+            (
+                candidate
+                for candidate in archived_packages
+                if identifier in {candidate.plan_id, candidate.package_dir.name, candidate.title}
+            ),
+            None,
+        )
+        if archived_match is not None:
+            issues.append(f"plan is archived, cannot close out: {archived_match.plan_id}")
+        else:
+            issues.append(f"plan not found: {identifier}")
+        return issues
+
+    for key in FRONTMATTER_KEYS:
+        if key not in package.metadata or not package.metadata[key].strip():
+            issues.append(f"plan frontmatter missing {key}: {package.index_path}")
+
+    managed_block_names = {
+        repo_root / TODO_PATH: "IMPLEMENTATION_INDEX",
+        repo_root / MILESTONE_PATH: "MILESTONE_INDEX",
+        repo_root / STATUS_PATH: "STATUS_DONE/STATUS_NEXT_ACTIONS",
+    }
+    expected_files = render_tracking_surfaces(repo_root, packages)
+    for path, expected_content in expected_files.items():
+        actual_content = read_text(path)
+        if actual_content != expected_content:
+            issues.append(f"{relative_to_root(path, repo_root)} managed block stale ({managed_block_names[path]})")
+
+    return issues
+
+
+def closeout_check(args: argparse.Namespace) -> list[str]:
+    repo_root = Path(args.repo_root).resolve()
+    return collect_closeout_issues(repo_root, args.identifier)
+
+
+def closeout_plan(args: argparse.Namespace) -> Path:
+    repo_root = Path(args.repo_root).resolve()
+    issues = collect_closeout_issues(repo_root, args.identifier)
+    if issues:
+        raise ValueError("\n".join(issues))
+
+    archive_args = argparse.Namespace(
+        repo_root=str(repo_root),
+        identifier=args.identifier,
+        updated_at=args.updated_at,
+        sync=False,
+        quiet=True,
+    )
+    target_dir = archive_plan(archive_args)
+    sync_indexes(repo_root)
+    validate(repo_root)
+    return target_dir
 
 
 def package_dir_for(active_root: Path, timestamp: str, slug: str) -> Path:
@@ -554,6 +675,7 @@ def archive_plan(args: argparse.Namespace) -> Path:
 def validate(repo_root: Path) -> None:
     todo_text = read_text(repo_root / TODO_PATH)
     milestone_text = read_text(repo_root / MILESTONE_PATH)
+    status_text = read_text(repo_root / STATUS_PATH)
     if (
         "<!-- BEGIN MANAGED:IMPLEMENTATION_INDEX -->" not in todo_text
         or "<!-- END MANAGED:IMPLEMENTATION_INDEX -->" not in todo_text
@@ -564,6 +686,13 @@ def validate(repo_root: Path) -> None:
         or "<!-- END MANAGED:MILESTONE_INDEX -->" not in milestone_text
     ):
         raise ValueError("MILESTONE.md managed block is missing.")
+    if "<!-- BEGIN MANAGED:STATUS_DONE -->" not in status_text or "<!-- END MANAGED:STATUS_DONE -->" not in status_text:
+        raise ValueError("docs/internal/status.md STATUS_DONE managed block is missing.")
+    if (
+        "<!-- BEGIN MANAGED:STATUS_NEXT_ACTIONS -->" not in status_text
+        or "<!-- END MANAGED:STATUS_NEXT_ACTIONS -->" not in status_text
+    ):
+        raise ValueError("docs/internal/status.md STATUS_NEXT_ACTIONS managed block is missing.")
 
     packages = scan_plan_packages(repo_root)
     if not packages:
@@ -599,29 +728,20 @@ def validate(repo_root: Path) -> None:
         if metadata["title"] not in body:
             raise ValueError(f"Title not reflected in body: {package.index_path}")
 
-    expected_todo = replace_managed_block(
-        todo_text,
-        "IMPLEMENTATION_INDEX",
-        build_todo_managed_block(
-            repo_root,
-            [package for package in packages if package.status == "active"],
-            [package for package in packages if package.status == "archived"],
-        ),
-    )
-    if expected_todo != todo_text:
-        raise ValueError("TODO.md managed block is out of sync.")
-
-    expected_milestone = replace_managed_block(
-        milestone_text,
-        "MILESTONE_INDEX",
-        build_milestone_managed_block(
-            repo_root,
-            [package for package in packages if package.status == "active"],
-            [package for package in packages if package.status == "archived"],
-        ),
-    )
-    if expected_milestone != milestone_text:
-        raise ValueError("MILESTONE.md managed block is out of sync.")
+    expected_files = render_tracking_surfaces(repo_root, packages)
+    actual_files = {
+        repo_root / TODO_PATH: todo_text,
+        repo_root / MILESTONE_PATH: milestone_text,
+        repo_root / STATUS_PATH: status_text,
+    }
+    tracked_paths = {
+        repo_root / TODO_PATH: "TODO.md managed block is out of sync.",
+        repo_root / MILESTONE_PATH: "MILESTONE.md managed block is out of sync.",
+        repo_root / STATUS_PATH: "docs/internal/status.md managed block is out of sync.",
+    }
+    for path, expected_content in expected_files.items():
+        if expected_content != actual_files[path]:
+            raise ValueError(tracked_paths[path])
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -651,7 +771,16 @@ def build_parser() -> argparse.ArgumentParser:
     archive_parser.add_argument("--no-sync", action="store_false", dest="sync", help="Skip index sync")
     archive_parser.add_argument("--quiet", action="store_true", help="Suppress stdout output")
 
-    sync_parser = subparsers.add_parser("sync-indexes", help="Refresh TODO/MILESTONE managed blocks")
+    closeout_check_parser = subparsers.add_parser("closeout-check", help="Check whether a plan can be safely closed out")
+    closeout_check_parser.add_argument("identifier", help="plan_id, package directory, or exact title")
+    closeout_check_parser.add_argument("--quiet", action="store_true", help="Suppress stdout output")
+
+    closeout_plan_parser = subparsers.add_parser("closeout-plan", help="Archive a plan, sync tracking surfaces, validate")
+    closeout_plan_parser.add_argument("identifier", help="plan_id, package directory, or exact title")
+    closeout_plan_parser.add_argument("--updated-at", help="ISO timestamp override")
+    closeout_plan_parser.add_argument("--quiet", action="store_true", help="Suppress stdout output")
+
+    sync_parser = subparsers.add_parser("sync-indexes", help="Refresh TODO/MILESTONE/status managed blocks")
     sync_parser.add_argument("--quiet", action="store_true", help="Suppress stdout output")
 
     validate_parser = subparsers.add_parser("validate", help="Validate naming, metadata, and managed blocks")
@@ -671,6 +800,17 @@ def main() -> int:
                 print(relative_to_root(package_dir, repo_root))
         elif args.command == "archive-plan":
             target_dir = archive_plan(args)
+            if not args.quiet:
+                print(relative_to_root(target_dir, repo_root))
+        elif args.command == "closeout-check":
+            issues = closeout_check(args)
+            if issues:
+                print("\n".join(issues), file=sys.stderr)
+                return 1
+            if not args.quiet:
+                print(f"closeout ready: {args.identifier}")
+        elif args.command == "closeout-plan":
+            target_dir = closeout_plan(args)
             if not args.quiet:
                 print(relative_to_root(target_dir, repo_root))
         elif args.command == "sync-indexes":

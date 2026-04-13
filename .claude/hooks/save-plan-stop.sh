@@ -14,12 +14,25 @@ python3 "$ROOT/scripts/implementation_docs.py" \
   --quiet
 
 # active plan 잔존 경고
-ACTIVE_PLANS=$(ls "$ROOT/docs/implementation/active/" 2>/dev/null | grep -v '^$' || true)
+ACTIVE_PLANS=$(
+  rg -l '^status: active$' "$ROOT/docs/implementation/active" -g 'index.md' 2>/dev/null \
+    | xargs -n1 dirname 2>/dev/null \
+    | xargs -n1 basename 2>/dev/null || true
+)
 if [ -n "$ACTIVE_PLANS" ]; then
   echo ""
   echo "⚠️  [StopHook] 완료되지 않은 active plan이 있습니다:"
   echo "$ACTIVE_PLANS" | sed 's/^/  - /'
+  echo ""
+  echo "  closeout readiness 점검:"
+  while IFS= read -r plan_dir; do
+    [ -n "$plan_dir" ] || continue
+    echo "  [check] $plan_dir"
+    python3 "$ROOT/scripts/implementation_docs.py" \
+      --repo-root "$ROOT" \
+      closeout-check \
+      "$plan_dir" 2>&1 | sed 's/^/    /'
+  done <<< "$ACTIVE_PLANS"
   echo "  작업이 완료됐다면 다음을 실행하세요:"
-  echo "  python3 scripts/implementation_docs.py archive-plan <plan_id>"
-  echo "  python3 scripts/implementation_docs.py sync-indexes"
+  echo "  python3 scripts/implementation_docs.py closeout-plan <plan_id>"
 fi

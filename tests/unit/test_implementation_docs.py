@@ -33,12 +33,29 @@ placeholder
 <!-- END MANAGED:MILESTONE_INDEX -->
 """
 
+STATUS_TEMPLATE = """# 내부 대시보드 상태판
+
+## 최근 완료 작업 (Done)
+
+<!-- BEGIN MANAGED:STATUS_DONE -->
+placeholder
+<!-- END MANAGED:STATUS_DONE -->
+
+## 다음 action
+
+<!-- BEGIN MANAGED:STATUS_NEXT_ACTIONS -->
+placeholder
+<!-- END MANAGED:STATUS_NEXT_ACTIONS -->
+"""
+
 
 def bootstrap_repo(tmp_path: Path) -> None:
     (tmp_path / "docs" / "implementation" / "active").mkdir(parents=True)
     (tmp_path / "docs" / "implementation" / "archive").mkdir(parents=True)
+    (tmp_path / "docs" / "internal").mkdir(parents=True)
     (tmp_path / "TODO.md").write_text(TODO_TEMPLATE, encoding="utf-8")
     (tmp_path / "MILESTONE.md").write_text(MILESTONE_TEMPLATE, encoding="utf-8")
+    (tmp_path / "docs" / "internal" / "status.md").write_text(STATUS_TEMPLATE, encoding="utf-8")
 
 
 def test_extract_plan_markdown_from_claude_stop_payload():
@@ -155,10 +172,13 @@ updated_at: 2026-04-02T09:00:00+09:00
 
     todo_text = (tmp_path / "TODO.md").read_text(encoding="utf-8")
     milestone_text = (tmp_path / "MILESTONE.md").read_text(encoding="utf-8")
+    status_text = (tmp_path / "docs" / "internal" / "status.md").read_text(encoding="utf-8")
     assert "Phase 2: 하네스 엔지니어링" in todo_text
     assert "레거시 계획" in todo_text
     assert "History Timeline" in milestone_text
     assert "docs/implementation/archive/2026/2026-04-01-legacy-plan/index.md" in milestone_text
+    assert "문서 운영 구조 재편 및 계획 자동 저장 체계" in status_text
+    assert "레거시 계획" in status_text
 
 
 def test_validate_detects_duplicate_plan_ids(tmp_path: Path):
@@ -184,3 +204,27 @@ updated_at: 2026-04-10T09:00:00+09:00
 
     with pytest.raises(ValueError, match="Duplicate plan_id"):
         MODULE.validate(tmp_path)
+
+
+def test_collect_closeout_issues_reports_stale_status_surface(tmp_path: Path):
+    bootstrap_repo(tmp_path)
+    active_dir = tmp_path / "docs" / "implementation" / "active" / "2026-04-10-doc-system"
+    active_dir.mkdir(parents=True)
+    active_index = """---
+plan_id: 2026-04-10-doc-system
+title: 문서 운영 구조 재편 및 계획 자동 저장 체계
+status: active
+milestone: Phase 2: 하네스 엔지니어링
+source_agent: codex
+created_at: 2026-04-10T09:00:00+09:00
+updated_at: 2026-04-10T10:00:00+09:00
+---
+# 문서 운영 구조 재편 및 계획 자동 저장 체계
+"""
+    (active_dir / "index.md").write_text(active_index, encoding="utf-8")
+
+    issues = MODULE.collect_closeout_issues(tmp_path, "2026-04-10-doc-system")
+
+    assert "TODO.md managed block stale (IMPLEMENTATION_INDEX)" in issues
+    assert "MILESTONE.md managed block stale (MILESTONE_INDEX)" in issues
+    assert "docs/internal/status.md managed block stale (STATUS_DONE/STATUS_NEXT_ACTIONS)" in issues
