@@ -1,7 +1,7 @@
 ---
 plan_id: 2026-04-12-phase4-2-promptops-ops-ui-implementation
 title: Phase 4-2 재개: /internal/prompts UI 구현 및 golden dataset 로더
-status: active
+status: reference
 milestone: Phase 3: PromptOps 자동화 및 에이전트 운영 확장
 source_agent: claude
 created_at: 2026-04-12T18:00:00+09:00

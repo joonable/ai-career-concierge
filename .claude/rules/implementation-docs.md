@@ -11,10 +11,12 @@
 ## 저장 규칙
 
 - 새 계획은 `docs/implementation/active/YYYY-MM-DD-<slug>/index.md` 형식으로 저장한다.
+- 기본 단위는 `Task 1개 = 세션 1개 = plan package 1개`이다.
 - `index.md`에는 frontmatter가 있어야 하며 `plan_id`, `title`, `status`, `milestone`, `source_agent`, `created_at`, `updated_at`를 모두 포함한다.
 - 문서가 길면 동일 디렉토리에 `01-summary.md`, `02-implementation.md`, `03-test-plan.md`처럼 분할한다.
 - hook이 없는 에이전트나 수동 작업은 `python3 scripts/implementation_docs.py save-plan ...`을 직접 호출해 저장한다.
 - canonical 문서(`docs/`, `TODO.md`, `MILESTONE.md`, `docs/internal/status.md`, `docs/implementation/active/`)는 루트 저장소에서 관리하는 것을 기본 원칙으로 한다.
+- broad phase/epic 성격 문서는 실행 task가 아니라 `status: reference` 문서로 관리한다.
 
 ## 실행 흐름 규칙
 
@@ -37,3 +39,4 @@
 
 - 문서 구조 변경 후 `python3 scripts/implementation_docs.py validate`를 통과시킨다.
 - `TODO.md`와 `MILESTONE.md`의 managed block은 수동 편집하지 않고 `sync-indexes`로 갱신한다.
+- active task plan에는 명확한 산출물과 사용자가 직접 확인할 수 있는 UI/CLI/테스트 검증 경로를 포함한다.
